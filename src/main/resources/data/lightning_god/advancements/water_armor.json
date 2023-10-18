@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "lightning_god:water_essence"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "lightning_god:water_helmet",
+      "lightning_god:water_chestplate",
+      "lightning_god:water_leggings",
+      "lightning_god:water_boots"
+    ]
+  }
+}

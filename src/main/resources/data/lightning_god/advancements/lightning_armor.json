@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "lightning_god:lightning_essence"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "lightning_god:lightning_helmet",
+      "lightning_god:lightning_chestplate",
+      "lightning_god:lightning_leggings",
+      "lightning_god:lightning_boots"
+    ]
+  }
+}

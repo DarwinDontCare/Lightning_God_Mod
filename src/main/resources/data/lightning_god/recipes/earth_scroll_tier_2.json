@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "GPI",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:reinforced_deepslate"
+    },
+    "G": {
+      "item": "minecraft:gold_block"
+    },
+    "P": {
+      "item": "lightning_god:earth_scroll"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "result": {
+    "item": "lightning_god:earth_scroll_tier_2"
+  }
+}

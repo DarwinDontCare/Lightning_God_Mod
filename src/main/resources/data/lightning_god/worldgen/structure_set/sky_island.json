@@ -1,0 +1,17 @@
+{
+  "structures": [
+    {
+      "structure": "lightning_god:sky_island",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "salt": 5464623448,
+
+    "spacing": 100,
+
+    "separation": 60,
+
+    "type": "minecraft:random_spread"
+  }
+}

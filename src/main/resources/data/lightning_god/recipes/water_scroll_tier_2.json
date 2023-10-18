@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "NPY",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:snowball"
+    },
+    "N": {
+      "item": "minecraft:nautilus_shell"
+    },
+    "P": {
+      "item": "lightning_god:water_scroll"
+    },
+    "Y": {
+      "item": "minecraft:prismarine_shard"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "result": {
+    "item": "lightning_god:water_scroll_tier_2"
+  }
+}

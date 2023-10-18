@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "BP/",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:magma_cream"
+    },
+    "B": {
+      "item": "minecraft:blaze_powder"
+    },
+    "P": {
+      "item": "lightning_god:earth_scroll"
+    },
+    "/": {
+      "item": "minecraft:blaze_rod"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "result": {
+    "item": "lightning_god:earth_scroll_tier_2"
+  }
+}

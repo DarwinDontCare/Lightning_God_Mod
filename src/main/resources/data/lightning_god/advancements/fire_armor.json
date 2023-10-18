@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "lightning_god:fire_essence"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "lightning_god:fire_helmet",
+      "lightning_god:fire_chestplate",
+      "lightning_god:fire_leggings",
+      "lightning_god:fire_boots"
+    ]
+  }
+}

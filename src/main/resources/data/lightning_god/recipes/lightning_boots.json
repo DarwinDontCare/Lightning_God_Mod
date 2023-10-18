@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#D#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "lightning_god:lightning_essence"
+    },
+    "D": {
+      "item": "minecraft:diamond_boots"
+    }
+  },
+  "result": {
+    "item": "lightning_god:lightning_boots",
+    "data": 0
+  }
+}

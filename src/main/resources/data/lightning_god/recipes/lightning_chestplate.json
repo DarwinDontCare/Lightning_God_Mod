@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#D#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "lightning_god:lightning_essence"
+    },
+    "D": {
+      "item": "minecraft:diamond_chestplate"
+    }
+  },
+  "result": {
+    "item": "lightning_god:lightning_chestplate",
+    "data": 0
+  }
+}

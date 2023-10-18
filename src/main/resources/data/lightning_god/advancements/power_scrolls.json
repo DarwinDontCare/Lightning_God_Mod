@@ -1,0 +1,28 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:paper"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "lightning_god:fire_scroll",
+      "lightning_god:lightning_scroll",
+      "lightning_god:earth_scroll",
+      "lightning_god:water_scroll",
+      "lightning_god:fire_scroll_tier_2",
+      "lightning_god:lightning_scroll_tier_2",
+      "lightning_god:earth_scroll_tier_2",
+      "lightning_god:water_scroll_tier_2"
+    ]
+  }
+}

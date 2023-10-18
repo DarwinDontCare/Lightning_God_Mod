@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#",
+    "P",
+    "O"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:flint_and_steel"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "result": {
+    "item": "lightning_god:fire_scroll",
+    "count": 1
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "cPc",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:diamond"
+    },
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "P": {
+      "item": "lightning_god:lightning_scroll"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "result": {
+    "item": "lightning_god:lightning_scroll_tier_2"
+  }
+}

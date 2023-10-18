@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "lightning_god:item/fire_scroll_tier_2"
+  }
+}

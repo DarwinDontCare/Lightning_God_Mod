@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#D#",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "lightning_god:fire_essence"
+    },
+    "D": {
+      "item": "minecraft:diamond_helmet"
+    }
+  },
+  "result": {
+    "item": "lightning_god:fire_helmet",
+    "data": 0
+  }
+}

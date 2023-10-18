@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "DPA",
+    " S "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:dirt"
+    },
+    "D": {
+      "item": "minecraft:deepslate"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "A": {
+      "item": "minecraft:andesite"
+    },
+    "S": {
+      "item": "minecraft:stone"
+    }
+  },
+  "result": {
+    "item": "lightning_god:earth_scroll",
+    "count": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "lightning_god:item/water_scroll_tier_3"
+  }
+}

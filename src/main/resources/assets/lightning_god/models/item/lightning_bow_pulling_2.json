@@ -1,0 +1,6 @@
+{
+  "parent": "lightning_god:item/lightning_bow",
+  "textures": {
+    "layer0": "lightning_god:item/lightning_bow_pulling_2"
+  }
+}
