@@ -112,10 +112,11 @@ public final class PlayerTickEventHandler {
 
     @SubscribeEvent()
     public static void onPlayerTick(final TickEvent.PlayerTickEvent event) {
-        if (!loadedModDataToPlayer) {
+        if (!loadedModDataToPlayer && event.player != null) {
             try {
                 CompoundTag data = event.player.getPersistentData();
                 currentPlayer = event.player;
+                LightningGodMod.setPlayer(currentPlayer);
                 loadedModDataToPlayer = true;
                 System.out.println(data.getString("currentPowers"));
             } catch (Exception exception) {

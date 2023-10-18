@@ -23,8 +23,9 @@ import net.minecraft.world.phys.Vec3;
 
 public class FireFlight {
     private static boolean isFlying = false;
-    private static final float SPEED = 1f;
+    private static final float MAX_SPEED = 1.5f;
     private static double CURRENT_SPEED = 0;
+    private static double MIN_SPEED = 0.7f;
     public static void start_flight(ServerPlayer player, int cooldown) {
         if (cooldown <= 0) flight_tick(player);
     }
@@ -36,14 +37,25 @@ public class FireFlight {
             ServerLevel serverLevel = (ServerLevel) player.level;
             new Thread(() -> {
                 int particleCooldown = 0;
-                //player.setPose(Pose.FALL_FLYING);
-                //ItemStack itemstack = player.getItemBySlot(EquipmentSlot.CHEST);
+
+                double xSquared = player.getDeltaMovement().x * player.getDeltaMovement().x;
+                double ySquared = player.getDeltaMovement().y * player.getDeltaMovement().y;
+                double zSquared = player.getDeltaMovement().z * player.getDeltaMovement().z;
+
+                CURRENT_SPEED = Math.sqrt(xSquared + ySquared + zSquared);
+                double targetSpeed = CURRENT_SPEED;
 
                 while (isFlying) {
                     try {
-                        if (CURRENT_SPEED < SPEED) {
+                        if (CURRENT_SPEED < targetSpeed) {
                             CURRENT_SPEED += 0.01f;
+                        } else if (CURRENT_SPEED > targetSpeed) {
+                            CURRENT_SPEED -= 0.01f;
                         }
+                        if (player.getXRot() != 0)targetSpeed = MAX_SPEED * player.getXRot();
+                        else targetSpeed = 1f;
+                        if (targetSpeed > MAX_SPEED) targetSpeed = MAX_SPEED;
+                        else if (targetSpeed < MIN_SPEED) targetSpeed = MIN_SPEED;
 
                         for (int i = 0; i < 2; i++) serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
                         if (particleCooldown <= 0) {
@@ -54,6 +66,7 @@ public class FireFlight {
                         double motionY = player.getForward().y * CURRENT_SPEED;
                         double motionZ = player.getForward().z * CURRENT_SPEED;
 
+                        player.startFallFlying();
                         ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, motionY, motionZ), player, false), player);
 
                         particleCooldown--;

@@ -50,6 +50,15 @@
     {
       "weight": 5,
       "element": {
+        "location": "lightning_god:sky_island_6",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
         "location": "lightning_god:sky_island_secondary_bridge_1",
         "processors": "minecraft:empty",
         "projection": "rigid",

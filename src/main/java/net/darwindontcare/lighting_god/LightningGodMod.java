@@ -12,6 +12,7 @@ import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.utils.ModItemProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CreativeModeTabEvent;
@@ -62,6 +63,7 @@ public class LightningGodMod
     private static final int MAX_FIRE_FLIGHT_COOLDOWN = 200;
     private static int MAX_FIRE_FLIGHT_COOLDOWN_PROCESSED = MAX_FIRE_FLIGHT_COOLDOWN;
     private static boolean showPowerWheel = false;
+    private static Player player;
     private static boolean alternativeGliding = false;
     private static final ArrayList<Vec3> launchBlockPositions = new ArrayList<>();
 
@@ -88,17 +90,23 @@ public class LightningGodMod
     }
 
     public static String getCurrentPower() {
-        if (Minecraft.getInstance().player != null) {
-            CompoundTag playerData = Minecraft.getInstance().player.getPersistentData();
+        if (player != null) {
+            CompoundTag playerData = player.getPersistentData();
             return playerData.getString("current_power");
         }
         return null;
     }
     public static void setCurrentPower(String value) {
-        if (Minecraft.getInstance().player != null) {
-            SetPlayerData.setString(Minecraft.getInstance().player, "current_power", value);
+        if (player != null) {
+            SetPlayerData.setString(player, "current_power", value);
         }
     }
+    
+    public static void setPlayer(Player player1) {
+        player = player1;
+    }
+    
+    public static Player getPlayer() {return player;}
 
     public static boolean getShowPowerWheel() {
         return showPowerWheel;
@@ -240,8 +248,8 @@ public class LightningGodMod
     }
 
     public static int getPowerTier(String power) {
-        if (Minecraft.getInstance().player != null) {
-            CompoundTag compoundTag = Minecraft.getInstance().player.getPersistentData();
+        if (player != null) {
+            CompoundTag compoundTag = player.getPersistentData();
             if (compoundTag.getInt(power+"_tier") < 1) return 1;
             return compoundTag.getInt(power+"_tier");
         }
@@ -249,8 +257,8 @@ public class LightningGodMod
     }
 
     public static ArrayList<String> getPowers () {
-        if (Minecraft.getInstance().player != null) {
-            CompoundTag playerData = Minecraft.getInstance().player.getPersistentData();
+        if (player != null) {
+            CompoundTag playerData = player.getPersistentData();
             return new ArrayList<String> (Arrays.asList(playerData.getString("currentPowers").split(",")));
         }
         return null;
