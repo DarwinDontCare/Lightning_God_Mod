@@ -68,10 +68,9 @@ public class EarthWall {
                             BlockState gorundBlock = serverLevel.getBlockState(groundBlockPos);
 
                             if (!serverLevel.getBlockState(blockPos).getMaterial().isSolid() && gorundBlock.getMaterial().isSolid()) {
-                                //System.out.println("placing "+block.getName()+" block on "+currentPos);
                                 serverLevel.setBlock(blockPos, Blocks.STONE.defaultBlockState(), 3);
                                 serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
-                                for (int t = 0; t < 25; t++) serverLevel.addParticle(ParticleTypes.HAPPY_VILLAGER, currentPos.x, currentPos.y + player.getRandom().nextDouble() * 2.0D, currentPos.z, player.getRandom().nextGaussian(), player.getRandom().nextGaussian(), player.getRandom().nextGaussian());
+                                for (int t = 0; t < 25; t++) serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                                 serverLevel.playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                                 wallBlocksPos.add(blockPos.getCenter());
                             }

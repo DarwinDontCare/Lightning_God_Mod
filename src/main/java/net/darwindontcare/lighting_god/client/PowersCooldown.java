@@ -25,6 +25,8 @@ public class PowersCooldown {
     private static final ResourceLocation FIRE_FLIGHT_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/fire_flight_icon.png");
     private static final ResourceLocation EARTH_LAUNCH_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_launch_icon.png");
     private static final ResourceLocation EARTH_WALL_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_wall_icon.png");
+    private static final ResourceLocation EARTH_METEOR_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_meteor_icon.png");
+    private static final ResourceLocation EARTH_TRAP_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_trap_icon.png");
     private static final ResourceLocation POWER_COOLDOWN = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/power_cooldown.png");
 
     private static final ResourceLocation POWER_WHEEL = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/roda-de-poderes.png");
@@ -88,6 +90,8 @@ public class PowersCooldown {
     private static void EarthPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {
         LoadPowerIcon(poseStack, width, height, EARTH_LAUNCH_ICON, 26, 40, LightningGodMod.getEarthLaunchCooldown(), LightningGodMod.getMaxProcessedEarthLaunchCooldown());
         if (LightningGodMod.getPowerTier("earth") > 1) LoadPowerIcon(poseStack, width, height, EARTH_WALL_ICON, 26, 58, LightningGodMod.getEarthWallCooldown(), LightningGodMod.getMaxProcessedEarthWallCooldown());
+        if (LightningGodMod.getPowerTier("earth") > 2) LoadPowerIcon(poseStack, width, height, EARTH_TRAP_ICON, 26, 76, LightningGodMod.getEarthTrapCooldown(), LightningGodMod.getMaxProcessedEarthTrapCooldown());
+        if (LightningGodMod.getPowerTier("earth") > 3) LoadPowerIcon(poseStack, width, height, EARTH_METEOR_ICON, 26, 95, LightningGodMod.getEarthMeteorCooldown(), LightningGodMod.getMaxProcessedEarthMeteorCooldown());
     }
 
 

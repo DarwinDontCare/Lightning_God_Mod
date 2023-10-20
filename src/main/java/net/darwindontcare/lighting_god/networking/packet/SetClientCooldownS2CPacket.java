@@ -42,6 +42,10 @@ public class SetClientCooldownS2CPacket {
                 LightningGodMod.setEarthLaunchCooldown(LightningGodMod.getMaxProcessedEarthLaunchCooldown());
             } else if (powerName.equals("earth_wall")) {
                 LightningGodMod.setEarthWallCooldown(LightningGodMod.getMaxProcessedEarthWallCooldown());
+            } else if (powerName.equals("earth_meteor")) {
+                LightningGodMod.setEarthMeteorCooldown(LightningGodMod.getMaxProcessedEarthMeteorCooldown());
+            } else if (powerName.equals("earth_trap")) {
+                LightningGodMod.setEarthTrapCooldown(LightningGodMod.getMaxProcessedEarthTrapCooldown());
             }
         });
 

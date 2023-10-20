@@ -151,6 +151,30 @@ public class ModMessage {
                 .encoder(ExplodeS2CPacket::toBytes)
                 .consumerMainThread(ExplodeS2CPacket::handle)
                 .add();
+
+        net.messageBuilder(EarthMeteorC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(EarthMeteorC2SPacket::new)
+                .encoder(EarthMeteorC2SPacket::toBytes)
+                .consumerMainThread(EarthMeteorC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(SetMeteorDataS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SetMeteorDataS2CPacket::new)
+                .encoder(SetMeteorDataS2CPacket::toBytes)
+                .consumerMainThread(SetMeteorDataS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(SetMeteorDataC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(SetMeteorDataC2SPacket::new)
+                .encoder(SetMeteorDataC2SPacket::toBytes)
+                .consumerMainThread(SetMeteorDataC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(EarthTrapC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(EarthTrapC2SPacket::new)
+                .encoder(EarthTrapC2SPacket::toBytes)
+                .consumerMainThread(EarthTrapC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

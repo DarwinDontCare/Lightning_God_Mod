@@ -32,7 +32,7 @@ import java.util.Random;
 
 public class FireBurst {
     private static final int RANGE = 10;
-    private static final int DAMAGE = 4;
+    private static final int DAMAGE = 10;
     public static void Burst(ServerPlayer player, int cooldown) {
         if (cooldown <= 0) {
             Vec3 playerPos = player.position();

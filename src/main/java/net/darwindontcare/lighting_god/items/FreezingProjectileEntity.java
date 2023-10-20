@@ -78,7 +78,7 @@ public class FreezingProjectileEntity extends Snowball {
 
     @Override
     public void tick() {
-        Freeze(null);
+        if (!this.level.isClientSide) Freeze(null);
         super.tick();
     }
 

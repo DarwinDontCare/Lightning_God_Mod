@@ -32,7 +32,7 @@ import org.apache.logging.log4j.core.jmx.Server;
 import java.util.List;
 
 public class SummonEntity {
-    private static final int FORCE_MULTIPLIER = 2;
+    private static final int FORCE_MULTIPLIER = 4;
     public static void Summon(ServerPlayer player, Entity entity, Vec3 position, Vec3 motion, boolean isEarthAttack, boolean holdEntity) {
         ServerLevel serverLevel = (ServerLevel) player.level;
         if (isEarthAttack) {
