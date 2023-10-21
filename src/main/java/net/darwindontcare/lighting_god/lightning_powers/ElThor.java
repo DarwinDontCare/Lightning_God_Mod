@@ -21,7 +21,6 @@ public class ElThor {
                 HitResult resultBlock = player.pick(RANGE, 1.0f, false);
                 RaycastUtil raycastUtil = new RaycastUtil();
                 Entity entity = raycastUtil.getEntityInCrosshair(1.0f, RANGE);
-                player.swing(InteractionHand.MAIN_HAND);
                 if (entity != null) {
                     System.out.println(entity);
                     summonLightning(player, entity.position());

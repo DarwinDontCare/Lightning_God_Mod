@@ -27,6 +27,7 @@ public class FireScyth extends SwordItem {
         ItemStack stack = player.getItemInHand(interactionHand);
         if (!player.getCooldowns().isOnCooldown(stack.getItem()) && useTimes < 1) {
             //System.out.println("right clicked");
+            player.swing(InteractionHand.MAIN_HAND);
             ModMessage.sendToServer(new FireScythDashS2CPacket());
             player.getCooldowns().addCooldown(stack.getItem(), DASH_COOLDOWN);
         }

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SAS",
+    "EPE",
+    "SAS"
+  ],
+  "key": {
+    "P": {
+      "item": "lightning_god:fire_scroll"
+    },
+    "A": {
+      "item": "lightning_god:fire_essence"
+    },
+    "S": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "result": {
+    "item": "lightning_god:fire_scroll_tier_4"
+  }
+}

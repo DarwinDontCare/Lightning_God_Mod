@@ -35,6 +35,7 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     private int POWER = 30;
     private Vec3 direction;
     private boolean canStartMoving;
+    private int shoot_timer = 110;
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     protected static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("idle");
@@ -118,6 +119,8 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
             this.setRemainingFireTicks(0);
         }
         ModMessage.sendToServer(new SetMeteorDataC2SPacket(serverInstanceId, canStartMoving));
+        if (shoot_timer > 0)shoot_timer -= 1;
+        else if (!canStartMoving) canStartMoving = true;
     }
 
     private boolean initiated = false;
@@ -155,6 +158,8 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
                     this.setDeltaMovement(0, 0, 0);
                     ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(0, 0, 0), this, false), (ServerPlayer) this.getOwner());
                 }
+                if (shoot_timer > 0)shoot_timer -= 1;
+                else if (!canStartMoving) canStartMoving = true;
             }
         } catch (Exception e) {System.out.println(e.toString());}
     }

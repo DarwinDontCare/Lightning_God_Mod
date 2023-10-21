@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SAS",
+    "APA",
+    "SAS"
+  ],
+  "key": {
+    "P": {
+      "item": "lightning_god:earth_scroll"
+    },
+    "A": {
+      "item": "lightning_god:earth_essence"
+    },
+    "S": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "result": {
+    "item": "lightning_god:earth_scroll_tier_3"
+  }
+}

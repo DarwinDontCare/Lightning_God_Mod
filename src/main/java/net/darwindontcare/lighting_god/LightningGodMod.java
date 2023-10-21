@@ -1,6 +1,16 @@
 package net.darwindontcare.lighting_god;
 
 import com.mojang.logging.LogUtils;
+import dev.kosmx.playerAnim.api.layered.IAnimation;
+import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.api.layered.modifier.MirrorModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
+import dev.kosmx.playerAnim.core.data.AnimationFormat;
+import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
+import dev.kosmx.playerAnim.core.data.gson.AnimationJson;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
 import net.darwindontcare.lighting_god.blocks.ModBlocks;
 import net.darwindontcare.lighting_god.blocks.entity.ModBlockEntities;
 import net.darwindontcare.lighting_god.client.SetPlayerData;
@@ -10,12 +20,14 @@ import net.darwindontcare.lighting_god.entities.client.MeteorProjectileRenderer;
 import net.darwindontcare.lighting_god.event.TeleportEvent;
 import net.darwindontcare.lighting_god.items.ModCreativeModeTab;
 import net.darwindontcare.lighting_god.items.ModItems;
+import net.darwindontcare.lighting_god.loot.ModLootModifiers;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.utils.ModItemProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -72,6 +84,9 @@ public class LightningGodMod
     private static int EARTH_TRAP_COOLDOWN = 0;
     private static final int MAX_EARTH_TRAP_COOLDOWN = 400;
     private static int MAX_EARTH_TRAP_COOLDOWN_PROCESSED = MAX_EARTH_TRAP_COOLDOWN;
+    private static int FIRE_PULL_COOLDOWN = 0;
+    private static final int MAX_FIRE_PULL_COOLDOWN = 200;
+    private static int MAX_FIRE_PULL_COOLDOWN_PROCESSED = MAX_FIRE_PULL_COOLDOWN;
     private static boolean showPowerWheel = false;
     private static Player player;
     private static boolean alternativeGliding = false;
@@ -286,6 +301,21 @@ public class LightningGodMod
     public static void setMaxProcessedEarthTrapCooldown(int value) {
         MAX_EARTH_TRAP_COOLDOWN_PROCESSED = value;
     }
+    public static int getFirePullCooldown() {
+        return FIRE_PULL_COOLDOWN;
+    }
+    public static void setFirePullCooldown(int value) {
+        FIRE_PULL_COOLDOWN = value;
+    }
+    public static int getMaxFirePullCooldown() {
+        return MAX_FIRE_PULL_COOLDOWN;
+    }
+    public static int getMaxProcessedFirePullCooldown() {
+        return MAX_FIRE_PULL_COOLDOWN_PROCESSED;
+    }
+    public static void setMaxProcessedFirePullCooldown(int value) {
+        MAX_FIRE_PULL_COOLDOWN_PROCESSED = value;
+    }
 
     public static int getPowerTier(String power) {
         if (player != null) {
@@ -312,6 +342,7 @@ public class LightningGodMod
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModBlockEntities.register(modEventBus);
+        ModLootModifiers.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
@@ -415,6 +446,8 @@ public class LightningGodMod
                 setEarthTrapCooldown(getEarthTrapCooldown() - 1);
             } if (getFireFlightCooldown() > 0) {
                 setFireFlightCooldown(getFireFlightCooldown() - 1);
+            } if (getFirePullCooldown() > 0) {
+                setFirePullCooldown(getFirePullCooldown() - 1);
             }
         }
     }

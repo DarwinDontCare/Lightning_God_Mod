@@ -1,0 +1,13 @@
+{
+  "type": "lightning_god:add_item",
+  "conditions": [
+    {
+      "condition": "minecraft:entity_properties",
+      "entity": "this",
+      "predicate": {
+        "type": "minecraft:guardian"
+      }
+    }
+  ],
+  "item": "lightning_god:water_essence"
+}

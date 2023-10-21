@@ -1,0 +1,13 @@
+{
+  "type": "lightning_god:add_item",
+  "conditions": [
+    {
+      "condition": "minecraft:entity_properties",
+      "entity": "this",
+      "predicate": {
+        "type": "minecraft:blaze"
+      }
+    }
+  ],
+  "item": "lightning_god:fire_essence"
+}

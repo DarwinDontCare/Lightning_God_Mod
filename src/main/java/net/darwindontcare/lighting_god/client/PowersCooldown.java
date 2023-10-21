@@ -23,6 +23,7 @@ public class PowersCooldown {
     private static final ResourceLocation ICE_SLIDE_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/ice_slide_icon.png");
     private static final ResourceLocation FIRE_BURST_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/fire_burst_icon.png");
     private static final ResourceLocation FIRE_FLIGHT_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/fire_flight_icon.png");
+    private static final ResourceLocation FIRE_PULL_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/fire_pull_icon.png");
     private static final ResourceLocation EARTH_LAUNCH_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_launch_icon.png");
     private static final ResourceLocation EARTH_WALL_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_wall_icon.png");
     private static final ResourceLocation EARTH_METEOR_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_meteor_icon.png");
@@ -77,9 +78,9 @@ public class PowersCooldown {
 
     private static void FirePowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {
         LoadPowerIcon(poseStack, width, height, FIREBALL_ICON, 26, 40, LightningGodMod.getFireballCooldown(), LightningGodMod.getMaxProcessedFireballCooldown());
-        if (LightningGodMod.getPowerTier("fire") > 1) LoadPowerIcon(poseStack, width, height, FIRE_BURST_ICON, 26, 58, LightningGodMod.getFireBurstCooldown(), LightningGodMod.getMaxProcessedFireBurstCooldown());
+        if (LightningGodMod.getPowerTier("fire") > 1) LoadPowerIcon(poseStack, width, height, FIRE_PULL_ICON, 26, 58, LightningGodMod.getFirePullCooldown(), LightningGodMod.getMaxProcessedFirePullCooldown());
         if (LightningGodMod.getPowerTier("fire") > 2) LoadPowerIcon(poseStack, width, height, FIRE_FLIGHT_ICON, 26, 76, LightningGodMod.getFireFlightCooldown(), LightningGodMod.getMaxProcessedFireFlightCooldown());
-
+        if (LightningGodMod.getPowerTier("fire") > 3) LoadPowerIcon(poseStack, width, height, FIRE_BURST_ICON, 26, 95, LightningGodMod.getFireBurstCooldown(), LightningGodMod.getMaxProcessedFireBurstCooldown());
     }
 
     private static void WaterPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {

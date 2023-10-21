@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "entries": [
+    "lightning_god:fire_essence_from_blaze",
+    "lightning_god:water_essence_from_guardian",
+    "lightning_god:earth_essence_from_ravager"
+  ]
+}

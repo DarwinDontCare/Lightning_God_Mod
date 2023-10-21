@@ -175,6 +175,12 @@ public class ModMessage {
                 .encoder(EarthTrapC2SPacket::toBytes)
                 .consumerMainThread(EarthTrapC2SPacket::handle)
                 .add();
+
+        net.messageBuilder(FirePullC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(FirePullC2SPacket::new)
+                .encoder(FirePullC2SPacket::toBytes)
+                .consumerMainThread(FirePullC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

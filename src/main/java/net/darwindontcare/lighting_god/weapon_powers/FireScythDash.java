@@ -5,6 +5,7 @@ import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.AddForceToEntityS2CPacket;
 import net.darwindontcare.lighting_god.utils.AddForceToEntity;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +21,7 @@ public class FireScythDash {
     public static void Dash(ServerPlayer player) {
         try {
             Vec3 direction = new Vec3(player.getForward().x * RANGE, player.getForward().y * RANGE, player.getForward().z * RANGE);
+            player.swing(InteractionHand.MAIN_HAND);
             ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(direction, player, false), player);
             List<LivingEntity> hitEntities = new ArrayList<>();
 

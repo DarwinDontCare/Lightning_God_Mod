@@ -16,6 +16,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.core.jmx.Server;
@@ -48,16 +49,21 @@ public class IceSlide {
                         if (CURRENT_SPEED < MAX_SLIDE_SPEED) {
                             CURRENT_SPEED += 0.001;
                         }
+                        BlockState currentBlockState = player.level.getBlockState(new BlockPos((int) (player.position().x + player.getForward().x), (int) player.position().y, (int) (player.position().z + player.getForward().z)));
                         //System.out.println("player movement: " + player.getDeltaMovement());
-                        if (player.level.getBlockState(new BlockPos((int) (player.position().x + player.getForward().x), (int) player.position().y, (int) (player.position().z + player.getForward().z))).getMaterial().isSolid()) {
+                        if (currentBlockState.getMaterial().isSolid()) {
                             if (!player.level.getBlockState(new BlockPos((int) (player.position().x + player.getForward().x), (int) player.position().y + 1, (int) (player.position().z + player.getForward().z))).getMaterial().isSolid() && !player.level.getBlockState(new BlockPos((int) (player.position().x + player.getForward().x), (int) player.position().y + 2, (int) (player.position().z + player.getForward().z))).getMaterial().isSolid()) {
-                                System.out.println("jumped block");
+                                //System.out.println("jumped block");
                                 player.teleportTo(player.position().x, player.position().y + 1, player.position().z);
                             }
                         }
-                        for (int x = -1; x < 1; x++) {
-                            for (int z = -1; z < 1; z++) {
-                                BlockPos currentPos = new BlockPos((int) player.position().x + x, (int) player.position().y - 1, (int) player.position().z + z);
+                        if (currentBlockState.getMaterial().isLiquid()) {
+                            ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(0, 0.2, 0), player, false), player);
+                        }
+                        Vec3 icePlacePos = player.position().add(new Vec3(player.getForward().x * 2, player.getForward().y * 2, player.getForward().z * 2));
+                        for (int x = -2; x < 2; x++) {
+                            for (int z = -2; z < 2; z++) {
+                                BlockPos currentPos = new BlockPos((int) icePlacePos.x + x, (int) icePlacePos.y - 1, (int) icePlacePos.z + z);
                                 if (player.level.getBlockState(currentPos).getBlock().equals(Blocks.WATER)) {
                                     serverLevel.setBlock(currentPos, Blocks.FROSTED_ICE.defaultBlockState(), 3);
                                     serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, currentPos);
@@ -77,10 +83,7 @@ public class IceSlide {
                         double motionX = -Math.sin(Math.toRadians(player.getYRot())) * CURRENT_SPEED;
                         double motionZ = Math.cos(Math.toRadians(player.getYRot())) * CURRENT_SPEED;
 
-                        if (player.isOnGround())
-                            ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, 0, motionZ), player, true), player);
-                        else
-                            ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, 0, motionZ), player, true), player);
+                        ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, 0, motionZ), player, true), player);
                         particleCooldown--;
                     } catch (Exception e) {
                         System.out.println(e.toString());

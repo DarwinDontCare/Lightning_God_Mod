@@ -22,7 +22,15 @@
       "lightning_god:fire_scroll_tier_2",
       "lightning_god:lightning_scroll_tier_2",
       "lightning_god:earth_scroll_tier_2",
-      "lightning_god:water_scroll_tier_2"
+      "lightning_god:water_scroll_tier_2",
+      "lightning_god:fire_scroll_tier_3",
+      "lightning_god:lightning_scroll_tier_3",
+      "lightning_god:earth_scroll_tier_3",
+      "lightning_god:water_scroll_tier_3",
+      "lightning_god:fire_scroll_tier_4",
+      "lightning_god:lightning_scroll_tier_4",
+      "lightning_god:earth_scroll_tier_4",
+      "lightning_god:water_scroll_tier_4"
     ]
   }
 }

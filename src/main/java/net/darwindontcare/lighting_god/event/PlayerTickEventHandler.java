@@ -34,8 +34,14 @@ public final class PlayerTickEventHandler {
     private static int maxProcessedIceSlideCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
     private static int maxEarthLaunchCooldown = LightningGodMod.getMaxEarthLaunchCooldown();
     private static int maxProcessedEarthLaunchCooldown = LightningGodMod.getMaxProcessedEarthLaunchCooldown();
+    private static int maxEarthTrapCooldown = LightningGodMod.getMaxEarthTrapCooldown();
+    private static int maxProcessedEarthTrapCooldown = LightningGodMod.getMaxProcessedEarthTrapCooldown();
+    private static int maxEarthMeteorCooldown = LightningGodMod.getMaxEarthMeteorCooldown();
+    private static int maxProcessedEarthMeteorCooldown = LightningGodMod.getMaxProcessedEarthMeteorCooldown();
     private static int maxFireFlightCooldown = LightningGodMod.getMaxEarthLaunchCooldown();
     private static int maxProcessedFireFlightCooldown = LightningGodMod.getMaxProcessedEarthLaunchCooldown();
+    private static int maxFirePullCooldown = LightningGodMod.getMaxFirePullCooldown();
+    private static int maxProcessedFirePullCooldown = LightningGodMod.getMaxProcessedFirePullCooldown();
     private static boolean[] appliedLightningArmorBuff = {false, false, false, false};
     private static boolean[] appliedFireArmorBuff = {false, false, false, false};
     private static boolean[] appliedWaterArmorBuff = {false, false, false, false};
@@ -140,14 +146,16 @@ public final class PlayerTickEventHandler {
             maxProcessedFireBurstCooldown = LightningGodMod.getMaxProcessedFireBurstCooldown();
             maxFireFlightCooldown = LightningGodMod.getMaxFireFlightCooldown();
             maxProcessedFireFlightCooldown = LightningGodMod.getMaxProcessedFireFlightCooldown();
+            maxFirePullCooldown = LightningGodMod.getMaxFirePullCooldown();
+            maxProcessedFirePullCooldown = LightningGodMod.getMaxProcessedFirePullCooldown();
 
             maxFreezeCooldown = LightningGodMod.getMaxFreezeCooldown();
             maxProcessedFreezeCooldown = LightningGodMod.getMaxProcessedFreezeCooldown();
             maxIceSlideCooldown = LightningGodMod.getMaxIceSlideCooldown();
             maxProcessedIceSlideCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
 
-            int[] fireMaxCooldonws = {maxFireballCooldown, maxFireBurstCooldown, maxFireFlightCooldown};
-            int[] fireMaxProcessedCooldonws = {maxProcessedFireballCooldown, maxProcessedFireBurstCooldown, maxProcessedFireFlightCooldown};
+            int[] fireMaxCooldonws = {maxFireballCooldown, maxFireBurstCooldown, maxFireFlightCooldown, maxFirePullCooldown};
+            int[] fireMaxProcessedCooldonws = {maxProcessedFireballCooldown, maxProcessedFireBurstCooldown, maxProcessedFireFlightCooldown, maxProcessedFirePullCooldown};
 
             int[] lightningMaxCooldonws = {maxTpCooldown, maxElThorCooldown};
             int[] lightningMaxProcessedCooldonws = {maxProcessedTpCooldown, maxProcessedElThorCooldown};

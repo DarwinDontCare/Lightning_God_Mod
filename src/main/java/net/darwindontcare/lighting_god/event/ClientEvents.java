@@ -1,6 +1,7 @@
 package net.darwindontcare.lighting_god.event;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
+import net.darwindontcare.lighting_god.client.PlayerAnim;
 import net.darwindontcare.lighting_god.client.PowersCooldown;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.*;
@@ -58,7 +59,7 @@ public class ClientEvents {
                     if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 1) {
                         ModMessage.sendToServer(new ElThorC2SPacket(LightningGodMod.getElThorCooldown()));
                     } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 1) {
-                        //ModMessage.sendToServer(new FireBurstC2SPacket(LightningGodMod.getFireBurstCooldown()));
+                        ModMessage.sendToServer(new FirePullC2SPacket(LightningGodMod.getFirePullCooldown()));
                     } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 1) {
                         ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown()));
                     } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 1) {
