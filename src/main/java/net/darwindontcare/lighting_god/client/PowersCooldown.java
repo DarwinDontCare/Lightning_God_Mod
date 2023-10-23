@@ -5,8 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.event.PlayerTickEventHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
@@ -28,6 +30,7 @@ public class PowersCooldown {
     private static final ResourceLocation EARTH_WALL_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_wall_icon.png");
     private static final ResourceLocation EARTH_METEOR_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_meteor_icon.png");
     private static final ResourceLocation EARTH_TRAP_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_trap_icon.png");
+    private static final ResourceLocation ICE_SPIKE_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/ice_spike_icon.png");
     private static final ResourceLocation POWER_COOLDOWN = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/power_cooldown.png");
 
     private static final ResourceLocation POWER_WHEEL = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/roda-de-poderes.png");
@@ -49,22 +52,24 @@ public class PowersCooldown {
     private static final ResourceLocation LIGHTNING_LOCK = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/lock_lightning.png");
     private static final ResourceLocation EARTH_LOCK = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/lock_earth.png");
     private static boolean isMouseLocked = true;
+    public static GuiGraphics guiGraphics;
 
     public static final IGuiOverlay HUD_POWERS = ((gui, poseStack, partialTick, width, height) -> {
 
         String currentPower = LightningGodMod.getCurrentPower();
+        guiGraphics = new GuiGraphics(gui.getMinecraft(), gui.getMinecraft().renderBuffers().bufferSource());
         if (currentPower != null) {
             if (currentPower.equals("lightning")) {
-                LightningPowerUI(width, poseStack, height, gui);
+                LightningPowerUI(width, poseStack.pose(), height, gui);
             } else if (currentPower.equals("fire")) {
-                FirePowerUI(width, poseStack, height, gui);
+                FirePowerUI(width, poseStack.pose(), height, gui);
             } else if (currentPower.equals("water")) {
-                WaterPowerUI(width, poseStack, height, gui);
+                WaterPowerUI(width, poseStack.pose(), height, gui);
             } else if (currentPower.equals("earth")) {
-                EarthPowerUI(width, poseStack, height, gui);
+                EarthPowerUI(width, poseStack.pose(), height, gui);
             }
         }
-        if (LightningGodMod.getShowPowerWheel()) PowerWheel(width, poseStack, height, gui, currentPower);
+        if (LightningGodMod.getShowPowerWheel()) PowerWheel(width, poseStack.pose(), height, gui, currentPower);
         else if (!isMouseLocked) {
             gui.getMinecraft().mouseHandler.grabMouse();
             isMouseLocked = true;
@@ -86,6 +91,8 @@ public class PowersCooldown {
     private static void WaterPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {
         LoadPowerIcon(poseStack, width, height, FREEZE_ICON, 26, 40, LightningGodMod.getFreezeCooldown(), LightningGodMod.getMaxProcessedFreezeCooldown());
         if (LightningGodMod.getPowerTier("water") > 1) LoadPowerIcon(poseStack, width, height, ICE_SLIDE_ICON, 26, 58, LightningGodMod.getIceSlideCooldown(), LightningGodMod.getMaxProcessedIceSlideCooldown());
+        if (LightningGodMod.getPowerTier("water") > 2) LoadPowerIcon(poseStack, width, height, ICE_SPIKE_ICON, 26, 76, LightningGodMod.getIceSpikeCooldown(), LightningGodMod.getMaxProcessedIceSpikeCooldown());
+
     }
 
     private static void EarthPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {
@@ -98,34 +105,34 @@ public class PowersCooldown {
 
     private static void PowerWheel(int width, PoseStack poseStack, int height, ForgeGui gui, String currentPower) {
         ArrayList<String> power = LightningGodMod.getPowers();
-        RenderSystem.setShaderTexture(0, POWER_WHEEL_BACKGROUND);
-        GuiComponent.blit(poseStack, 0, 0, 0, 0, width, height, width, height);
-        RenderSystem.setShaderTexture(0, POWER_WHEEL);
-        GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+        //RenderSystem.setShaderTexture(0, POWER_WHEEL_BACKGROUND);
+        guiGraphics.blit(POWER_WHEEL_BACKGROUND, 0, 0, 0, 0, width, height, width, height);
+        //RenderSystem.setShaderTexture(0, POWER_WHEEL);
+        guiGraphics.blit(POWER_WHEEL, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         if (power.contains("fire")) {
-            RenderSystem.setShaderTexture(0, POWER_WHEEL_FIRE);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, POWER_WHEEL_FIRE);
+            guiGraphics.blit(POWER_WHEEL_FIRE, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } else {
-            RenderSystem.setShaderTexture(0, FIRE_LOCK);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, FIRE_LOCK);
+            guiGraphics.blit(FIRE_LOCK, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } if (power.contains("water")) {
-            RenderSystem.setShaderTexture(0, POWER_WHEEL_WATER);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, POWER_WHEEL_WATER);
+            guiGraphics.blit(POWER_WHEEL_WATER, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } else {
-            RenderSystem.setShaderTexture(0, WATER_LOCK);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, WATER_LOCK);
+            guiGraphics.blit(WATER_LOCK, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } if (power.contains("lightning")) {
-            RenderSystem.setShaderTexture(0, POWER_WHEEL_LIGHTNING);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, POWER_WHEEL_LIGHTNING);
+            guiGraphics.blit(POWER_WHEEL_LIGHTNING, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } else {
-            RenderSystem.setShaderTexture(0, LIGHTNING_LOCK);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, LIGHTNING_LOCK);
+            guiGraphics.blit(LIGHTNING_LOCK, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } if (power.contains("earth")) {
-            RenderSystem.setShaderTexture(0, POWER_WHEEL_EARTH);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, POWER_WHEEL_EARTH);
+            guiGraphics.blit(POWER_WHEEL_EARTH, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         } else {
-            RenderSystem.setShaderTexture(0, EARTH_LOCK);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, EARTH_LOCK);
+            guiGraphics.blit(EARTH_LOCK, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
         }
 
         gui.getMinecraft().mouseHandler.releaseMouse();
@@ -145,37 +152,37 @@ public class PowersCooldown {
         if (isMouseLocked) isMouseLocked = false;
 
         if (mouseX < (int) (width / 2) - offset && mouseY < (int) (height / 2.5) + offset && mouseY > (int) (height / 2.3) - offset && power.contains("fire")) {
-            RenderSystem.setShaderTexture(0, FIRE_GLARE);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0,200, 200, 200, 200);
-            RenderSystem.setShaderTexture(0, FIRE_GLOW);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, FIRE_GLARE);
+            guiGraphics.blit(FIRE_GLARE, width / 2 - 103, height / 2 - 100, 0, 0,200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, FIRE_GLOW);
+            guiGraphics.blit(FIRE_GLOW, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
             if (!currentPower.equals("fire")) {
                 LightningGodMod.setCurrentPower("fire");
                 System.out.println(LightningGodMod.getCurrentPower());
             }
         } else if (mouseX > (int) (width / 2.1) + offset && mouseY < (int) (height / 2.5) + offset && mouseY > (int) (height / 2.3) - offset && power.contains("water")) {
-            RenderSystem.setShaderTexture(0, WATER_GLARE);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
-            RenderSystem.setShaderTexture(0, WATER_GLOW);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, WATER_GLARE);
+            guiGraphics.blit(WATER_GLARE, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, WATER_GLOW);
+            guiGraphics.blit(WATER_GLOW, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
             if (!currentPower.equals("water")) {
                 LightningGodMod.setCurrentPower("water");
                 System.out.println(LightningGodMod.getCurrentPower());
             }
         } else if (mouseY < (int) (height / 2.2) - offset && power.contains("lightning")) {
-            RenderSystem.setShaderTexture(0, LIGHTNING_GLARE);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
-            RenderSystem.setShaderTexture(0, LIGHTNING_GLOW);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, LIGHTNING_GLARE);
+            guiGraphics.blit(LIGHTNING_GLARE, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, LIGHTNING_GLOW);
+            guiGraphics.blit(LIGHTNING_GLOW, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
             if (!currentPower.equals("lightning")) {
                 LightningGodMod.setCurrentPower("lightning");
                 System.out.println(LightningGodMod.getCurrentPower());
             }
         } else if (mouseY > (int) (height / 2.5) + offset && power.contains("earth")) {
-            RenderSystem.setShaderTexture(0, EARTH_GLARE);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
-            RenderSystem.setShaderTexture(0, EARTH_GLOW);
-            GuiComponent.blit(poseStack, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, EARTH_GLARE);
+            guiGraphics.blit(EARTH_GLARE, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
+            //RenderSystem.setShaderTexture(0, EARTH_GLOW);
+            guiGraphics.blit(EARTH_GLOW, width / 2 - 103, height / 2 - 100, 0, 0, 200, 200, 200, 200);
             if (!currentPower.equals("earth")) {
                 LightningGodMod.setCurrentPower("earth");
                 System.out.println(LightningGodMod.getCurrentPower());
@@ -186,13 +193,14 @@ public class PowersCooldown {
     private static void LoadPowerIcon(PoseStack poseStack, int width, int height, ResourceLocation icon, int offsetWidth, int offsetHeight, int cooldown, int maxCooldown) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, icon);
-        GuiComponent.blit(poseStack, width - offsetWidth, height - offsetHeight, 0, 0, 16, 16, 16, 16);
+        //RenderSystem.setShaderTexture(0, icon);
+
+        guiGraphics.blit(icon, width - offsetWidth, height - offsetHeight, 0, 0, 16, 16, 16, 16);
 
         if (cooldown > 0 && !Minecraft.getInstance().isPaused()) {
-            RenderSystem.setShaderTexture(0, POWER_COOLDOWN);
+            //RenderSystem.setShaderTexture(0, POWER_COOLDOWN);
             int cooldown_width = (((cooldown * 100) / maxCooldown) * 16) / 100;
-            GuiComponent.blit(poseStack, width - offsetWidth, height - offsetHeight, 0, 0, cooldown_width, 16, 16, 16);
+            guiGraphics.blit(POWER_COOLDOWN, width - offsetWidth, height - offsetHeight, 0, 0, cooldown_width, 16, 16, 16);
         }
     }
 }

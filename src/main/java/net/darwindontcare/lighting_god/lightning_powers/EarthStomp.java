@@ -32,23 +32,23 @@ public class EarthStomp {
     private static void Stomp(ServerPlayer player, int level) {
         new Thread(() -> {
             try {
-                ServerLevel serverLevel = (ServerLevel) player.level;
+                ServerLevel serverLevel = (ServerLevel) player.level();
                 float maxDamage = DAMAGE_TABLE[level - 1];
                 while (stomping) {
                     if (DAMAGE > maxDamage) {
                         DAMAGE = maxDamage;
                     }
-                    if (!player.isOnGround() && DAMAGE < maxDamage && player.getDeltaMovement().y < -1 && DAMAGE < (float) (player.getDeltaMovement().y * -(level / 0.5))) {
+                    if (!player.onGround() && DAMAGE < maxDamage && player.getDeltaMovement().y < -1 && DAMAGE < (float) (player.getDeltaMovement().y * -(level / 0.5))) {
                         DAMAGE = (float) (player.getDeltaMovement().y * -(level / 0.5));
-                    } if (player.isOnGround() && DAMAGE > 1) {
+                    } if (player.onGround() && DAMAGE > 1) {
                         System.out.println("damage: " + DAMAGE + ", level: " + level+", player y velocity: "+ player.getDeltaMovement().y);
                         serverLevel.explode(player, player.position().x, player.position().y, player.position().z, DAMAGE, Level.ExplosionInteraction.NONE);
                         //ModMessage.sendToPlayer(new ExplodeS2CPacket(player.position(), player, DAMAGE), player);
 
                         DAMAGE = 0;
                         stomping = false;
-                    } else if (player.isOnGround()) DAMAGE = 0;
-                    if (!player.isOnGround()) {
+                    } else if (player.onGround()) DAMAGE = 0;
+                    if (!player.onGround()) {
                         player.resetFallDistance();
                     }
                 }

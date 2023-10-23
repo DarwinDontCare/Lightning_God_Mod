@@ -39,27 +39,27 @@ public class ElThor {
     private static void summonLightning(ServerPlayer player, Vec3 position) {
         new Thread(() -> {
             try {
-                CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level, true, player);
+                CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
                 lightningBolt.setPos(position);
-                player.level.addFreshEntity(lightningBolt);
+                player.level().addFreshEntity(lightningBolt);
 
                 Thread.sleep(200);
 
-                CustomLightningBolt lightningBolt2 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level, true, player);
+                CustomLightningBolt lightningBolt2 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
                 lightningBolt2.setPos(new Vec3(position.x, position.y, position.z + 1));
-                player.level.addFreshEntity(lightningBolt2);
+                player.level().addFreshEntity(lightningBolt2);
 
                 Thread.sleep(200);
 
-                CustomLightningBolt lightningBolt3 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level, true, player);
+                CustomLightningBolt lightningBolt3 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
                 lightningBolt3.setPos(new Vec3(position.x + 1, position.y, position.z + 1));
-                player.level.addFreshEntity(lightningBolt3);
+                player.level().addFreshEntity(lightningBolt3);
 
                 Thread.sleep(200);
 
-                CustomLightningBolt lightningBolt4 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level, true, player);
+                CustomLightningBolt lightningBolt4 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
                 lightningBolt4.setPos(new Vec3(position.x + 1, position.y, position.z));
-                player.level.addFreshEntity(lightningBolt4);
+                player.level().addFreshEntity(lightningBolt4);
             } catch (Exception exception) {
                 System.out.println(exception.toString());
             }

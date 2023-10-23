@@ -34,9 +34,9 @@ import java.util.List;
 public class SummonEntity {
     private static final int FORCE_MULTIPLIER = 4;
     public static void Summon(ServerPlayer player, Entity entity, Vec3 position, Vec3 motion, boolean isEarthAttack, boolean holdEntity) {
-        ServerLevel serverLevel = (ServerLevel) player.level;
+        ServerLevel serverLevel = (ServerLevel) player.level();
         if (isEarthAttack) {
-            LaunchBlock(player, (ServerLevel) player.level, new BlockPos((int)position.x, (int)position.y, (int)position.z), holdEntity);
+            LaunchBlock(player, (ServerLevel) player.level(), new BlockPos((int)position.x, (int)position.y, (int)position.z), holdEntity);
         } else {
             entity.setPos(position);
             entity.setDeltaMovement(motion);
@@ -102,7 +102,7 @@ public class SummonEntity {
                 fallingBlockEntity.noPhysics = false;
                 Vec3 originForward = origin.add(new Vec3(owner.getForward().x, 0, owner.getForward().z));
                 Vec3 processedDirection = direction;
-                if (!owner.level.getBlockState(new BlockPos((int) originForward.x, (int) originForward.y, (int) originForward.z)).getMaterial().isSolid()) {
+                if (!owner.level().getBlockState(new BlockPos((int) originForward.x, (int) originForward.y, (int) originForward.z)).isSolid()) {
                     fallingBlockEntity.setPos(originForward);
                     processedDirection = direction.subtract(new Vec3(owner.getForward().x, 0, owner.getForward().z));
                 }
@@ -110,10 +110,10 @@ public class SummonEntity {
                 fallingBlockEntity.addDeltaMovement(processedDirection);
                 Vec3 lastDirection = fallingBlockEntity.getDeltaMovement();
                 while (true) {
-                    Level level = fallingBlockEntity.level;
+                    Level level = fallingBlockEntity.level();
                     Vec3 currentPos = fallingBlockEntity.position();
                     boolean foundBlock = false;
-                    if (fallingBlockEntity.isOnGround() && fallingBlockEntity.position().distanceTo(origin) > 1.5 || fallingBlockEntity.getDeltaMovement().distanceTo(lastDirection) > 0.3 && fallingBlockEntity.position().distanceTo(origin) > 1.5) {
+                    if (fallingBlockEntity.onGround() && fallingBlockEntity.position().distanceTo(origin) > 1.5 || fallingBlockEntity.getDeltaMovement().distanceTo(lastDirection) > 0.3 && fallingBlockEntity.position().distanceTo(origin) > 1.5) {
                         Vec3i pos = new Vec3i((int) currentPos.x, (int) currentPos.y, (int) currentPos.z);
                         BlockPos blockPos = new BlockPos(pos);
                         level.explode(owner, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 2, Level.ExplosionInteraction.NONE);

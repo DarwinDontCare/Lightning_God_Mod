@@ -30,6 +30,8 @@ public class SetClientCooldownS2CPacket {
                 LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("ice_slide")) {
                 LightningGodMod.setIceSlideCooldown(LightningGodMod.getMaxProcessedIceSlideCooldown());
+            } else if (powerName.equals("ice_spike")) {
+                LightningGodMod.setIceSpikeCooldown(LightningGodMod.getMaxProcessedIceSpikeCooldown());
             } else if (powerName.equals("fireball")) {
                 LightningGodMod.setFireballCooldown(LightningGodMod.getMaxProcessedFireballCooldown());
                 LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);

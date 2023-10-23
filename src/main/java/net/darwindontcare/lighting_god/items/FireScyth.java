@@ -2,7 +2,10 @@ package net.darwindontcare.lighting_god.items;
 
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.FireScythDashS2CPacket;
+import net.darwindontcare.lighting_god.weapon_powers.FireScythDash;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,15 +27,15 @@ public class FireScyth extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-        ItemStack stack = player.getItemInHand(interactionHand);
-        if (!player.getCooldowns().isOnCooldown(stack.getItem()) && useTimes < 1) {
-            //System.out.println("right clicked");
-            player.swing(InteractionHand.MAIN_HAND);
-            ModMessage.sendToServer(new FireScythDashS2CPacket());
-            player.getCooldowns().addCooldown(stack.getItem(), DASH_COOLDOWN);
+        if (!level.isClientSide) {
+            ItemStack stack = player.getItemInHand(interactionHand);
+            if (!player.getCooldowns().isOnCooldown(stack.getItem()) && useTimes < 1) {
+                //System.out.println("right clicked");
+                player.swing(InteractionHand.MAIN_HAND);
+                FireScythDash.Dash((ServerPlayer) player);
+                player.getCooldowns().addCooldown(stack.getItem(), DASH_COOLDOWN);
+            }
         }
-        useTimes++;
-        if (useTimes > 1) useTimes = 0;
         return super.use(level, player, interactionHand);
     }
 
@@ -44,7 +47,7 @@ public class FireScyth extends SwordItem {
     @Override
     public boolean hurtEnemy(ItemStack itemStack, LivingEntity hurtEntity, LivingEntity attacker) {
         Vec3 hurtEntityPos = hurtEntity.position();
-        Level attackerLevel = attacker.level;
+        Level attackerLevel = attacker.level();
         List<LivingEntity> nearbyEntities = attackerLevel.getEntitiesOfClass(
                 LivingEntity.class,
                 new AABB(hurtEntityPos.x - 3, hurtEntityPos.y - 3, hurtEntityPos.z - 3, hurtEntityPos.x + 3, hurtEntityPos.y + 3, hurtEntityPos.z + 3)

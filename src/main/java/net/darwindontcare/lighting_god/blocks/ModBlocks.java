@@ -1,18 +1,10 @@
 package net.darwindontcare.lighting_god.blocks;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
-import net.darwindontcare.lighting_god.entities.CustomFallingBlockEntity;
 import net.darwindontcare.lighting_god.items.ModItems;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;

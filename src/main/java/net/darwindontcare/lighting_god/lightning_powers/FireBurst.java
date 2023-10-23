@@ -36,7 +36,7 @@ public class FireBurst {
     public static void Burst(ServerPlayer player, int cooldown) {
         if (cooldown <= 0) {
             Vec3 playerPos = player.position();
-            ServerLevel serverLevel = (ServerLevel) player.level;
+            ServerLevel serverLevel = (ServerLevel) player.level();
             List<LivingEntity> nearbyEntities = serverLevel.getEntitiesOfClass(
                     LivingEntity.class,
                     new AABB(playerPos.x, playerPos.y - RANGE, playerPos.z - RANGE, playerPos.x, playerPos.y + RANGE, playerPos.z + RANGE)
@@ -49,8 +49,8 @@ public class FireBurst {
             }
             for (int i = 0; i < 25; i++) {serverLevel.sendParticles(ParticleTypes.FLAME, playerPos.x + player.getRandomY() * 0.01, playerPos.y + player.getRandomY() * 0.01, playerPos.z + player.getRandomY() * 0.01, 1, player.getRandomY() * 0.01, player.getRandomY() * 0.01, player.getRandomY() * 0.01, player.getRandomY() * 0.01);}
             serverLevel.playSound(null, playerPos.x, playerPos.y, playerPos.z, SoundEvents.BLAZE_SHOOT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(player.level, player);
-            player.level.explode(player, player.getX(), player.getY(), player.getZ(), (float)5, flag, Level.ExplosionInteraction.NONE);
+            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(player.level(), player);
+            player.level().explode(player, player.getX(), player.getY(), player.getZ(), (float)5, flag, Level.ExplosionInteraction.NONE);
             MobEffectInstance fireProtection = new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200, 2);
             player.addEffect(fireProtection);
             PlaceFire(player, RANGE);
@@ -61,7 +61,7 @@ public class FireBurst {
     private static void PlaceFire(ServerPlayer player, int maxDistance) {
         new Thread(() -> {
             Random random = new Random();
-            ServerLevel serverLevel = (ServerLevel) player.level;
+            ServerLevel serverLevel = (ServerLevel) player.level();
             for (int distance = 1; distance < maxDistance; distance++) {
                 for (int x = -1; x < 1; x++) {
                     for (int y = -1; y < 1; y++) {
@@ -78,7 +78,7 @@ public class FireBurst {
                                         for(int idx = 0; idx < 10; idx++) {
                                             serverLevel.sendParticles(ParticleTypes.CLOUD, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                                         }
-                                        player.level.playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+                                        player.level().playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                                     } else if ((probability > 0.5 && currentBlock.getBlock().equals(Blocks.OBSIDIAN))) {
                                         serverLevel.setBlock(new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z), Blocks.LAVA.defaultBlockState(), 3);
                                         serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z));
@@ -86,7 +86,7 @@ public class FireBurst {
                                         for(int idx = 0; idx < 10; idx++) {
                                             serverLevel.sendParticles(ParticleTypes.CLOUD, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                                         }
-                                        player.level.playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+                                        player.level().playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                                     }
                                 }
                             }

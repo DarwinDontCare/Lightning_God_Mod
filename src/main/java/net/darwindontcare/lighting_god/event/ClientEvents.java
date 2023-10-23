@@ -1,7 +1,6 @@
 package net.darwindontcare.lighting_god.event;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
-import net.darwindontcare.lighting_god.client.PlayerAnim;
 import net.darwindontcare.lighting_god.client.PowersCooldown;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.*;
@@ -13,6 +12,9 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class ClientEvents {
     @Mod.EventBusSubscriber(modid = LightningGodMod.MOD_ID, value = Dist.CLIENT)
@@ -72,7 +74,7 @@ public class ClientEvents {
                     } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 2) {
                         ModMessage.sendToServer(new StartFireFlightC2SPacket(LightningGodMod.getFireFlightCooldown()));
                     } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 2) {
-                        //ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown()));
+                        ModMessage.sendToServer(new IceSpikePowerC2SPacket(LightningGodMod.getIceSpikeCooldown()));
                     } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 2) {
                         ModMessage.sendToServer(new EarthTrapC2SPacket(LightningGodMod.getEarthTrapCooldown()));
                     }
@@ -107,6 +109,10 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onKeyRegister(RegisterKeyMappingsEvent event) {
             event.register(KeyBindings.FIRST_POWER_KEY);
+            event.register(KeyBindings.SECOND_POWER_KEY);
+            event.register(KeyBindings.THIRD_POWER_KEY);
+            event.register(KeyBindings.FORTH_POWER_KEY);
+            event.register(KeyBindings.POWER_WHEEL_KEY);
         }
 
         @SubscribeEvent

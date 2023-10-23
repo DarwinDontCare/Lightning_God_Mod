@@ -23,15 +23,15 @@ public class CustomFireball extends LargeFireball {
     @Override
     protected void onHit(HitResult hitResult) {
         //super.onHit(hitResult);
-        level.explode(this.getOwner(), this.position().x, this.position().y, this.position().z, explosionPower, true, Level.ExplosionInteraction.NONE);
+        level().explode(this.getOwner(), this.position().x, this.position().y, this.position().z, explosionPower, true, Level.ExplosionInteraction.NONE);
         this.discard();
     }
 
     @Override
     protected void onHitEntity(EntityHitResult entityHitResult) {
         //super.onHitEntity(entityHitResult);
-        level.explode(this.getOwner(), this.position().x, this.position().y, this.position().z, explosionPower, true, Level.ExplosionInteraction.NONE);
-        if (!this.level.isClientSide) {
+        level().explode(this.getOwner(), this.position().x, this.position().y, this.position().z, explosionPower, true, Level.ExplosionInteraction.NONE);
+        if (!this.level().isClientSide) {
             Entity entity = entityHitResult.getEntity();
             Entity entity1 = this.getOwner();
             entity.hurt(this.damageSources().fireball(this, entity1), damage);

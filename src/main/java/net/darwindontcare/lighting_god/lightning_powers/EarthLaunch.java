@@ -15,7 +15,7 @@ public class EarthLaunch {
             double motionY = player.getForward().y * POWER;
             double motionZ = player.getForward().z * POWER;
             ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, motionY, motionZ), player, false), player);
-            player.level.explode(player, player.getX(), player.getY(0.0625D), player.getZ(), 3.0F, Level.ExplosionInteraction.NONE);
+            player.level().explode(player, player.getX(), player.getY(0.0625D), player.getZ(), 3.0F, Level.ExplosionInteraction.NONE);
             ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_launch"), player);
         }
     }

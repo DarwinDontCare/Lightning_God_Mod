@@ -33,9 +33,9 @@ public class SetMeteorDataC2SPacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             try {
-                MeteorProjectile projectile = (MeteorProjectile) player.level.getEntity(entity);
+                MeteorProjectile projectile = (MeteorProjectile) player.level().getEntity(entity);
                 if (projectile == null) {
-                    List<MeteorProjectile> projectiles = player.level.getEntitiesOfClass(
+                    List<MeteorProjectile> projectiles = player.level().getEntitiesOfClass(
                             MeteorProjectile.class,
                             new AABB(player.getX() - 1000, player.getY() - 1000, player.getZ() - 1000, player.getX() + 1000, player.getY() + 1000, player.getZ() + 1000)
                     );

@@ -36,7 +36,7 @@ public class EarthMeteor {
 
     private static void summonMeteor(ServerPlayer player, Vec3 position) {
         try {
-            ServerLevel serverLevel = (ServerLevel)player.level;
+            ServerLevel serverLevel = (ServerLevel)player.level();
             MeteorProjectile meteorProjectile = new MeteorProjectile(serverLevel, player, 0, 0, 0, 30, new Vec3(0, -2f, 0));
             meteorProjectile.setPower(30);
             try {

@@ -21,15 +21,15 @@ import java.util.List;
 public class Fireball {
     public static void ShootFireball(ServerPlayer player, int cooldown) {
         try {
-            ServerLevel serverLevel = (ServerLevel) player.level;
+            ServerLevel serverLevel = (ServerLevel) player.level();
             player.swing(InteractionHand.MAIN_HAND);
             if (cooldown <= 0) {
-                CustomFireball largeFireball = new CustomFireball(player.level, player, player.getForward().x, player.getForward().y, player.getForward().z, 3);
+                CustomFireball largeFireball = new CustomFireball(player.level(), player, player.getForward().x, player.getForward().y, player.getForward().z, 2);
                 largeFireball.setPos(largeFireball.position().x, largeFireball.position().y + player.getEyeHeight(), largeFireball.position().z);
                 largeFireball.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0f, 4.0f, 4.0f);
-                player.level.addFreshEntity(largeFireball);
+                player.level().addFreshEntity(largeFireball);
                 for(int i = 0; i < 35; i++){serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.005, player.getY() + player.getEyeHeight() + player.getRandomY() * 0.005, player.getZ() + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);}
-                player.level.playSound(null, player.position().x, player.position().y + player.getEyeHeight(), player.position().z, SoundEvents.GHAST_SHOOT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+                player.level().playSound(null, player.position().x, player.position().y + player.getEyeHeight(), player.position().z, SoundEvents.GHAST_SHOOT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                 ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fireball"), player);
             }
         } catch (Exception exception) {

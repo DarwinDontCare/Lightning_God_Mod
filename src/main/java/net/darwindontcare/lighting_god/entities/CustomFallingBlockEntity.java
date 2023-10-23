@@ -1,34 +1,22 @@
 package net.darwindontcare.lighting_god.entities;
 
-import com.mojang.logging.LogUtils;
-import net.darwindontcare.lighting_god.blocks.ModBlocks;
-import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.commands.data.BlockDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.levelgen.material.MaterialRuleList;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class CustomFallingBlockEntity extends FallingBlock {
@@ -38,7 +26,7 @@ public class CustomFallingBlockEntity extends FallingBlock {
     private static final float POWER = 1f;
 
     public CustomFallingBlockEntity() {
-        super(Properties.of(Material.STONE, MaterialColor.STONE).strength(0.5F, 2.0F).color(MaterialColor.STONE).noOcclusion());
+        super(Properties.of().strength(0.5F, 2.0F).mapColor(MapColor.STONE).noOcclusion());
     }
 
     @Override
@@ -68,10 +56,10 @@ public class CustomFallingBlockEntity extends FallingBlock {
     @Override
     protected void falling(FallingBlockEntity fallingBlockEntity) {
         super.falling(fallingBlockEntity);
-        ServerLevel serverLevel = (ServerLevel) fallingBlockEntity.level;
+        ServerLevel serverLevel = (ServerLevel) fallingBlockEntity.level();
         BlockPos blockPos = new BlockPos((int)fallingBlockEntity.position().x, (int)fallingBlockEntity.position().y, (int)fallingBlockEntity.position().z);
         BlockState currentBlockState = serverLevel.getBlockState(blockPos);
-        if (currentBlockState.getMaterial().isSolid() && currentBlockState.getBlock() != parentBlock) {
+        if (currentBlockState.isSolid() && currentBlockState.getBlock() != parentBlock) {
             serverLevel.explode(getOwner(), blockPos.getX(), blockPos.getY(), blockPos.getZ(), 3, Level.ExplosionInteraction.TNT);
         }
         List<LivingEntity> nearbyEntities = serverLevel.getEntitiesOfClass(

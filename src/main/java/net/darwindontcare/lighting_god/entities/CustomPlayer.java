@@ -198,7 +198,7 @@ public abstract class CustomPlayer extends Player {
         net.minecraftforge.event.ForgeEventFactory.onPlayerPreTick(this);
         this.noPhysics = this.isSpectator();
         if (this.isSpectator()) {
-            this.onGround = false;
+            this.setOnGround(false);
         }
 
         if (this.takeXpDelay > 0) {
@@ -211,7 +211,7 @@ public abstract class CustomPlayer extends Player {
                 this.sleepCounter = 100;
             }
 
-            if (!this.level.isClientSide && !net.minecraftforge.event.ForgeEventFactory.fireSleepingTimeCheck(this, getSleepingPos())) {
+            if (!this.level().isClientSide && !net.minecraftforge.event.ForgeEventFactory.fireSleepingTimeCheck(this, getSleepingPos())) {
                 this.stopSleepInBed(false, true);
             }
         } else if (this.sleepCounter > 0) {
@@ -223,13 +223,13 @@ public abstract class CustomPlayer extends Player {
 
         this.updateIsUnderwater();
         super.tick();
-        if (!this.level.isClientSide && this.containerMenu != null && !this.containerMenu.stillValid(this)) {
+        if (!this.level().isClientSide && this.containerMenu != null && !this.containerMenu.stillValid(this)) {
             this.closeContainer();
             this.containerMenu = this.inventoryMenu;
         }
 
         this.moveCloak();
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             this.foodData.tick(this);
             this.awardStat(Stats.PLAY_TIME);
             this.awardStat(Stats.TOTAL_WORLD_TIME);
@@ -256,7 +256,7 @@ public abstract class CustomPlayer extends Player {
         ++this.attackStrengthTicker;
         ItemStack itemstack = this.getMainHandItem();
         if (!ItemStack.matches(this.lastItemInMainHand, itemstack)) {
-            if (!ItemStack.isSame(this.lastItemInMainHand, itemstack)) {
+            if (!ItemStack.isSameItem(this.lastItemInMainHand, itemstack)) {
                 this.resetAttackStrengthTicker();
             }
 
@@ -398,7 +398,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     public void playSound(SoundEvent p_36137_, float p_36138_, float p_36139_) {
-        this.level.playSound(this, this.getX(), this.getY(), this.getZ(), p_36137_, this.getSoundSource(), p_36138_, p_36139_);
+        this.level().playSound(this, this.getX(), this.getY(), this.getZ(), p_36137_, this.getSoundSource(), p_36138_, p_36139_);
     }
 
     public void playNotifySound(SoundEvent p_36140_, SoundSource p_36141_, float p_36142_, float p_36143_) {
@@ -432,7 +432,7 @@ public abstract class CustomPlayer extends Player {
             double d0 = this.random.nextGaussian() * 0.02D;
             double d1 = this.random.nextGaussian() * 0.02D;
             double d2 = this.random.nextGaussian() * 0.02D;
-            this.level.addParticle(p_36209_, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
+            this.level().addParticle(p_36209_, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
         }
 
     }
@@ -445,7 +445,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     public void rideTick() {
-        if (!this.level.isClientSide && this.wantsToStopRiding() && this.isPassenger()) {
+        if (!this.level().isClientSide && this.wantsToStopRiding() && this.isPassenger()) {
             this.stopRiding();
             this.setShiftKeyDown(false);
         } else {
@@ -470,7 +470,7 @@ public abstract class CustomPlayer extends Player {
             --this.jumpTriggerTime;
         }
 
-        if (this.level.getDifficulty() == Difficulty.PEACEFUL && this.level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION)) {
+        if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION)) {
             if (this.getHealth() < this.getMaxHealth() && this.tickCount % 20 == 0) {
                 this.heal(1.0F);
             }
@@ -485,7 +485,7 @@ public abstract class CustomPlayer extends Player {
         super.aiStep();
         this.setSpeed((float)this.getAttributeValue(Attributes.MOVEMENT_SPEED));
         float f;
-        if (this.onGround && !this.isDeadOrDying() && !this.isSwimming()) {
+        if (this.onGround() && !this.isDeadOrDying() && !this.isSwimming()) {
             f = Math.min(0.1F, (float)this.getDeltaMovement().horizontalDistance());
         } else {
             f = 0.0F;
@@ -500,7 +500,7 @@ public abstract class CustomPlayer extends Player {
                 aabb = this.getBoundingBox().inflate(1.0D, 0.5D, 1.0D);
             }
 
-            List<Entity> list = this.level.getEntities(this, aabb);
+            List<Entity> list = this.level().getEntities(this, aabb);
             List<Entity> list1 = Lists.newArrayList();
 
             for(int i = 0; i < list.size(); ++i) {
@@ -519,20 +519,20 @@ public abstract class CustomPlayer extends Player {
 
         this.playShoulderEntityAmbientSound(this.getShoulderEntityLeft());
         this.playShoulderEntityAmbientSound(this.getShoulderEntityRight());
-        if (!this.level.isClientSide && (this.fallDistance > 0.5F || this.isInWater()) || this.abilities.flying || this.isSleeping() || this.isInPowderSnow) {
+        if (!this.level().isClientSide && (this.fallDistance > 0.5F || this.isInWater()) || this.abilities.flying || this.isSleeping() || this.isInPowderSnow) {
             this.removeEntitiesOnShoulder();
         }
 
     }
 
     private void playShoulderEntityAmbientSound(@Nullable CompoundTag p_36368_) {
-        if (p_36368_ != null && (!p_36368_.contains("Silent") || !p_36368_.getBoolean("Silent")) && this.level.random.nextInt(200) == 0) {
+        if (p_36368_ != null && (!p_36368_.contains("Silent") || !p_36368_.getBoolean("Silent")) && this.level().random.nextInt(200) == 0) {
             String s = p_36368_.getString("id");
             EntityType.byString(s).filter((p_36280_) -> {
                 return p_36280_ == EntityType.PARROT;
             }).ifPresent((p_276002_) -> {
-                if (!Parrot.imitateNearbyMobs(this.level, this)) {
-                    this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), Parrot.getAmbient(this.level, this.level.random), this.getSoundSource(), 1.0F, Parrot.getPitch(this.level.random));
+                if (!Parrot.imitateNearbyMobs(this.level(), this)) {
+                    this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), Parrot.getAmbient(this.level(), this.level().random), this.getSoundSource(), 1.0F, Parrot.getPitch(this.level().random));
                 }
 
             });
@@ -559,7 +559,7 @@ public abstract class CustomPlayer extends Player {
 
     public void startAutoSpinAttack(int p_204080_) {
         this.autoSpinAttackTicks = p_204080_;
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             this.removeEntitiesOnShoulder();
             this.setLivingEntityFlag(4, true);
         }
@@ -585,12 +585,12 @@ public abstract class CustomPlayer extends Player {
         this.resetStat(Stats.CUSTOM.get(Stats.TIME_SINCE_REST));
         this.clearFire();
         this.setSharedFlagOnFire(false);
-        this.setLastDeathLocation(Optional.of(GlobalPos.of(this.level.dimension(), this.blockPosition())));
+        this.setLastDeathLocation(Optional.of(GlobalPos.of(this.level().dimension(), this.blockPosition())));
     }
 
     protected void dropEquipment() {
         super.dropEquipment();
-        if (!this.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+        if (!this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
             this.destroyVanishingCursedItems();
             this.inventory.dropAll();
         }
@@ -625,12 +625,12 @@ public abstract class CustomPlayer extends Player {
         if (p_36179_.isEmpty()) {
             return null;
         } else {
-            if (this.level.isClientSide) {
+            if (this.level().isClientSide) {
                 this.swing(InteractionHand.MAIN_HAND);
             }
 
             double d0 = this.getEyeY() - (double)0.3F;
-            ItemEntity itementity = new ItemEntity(this.level, this.getX(), d0, this.getZ(), p_36179_);
+            ItemEntity itementity = new ItemEntity(this.level(), this.getX(), d0, this.getZ(), p_36179_);
             itementity.setPickUpDelay(40);
             if (p_36181_) {
                 itementity.setThrower(this.getUUID());
@@ -698,7 +698,7 @@ public abstract class CustomPlayer extends Player {
             f /= 5.0F;
         }
 
-        if (!this.onGround) {
+        if (!this.onGround()) {
             f /= 5.0F;
         }
 
@@ -780,13 +780,13 @@ public abstract class CustomPlayer extends Player {
         if (super.isInvulnerableTo(p_36249_)) {
             return true;
         } else if (p_36249_.is(DamageTypeTags.IS_DROWNING)) {
-            return !this.level.getGameRules().getBoolean(GameRules.RULE_DROWNING_DAMAGE);
+            return !this.level().getGameRules().getBoolean(GameRules.RULE_DROWNING_DAMAGE);
         } else if (p_36249_.is(DamageTypeTags.IS_FALL)) {
-            return !this.level.getGameRules().getBoolean(GameRules.RULE_FALL_DAMAGE);
+            return !this.level().getGameRules().getBoolean(GameRules.RULE_FALL_DAMAGE);
         } else if (p_36249_.is(DamageTypeTags.IS_FIRE)) {
-            return !this.level.getGameRules().getBoolean(GameRules.RULE_FIRE_DAMAGE);
+            return !this.level().getGameRules().getBoolean(GameRules.RULE_FIRE_DAMAGE);
         } else if (p_36249_.is(DamageTypeTags.IS_FREEZING)) {
-            return !this.level.getGameRules().getBoolean(GameRules.RULE_FREEZE_DAMAGE);
+            return !this.level().getGameRules().getBoolean(GameRules.RULE_FREEZE_DAMAGE);
         } else {
             return false;
         }
@@ -803,20 +803,20 @@ public abstract class CustomPlayer extends Player {
             if (this.isDeadOrDying()) {
                 return false;
             } else {
-                if (!this.level.isClientSide) {
+                if (!this.level().isClientSide) {
                     this.removeEntitiesOnShoulder();
                 }
 
                 if (p_36154_.scalesWithDifficulty()) {
-                    if (this.level.getDifficulty() == Difficulty.PEACEFUL) {
+                    if (this.level().getDifficulty() == Difficulty.PEACEFUL) {
                         p_36155_ = 0.0F;
                     }
 
-                    if (this.level.getDifficulty() == Difficulty.EASY) {
+                    if (this.level().getDifficulty() == Difficulty.EASY) {
                         p_36155_ = Math.min(p_36155_ / 2.0F + 1.0F, p_36155_);
                     }
 
-                    if (this.level.getDifficulty() == Difficulty.HARD) {
+                    if (this.level().getDifficulty() == Difficulty.HARD) {
                         p_36155_ = p_36155_ * 3.0F / 2.0F;
                     }
                 }
@@ -858,7 +858,7 @@ public abstract class CustomPlayer extends Player {
 
     protected void hurtCurrentlyUsedShield(float p_36383_) {
         if (this.useItem.canPerformAction(net.minecraftforge.common.ToolActions.SHIELD_BLOCK)) {
-            if (!this.level.isClientSide) {
+            if (!this.level().isClientSide) {
                 this.awardStat(Stats.ITEM_USED.get(this.useItem.getItem()));
             }
 
@@ -878,7 +878,7 @@ public abstract class CustomPlayer extends Player {
                     }
 
                     this.useItem = ItemStack.EMPTY;
-                    this.playSound(SoundEvents.SHIELD_BREAK, 0.8F, 0.8F + this.level.random.nextFloat() * 0.4F);
+                    this.playSound(SoundEvents.SHIELD_BREAK, 0.8F, 0.8F + this.level().random.nextFloat() * 0.4F);
                 }
             }
 
@@ -902,7 +902,7 @@ public abstract class CustomPlayer extends Player {
             if (f2 != 0.0F) {
                 this.causeFoodExhaustion(p_36312_.getFoodExhaustion());
                 float f1 = this.getHealth();
-                this.getCombatTracker().recordDamage(p_36312_, f1, f2);
+                this.getCombatTracker().recordDamage(p_36312_, f1);
                 this.setHealth(f1 - f2); // Forge: moved to fix MC-121048
                 if (f2 < 3.4028235E37F) {
                     this.awardStat(Stats.DAMAGE_TAKEN, Math.round(f2 * 10.0F));
@@ -978,7 +978,7 @@ public abstract class CustomPlayer extends Player {
 
                     InteractionResult interactionresult1 = itemstack.interactLivingEntity(this, (LivingEntity)p_36158_, p_36159_);
                     if (interactionresult1.consumesAction()) {
-                        this.level.gameEvent(GameEvent.ENTITY_INTERACT, p_36158_.position(), GameEvent.Context.of(this));
+                        this.level().gameEvent(GameEvent.ENTITY_INTERACT, p_36158_.position(), GameEvent.Context.of(this));
                         if (itemstack.isEmpty() && !this.abilities.instabuild) {
                             net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this, itemstack1, p_36159_);
                             this.setItemInHand(p_36159_, ItemStack.EMPTY);
@@ -1017,7 +1017,7 @@ public abstract class CustomPlayer extends Player {
             double d1 = p_36201_.z;
             double d2 = 0.05D;
 
-            while(d0 != 0.0D && this.level.noCollision(this, this.getBoundingBox().move(d0, (double)(-this.maxUpStep()), 0.0D))) {
+            while(d0 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(d0, (double)(-this.maxUpStep()), 0.0D))) {
                 if (d0 < 0.05D && d0 >= -0.05D) {
                     d0 = 0.0D;
                 } else if (d0 > 0.0D) {
@@ -1027,7 +1027,7 @@ public abstract class CustomPlayer extends Player {
                 }
             }
 
-            while(d1 != 0.0D && this.level.noCollision(this, this.getBoundingBox().move(0.0D, (double)(-this.maxUpStep()), d1))) {
+            while(d1 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(0.0D, (double)(-this.maxUpStep()), d1))) {
                 if (d1 < 0.05D && d1 >= -0.05D) {
                     d1 = 0.0D;
                 } else if (d1 > 0.0D) {
@@ -1037,7 +1037,7 @@ public abstract class CustomPlayer extends Player {
                 }
             }
 
-            while(d0 != 0.0D && d1 != 0.0D && this.level.noCollision(this, this.getBoundingBox().move(d0, (double)(-this.maxUpStep()), d1))) {
+            while(d0 != 0.0D && d1 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(d0, (double)(-this.maxUpStep()), d1))) {
                 if (d0 < 0.05D && d0 >= -0.05D) {
                     d0 = 0.0D;
                 } else if (d0 > 0.0D) {
@@ -1063,7 +1063,7 @@ public abstract class CustomPlayer extends Player {
 
     // Forge: Don't update this method to use IForgeEntity#getStepHeight() - https://github.com/MinecraftForge/MinecraftForge/issues/9376
     private boolean isAboveGround() {
-        return this.onGround || this.fallDistance < this.maxUpStep() && !this.level.noCollision(this, this.getBoundingBox().move(0.0D, (double)(this.fallDistance - this.maxUpStep()), 0.0D));
+        return this.onGround() || this.fallDistance < this.maxUpStep() && !this.level().noCollision(this, this.getBoundingBox().move(0.0D, (double)(this.fallDistance - this.maxUpStep()), 0.0D));
     }
 
     public void attack(Entity p_36347_) {
@@ -1087,12 +1087,12 @@ public abstract class CustomPlayer extends Player {
                     float i = (float)this.getAttributeValue(Attributes.ATTACK_KNOCKBACK); // Forge: Initialize this value to the attack knockback attribute of the player, which is by default 0
                     i += EnchantmentHelper.getKnockbackBonus(this);
                     if (this.isSprinting() && flag) {
-                        this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, this.getSoundSource(), 1.0F, 1.0F);
+                        this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_KNOCKBACK, this.getSoundSource(), 1.0F, 1.0F);
                         ++i;
                         flag1 = true;
                     }
 
-                    boolean flag2 = flag && this.fallDistance > 0.0F && !this.onGround && !this.onClimbable() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && p_36347_ instanceof LivingEntity;
+                    boolean flag2 = flag && this.fallDistance > 0.0F && !this.onGround() && !this.onClimbable() && !this.isInWater() && !this.hasEffect(MobEffects.BLINDNESS) && !this.isPassenger() && p_36347_ instanceof LivingEntity;
                     flag2 = flag2 && !this.isSprinting();
                     net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(this, p_36347_, flag2, flag2 ? 1.5F : 1.0F);
                     flag2 = hitResult != null;
@@ -1103,7 +1103,7 @@ public abstract class CustomPlayer extends Player {
                     f += f1;
                     boolean flag3 = false;
                     double d0 = (double)(this.walkDist - this.walkDistO);
-                    if (flag && !flag2 && !flag1 && this.onGround && d0 < (double)this.getSpeed()) {
+                    if (flag && !flag2 && !flag1 && this.onGround() && d0 < (double)this.getSpeed()) {
                         ItemStack itemstack = this.getItemInHand(InteractionHand.MAIN_HAND);
                         flag3 = itemstack.canPerformAction(net.minecraftforge.common.ToolActions.SWORD_SWEEP);
                     }
@@ -1136,7 +1136,7 @@ public abstract class CustomPlayer extends Player {
                         if (flag3) {
                             float f3 = 1.0F + EnchantmentHelper.getSweepingDamageRatio(this) * f;
 
-                            for(LivingEntity livingentity : this.level.getEntitiesOfClass(LivingEntity.class, this.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(this, p_36347_))) {
+                            for(LivingEntity livingentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(this, p_36347_))) {
                                 double entityReachSq = Mth.square(this.getEntityReach()); // Use entity reach instead of constant 9.0. Vanilla uses bottom center-to-center checks here, so don't update this to use canReach, since it uses closest-corner checks.
                                 if (livingentity != this && livingentity != p_36347_ && !this.isAlliedTo(livingentity) && (!(livingentity instanceof ArmorStand) || !((ArmorStand)livingentity).isMarker()) && this.distanceToSqr(livingentity) < entityReachSq) {
                                     livingentity.knockback((double)0.4F, (double)Mth.sin(this.getYRot() * ((float)Math.PI / 180F)), (double)(-Mth.cos(this.getYRot() * ((float)Math.PI / 180F))));
@@ -1144,7 +1144,7 @@ public abstract class CustomPlayer extends Player {
                                 }
                             }
 
-                            this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, this.getSoundSource(), 1.0F, 1.0F);
+                            this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, this.getSoundSource(), 1.0F, 1.0F);
                             this.sweepAttack();
                         }
 
@@ -1155,15 +1155,15 @@ public abstract class CustomPlayer extends Player {
                         }
 
                         if (flag2) {
-                            this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, this.getSoundSource(), 1.0F, 1.0F);
+                            this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, this.getSoundSource(), 1.0F, 1.0F);
                             this.crit(p_36347_);
                         }
 
                         if (!flag2 && !flag3) {
                             if (flag) {
-                                this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, this.getSoundSource(), 1.0F, 1.0F);
+                                this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, this.getSoundSource(), 1.0F, 1.0F);
                             } else {
-                                this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, this.getSoundSource(), 1.0F, 1.0F);
+                                this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, this.getSoundSource(), 1.0F, 1.0F);
                             }
                         }
 
@@ -1183,7 +1183,7 @@ public abstract class CustomPlayer extends Player {
                             entity = ((net.minecraftforge.entity.PartEntity<?>) p_36347_).getParent();
                         }
 
-                        if (!this.level.isClientSide && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
+                        if (!this.level().isClientSide && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
                             ItemStack copy = itemstack1.copy();
                             itemstack1.hurtEnemy((LivingEntity)entity, this);
                             if (itemstack1.isEmpty()) {
@@ -1199,15 +1199,15 @@ public abstract class CustomPlayer extends Player {
                                 p_36347_.setSecondsOnFire(j * 4);
                             }
 
-                            if (this.level instanceof ServerLevel && f5 > 2.0F) {
+                            if (this.level() instanceof ServerLevel && f5 > 2.0F) {
                                 int k = (int)((double)f5 * 0.5D);
-                                ((ServerLevel)this.level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, p_36347_.getX(), p_36347_.getY(0.5D), p_36347_.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
+                                ((ServerLevel)this.level()).sendParticles(ParticleTypes.DAMAGE_INDICATOR, p_36347_.getX(), p_36347_.getY(0.5D), p_36347_.getZ(), k, 0.1D, 0.0D, 0.1D, 0.2D);
                             }
                         }
 
                         this.causeFoodExhaustion(0.1F);
                     } else {
-                        this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, this.getSoundSource(), 1.0F, 1.0F);
+                        this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, this.getSoundSource(), 1.0F, 1.0F);
                         if (flag4) {
                             p_36347_.clearFire();
                         }
@@ -1232,7 +1232,7 @@ public abstract class CustomPlayer extends Player {
         if (this.random.nextFloat() < f) {
             this.getCooldowns().addCooldown(this.getUseItem().getItem(), 100);
             this.stopUsingItem();
-            this.level.broadcastEntityEvent(this, (byte)30);
+            this.level().broadcastEntityEvent(this, (byte)30);
         }
 
     }
@@ -1246,8 +1246,8 @@ public abstract class CustomPlayer extends Player {
     public void sweepAttack() {
         double d0 = (double)(-Mth.sin(this.getYRot() * ((float)Math.PI / 180F)));
         double d1 = (double)Mth.cos(this.getYRot() * ((float)Math.PI / 180F));
-        if (this.level instanceof ServerLevel) {
-            ((ServerLevel)this.level).sendParticles(ParticleTypes.SWEEP_ATTACK, this.getX() + d0, this.getY(0.5D), this.getZ() + d1, 0, d0, 0.0D, d1, 0.0D);
+        if (this.level() instanceof ServerLevel) {
+            ((ServerLevel)this.level()).sendParticles(ParticleTypes.SWEEP_ATTACK, this.getX() + d0, this.getY(0.5D), this.getZ() + d1, 0, d0, 0.0D, d1, 0.0D);
         }
 
     }
@@ -1296,8 +1296,8 @@ public abstract class CustomPlayer extends Player {
     public void stopSleepInBed(boolean p_36226_, boolean p_36227_) {
         net.minecraftforge.event.ForgeEventFactory.onPlayerWakeup(this, p_36226_, p_36227_);
         super.stopSleeping();
-        if (this.level instanceof ServerLevel && p_36227_) {
-            ((ServerLevel)this.level).updateSleepingPlayerList();
+        if (this.level() instanceof ServerLevel && p_36227_) {
+            ((ServerLevel)this.level()).updateSleepingPlayerList();
         }
 
         this.sleepCounter = p_36226_ ? 0 : 100;
@@ -1322,8 +1322,8 @@ public abstract class CustomPlayer extends Player {
         } else if (!p_36134_) {
             return blockstate.getRespawnPosition(EntityType.PLAYER, p_36131_, p_36132_, p_36133_, null);
         } else {
-            boolean flag = block.isPossibleToRespawnInThis();
-            boolean flag1 = p_36131_.getBlockState(p_36132_.above()).getBlock().isPossibleToRespawnInThis();
+            boolean flag = block.isPossibleToRespawnInThis(blockstate);
+            boolean flag1 = p_36131_.getBlockState(p_36132_.above()).getBlock().isPossibleToRespawnInThis(blockstate);
             return flag && flag1 ? Optional.of(new Vec3((double)p_36132_.getX() + 0.5D, (double)p_36132_.getY() + 0.1D, (double)p_36132_.getZ() + 0.5D)) : Optional.empty();
         }
     }
@@ -1386,7 +1386,7 @@ public abstract class CustomPlayer extends Player {
         if (this.isSwimming() && !this.isPassenger()) {
             double d3 = this.getLookAngle().y;
             double d4 = d3 < -0.2D ? 0.085D : 0.06D;
-            if (d3 <= 0.0D || this.jumping || !this.level.getBlockState(BlockPos.containing(this.getX(), this.getY() + 1.0D - 0.1D, this.getZ())).getFluidState().isEmpty()) {
+            if (d3 <= 0.0D || this.jumping || !this.level().getBlockState(BlockPos.containing(this.getX(), this.getY() + 1.0D - 0.1D, this.getZ())).getFluidState().isEmpty()) {
                 Vec3 vec3 = this.getDeltaMovement();
                 this.setDeltaMovement(vec3.add(0.0D, (d3 - vec3.y) * d4, 0.0D));
             }
@@ -1416,7 +1416,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     protected boolean freeAt(BlockPos p_36351_) {
-        return !this.level.getBlockState(p_36351_).isSuffocating(this.level, p_36351_);
+        return !this.level().getBlockState(p_36351_).isSuffocating(this.level(), p_36351_);
     }
 
     public float getSpeed() {
@@ -1447,7 +1447,7 @@ public abstract class CustomPlayer extends Player {
                 if (p_36380_ > 0.0D) {
                     this.awardStat(Stats.CLIMB_ONE_CM, (int)Math.round(p_36380_ * 100.0D));
                 }
-            } else if (this.onGround) {
+            } else if (this.onGround()) {
                 int l = Math.round((float)Math.sqrt(p_36379_ * p_36379_ + p_36381_ * p_36381_) * 100.0F);
                 if (l > 0) {
                     if (this.isSprinting()) {
@@ -1509,7 +1509,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     public boolean tryToStartFallFlying() {
-        if (!this.onGround && !this.isFallFlying() && !this.isInWater() && !this.hasEffect(MobEffects.LEVITATION)) {
+        if (!this.onGround() && !this.isFallFlying() && !this.isInWater() && !this.hasEffect(MobEffects.LEVITATION)) {
             ItemStack itemstack = this.getItemBySlot(EquipmentSlot.CHEST);
             if (itemstack.canElytraFly(this)) {
                 this.startFallFlying();
@@ -1609,7 +1609,7 @@ public abstract class CustomPlayer extends Player {
 
         if (p_36276_ > 0 && this.experienceLevel % 5 == 0 && (float)this.lastLevelUpTime < (float)this.tickCount - 100.0F) {
             float f = this.experienceLevel > 30 ? 1.0F : (float)this.experienceLevel / 30.0F;
-            this.level.playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_LEVELUP, this.getSoundSource(), f * 0.75F, 1.0F);
+            this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_LEVELUP, this.getSoundSource(), f * 0.75F, 1.0F);
             this.lastLevelUpTime = this.tickCount;
         }
 
@@ -1625,7 +1625,7 @@ public abstract class CustomPlayer extends Player {
 
     public void causeFoodExhaustion(float p_36400_) {
         if (!this.abilities.invulnerable) {
-            if (!this.level.isClientSide) {
+            if (!this.level().isClientSide) {
                 this.foodData.addExhaustion(p_36400_);
             }
 
@@ -1657,13 +1657,13 @@ public abstract class CustomPlayer extends Player {
             return true;
         } else {
             BlockPos blockpos = p_36205_.relative(p_36206_.getOpposite());
-            BlockInWorld blockinworld = new BlockInWorld(this.level, blockpos, false);
-            return p_36207_.hasAdventureModePlaceTagForBlock(this.level.registryAccess().registryOrThrow(Registries.BLOCK), blockinworld);
+            BlockInWorld blockinworld = new BlockInWorld(this.level(), blockpos, false);
+            return p_36207_.hasAdventureModePlaceTagForBlock(this.level().registryAccess().registryOrThrow(Registries.BLOCK), blockinworld);
         }
     }
 
     public int getExperienceReward() {
-        if (!this.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !this.isSpectator()) {
+        if (!this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !this.isSpectator()) {
             int i = this.experienceLevel * 7;
             return i > 100 ? 100 : i;
         } else {
@@ -1680,7 +1680,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     protected Entity.MovementEmission getMovementEmission() {
-        return this.abilities.flying || this.onGround && this.isDiscrete() ? Entity.MovementEmission.NONE : Entity.MovementEmission.ALL;
+        return this.abilities.flying || this.onGround() && this.isDiscrete() ? Entity.MovementEmission.NONE : Entity.MovementEmission.ALL;
     }
 
     public void onUpdateAbilities() {
@@ -1733,14 +1733,14 @@ public abstract class CustomPlayer extends Player {
     }
 
     public boolean setEntityOnShoulder(CompoundTag p_36361_) {
-        if (!this.isPassenger() && this.onGround && !this.isInWater() && !this.isInPowderSnow) {
+        if (!this.isPassenger() && this.onGround() && !this.isInWater() && !this.isInPowderSnow) {
             if (this.getShoulderEntityLeft().isEmpty()) {
                 this.setShoulderEntityLeft(p_36361_);
-                this.timeEntitySatOnShoulder = this.level.getGameTime();
+                this.timeEntitySatOnShoulder = this.level().getGameTime();
                 return true;
             } else if (this.getShoulderEntityRight().isEmpty()) {
                 this.setShoulderEntityRight(p_36361_);
-                this.timeEntitySatOnShoulder = this.level.getGameTime();
+                this.timeEntitySatOnShoulder = this.level().getGameTime();
                 return true;
             } else {
                 return false;
@@ -1751,7 +1751,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     protected void removeEntitiesOnShoulder() {
-        if (this.timeEntitySatOnShoulder + 20L < this.level.getGameTime()) {
+        if (this.timeEntitySatOnShoulder + 20L < this.level().getGameTime()) {
             this.respawnEntityOnShoulder(this.getShoulderEntityLeft());
             this.setShoulderEntityLeft(new CompoundTag());
             this.respawnEntityOnShoulder(this.getShoulderEntityRight());
@@ -1761,14 +1761,14 @@ public abstract class CustomPlayer extends Player {
     }
 
     private void respawnEntityOnShoulder(CompoundTag p_36371_) {
-        if (!this.level.isClientSide && !p_36371_.isEmpty()) {
-            EntityType.create(p_36371_, this.level).ifPresent((p_276001_) -> {
+        if (!this.level().isClientSide && !p_36371_.isEmpty()) {
+            EntityType.create(p_36371_, this.level()).ifPresent((p_276001_) -> {
                 if (p_276001_ instanceof TamableAnimal) {
                     ((TamableAnimal)p_276001_).setOwnerUUID(this.uuid);
                 }
 
                 p_276001_.setPos(this.getX(), this.getY() + (double)0.7F, this.getZ());
-                ((ServerLevel)this.level).addWithUUID(p_276001_);
+                ((ServerLevel)this.level()).addWithUUID(p_276001_);
             });
         }
 
@@ -1791,7 +1791,7 @@ public abstract class CustomPlayer extends Player {
     }
 
     public Scoreboard getScoreboard() {
-        return this.level.getScoreboard();
+        return this.level().getScoreboard();
     }
 
     public Component getDisplayName() {

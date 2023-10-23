@@ -15,6 +15,14 @@ import java.util.ArrayList;
 public class BlockPunchEvent {
     private static final float VELOCITY = 1f;
     private static boolean holdingBlock = false;
+
+    @SubscribeEvent
+    public static void onPlayerRightClick(PlayerInteractEvent.LeftClickEmpty event) {
+        if (BlockPunchEvent.isHoldingBlock()) {
+            BlockPunchEvent.resetHoldingBlock();
+        }
+    }
+
     @SubscribeEvent
     public static void onBlockRightClick(PlayerInteractEvent.RightClickBlock event) {
         // Este evento é acionado quando o jogador clica com o botão direito em um bloco.
@@ -58,6 +66,8 @@ public class BlockPunchEvent {
                         LightningGodMod.RemoveLaunchBlockToArray(pos);
                     }
                 }
+            } else if (holdingBlock) {
+                BlockPunchEvent.resetHoldingBlock();
             }
         } catch (Exception e) {System.out.println(e.toString());}
     }

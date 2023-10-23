@@ -25,7 +25,7 @@ public class EarthTrap {
     public static void Trap(ServerPlayer player, int cooldown) {
         if (cooldown <= 0) {
             Vec3 currentPos = player.position();
-            ServerLevel serverLevel = (ServerLevel) player.level;
+            ServerLevel serverLevel = (ServerLevel) player.level();
             serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BELL_RESONATE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
             for (int i = 0; i < 30; i++) {
                 serverLevel.sendParticles(ParticleTypes.ASH, player.getX(), player.getY(), player.getZ(), 1, player.getRandomY() * 0.01, player.getRandomY() * 0.01, 0, player.getRandomY() * 0.01);
@@ -50,7 +50,7 @@ public class EarthTrap {
         if (!entity.equals(caster)) {
             entity.hurt(caster.damageSources().playerAttack((Player) caster), DAMAGE);
             boolean placedIce1;
-            if (!serverLevel.getBlockState(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().y)).getMaterial().isSolid()) {
+            if (!serverLevel.getBlockState(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().y)).isSolid()) {
                 placedIce1 = serverLevel.setBlock(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z), Blocks.STONE.defaultBlockState(), 3);
                 if (placedIce1) serverLevel.gameEvent(caster, GameEvent.BLOCK_PLACE, new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z));
             } else {

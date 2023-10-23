@@ -27,7 +27,7 @@ public class FireScythDash {
 
             for (int i = 1; i < 5; i++) {
                 Vec3 currentPos = player.position().add(new Vec3(player.getForward().x * i, player.getForward().y * i, player.getForward().z * i));
-                List<LivingEntity> entities = player.level.getEntitiesOfClass(
+                List<LivingEntity> entities = player.level().getEntitiesOfClass(
                         LivingEntity.class,
                         new AABB(currentPos.x + 1, currentPos.y + 1, currentPos.z + 1, currentPos.x - 1, currentPos.y -1, currentPos.z - 1)
                 );

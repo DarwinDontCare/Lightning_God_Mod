@@ -5,6 +5,7 @@ import net.darwindontcare.lighting_god.networking.packet.AddLaunchBlockS2CPakcet
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.darwindontcare.lighting_god.utils.AddForceToEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,7 +42,7 @@ public class EarthWall {
                     playerPos = new Vec3(hitResult.getLocation().x, hitResult.getLocation().y, hitResult.getLocation().z);
                 }
 
-                List<LivingEntity> hitEntities = player.level.getEntitiesOfClass(
+                List<LivingEntity> hitEntities = player.level().getEntitiesOfClass(
                         LivingEntity.class,
                         new AABB(playerPos.x + (playerLeft.x * -1) + playerForward.x + 1, playerPos.y, playerPos.z + (playerLeft.z * -1) + playerForward.z + 1, playerPos.x + playerLeft.x + playerForward.x - 1, playerPos.y + 2, playerPos.z + playerLeft.z + playerForward.z - 1)
                 );
@@ -52,7 +53,7 @@ public class EarthWall {
                     }
                 }
 
-                ServerLevel serverLevel = (ServerLevel) player.level;
+                ServerLevel serverLevel = (ServerLevel) player.level();
                 ArrayList<Vec3> wallBlocksPos = new ArrayList<>();
                 for (int height = 0; height < 3; height++) {
                     try {
@@ -67,10 +68,10 @@ public class EarthWall {
                             BlockPos groundBlockPos = new BlockPos((int) currentPos.x,(int) currentPos.y - 1,(int) currentPos.z);
                             BlockState gorundBlock = serverLevel.getBlockState(groundBlockPos);
 
-                            if (!serverLevel.getBlockState(blockPos).getMaterial().isSolid() && gorundBlock.getMaterial().isSolid()) {
+                            if (!serverLevel.getBlockState(blockPos).isSolid() && gorundBlock.isSolid()) {
                                 serverLevel.setBlock(blockPos, Blocks.STONE.defaultBlockState(), 3);
                                 serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
-                                for (int t = 0; t < 25; t++) serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
+                                for (int t = 0; t < 25; t++) serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GLASS.defaultBlockState()), currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                                 serverLevel.playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                                 wallBlocksPos.add(blockPos.getCenter());
                             }

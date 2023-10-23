@@ -1,21 +1,13 @@
 package net.darwindontcare.lighting_god;
 
 import com.mojang.logging.LogUtils;
-import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
-import dev.kosmx.playerAnim.api.layered.ModifierLayer;
-import dev.kosmx.playerAnim.api.layered.modifier.MirrorModifier;
-import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
-import dev.kosmx.playerAnim.core.data.AnimationFormat;
-import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
-import dev.kosmx.playerAnim.core.data.gson.AnimationJson;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
+
 import net.darwindontcare.lighting_god.blocks.ModBlocks;
 import net.darwindontcare.lighting_god.blocks.entity.ModBlockEntities;
 import net.darwindontcare.lighting_god.client.SetPlayerData;
 import net.darwindontcare.lighting_god.client.render.LightningArrowRender;
 import net.darwindontcare.lighting_god.entities.EntityInit;
+import net.darwindontcare.lighting_god.entities.client.IceSpikesRenderer;
 import net.darwindontcare.lighting_god.entities.client.MeteorProjectileRenderer;
 import net.darwindontcare.lighting_god.event.TeleportEvent;
 import net.darwindontcare.lighting_god.items.ModCreativeModeTab;
@@ -23,15 +15,12 @@ import net.darwindontcare.lighting_god.items.ModItems;
 import net.darwindontcare.lighting_god.loot.ModLootModifiers;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.utils.ModItemProperties;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -87,6 +76,9 @@ public class LightningGodMod
     private static int FIRE_PULL_COOLDOWN = 0;
     private static final int MAX_FIRE_PULL_COOLDOWN = 200;
     private static int MAX_FIRE_PULL_COOLDOWN_PROCESSED = MAX_FIRE_PULL_COOLDOWN;
+    private static int ICE_SPIKE_COOLDOWN = 0;
+    private static final int MAX_ICE_SPIKE_COOLDOWN = 200;
+    private static int MAX_ICE_SPIKE_COOLDOWN_PROCESSED = MAX_ICE_SPIKE_COOLDOWN;
     private static boolean showPowerWheel = false;
     private static Player player;
     private static boolean alternativeGliding = false;
@@ -316,6 +308,21 @@ public class LightningGodMod
     public static void setMaxProcessedFirePullCooldown(int value) {
         MAX_FIRE_PULL_COOLDOWN_PROCESSED = value;
     }
+    public static int getIceSpikeCooldown() {
+        return ICE_SPIKE_COOLDOWN;
+    }
+    public static void setIceSpikeCooldown(int value) {
+        ICE_SPIKE_COOLDOWN = value;
+    }
+    public static int getMaxIceSpikeCooldown() {
+        return MAX_ICE_SPIKE_COOLDOWN;
+    }
+    public static int getMaxProcessedIceSpikeCooldown() {
+        return MAX_ICE_SPIKE_COOLDOWN_PROCESSED;
+    }
+    public static void setMaxProcessedIceSpikeCooldown(int value) {
+        MAX_ICE_SPIKE_COOLDOWN_PROCESSED = value;
+    }
 
     public static int getPowerTier(String power) {
         if (player != null) {
@@ -341,6 +348,7 @@ public class LightningGodMod
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModCreativeModeTab.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModLootModifiers.register(modEventBus);
 
@@ -369,56 +377,57 @@ public class LightningGodMod
         {
             ModItemProperties.addCustomItemProperties();
             EntityRenderers.register(EntityInit.EARTH_METEOR.get(), MeteorProjectileRenderer::new);
+            EntityRenderers.register(EntityInit.ICE_SPIKES.get(), IceSpikesRenderer::new);
             EntityRenderers.register(EntityInit.LIGHTNING_ARROW.get(), LightningArrowRender::new);
         }
     }
 
-    private void addCreative(CreativeModeTabEvent.BuildContents event) {
-        if (event.getTab() == ModCreativeModeTab.LIGHTNING_GOD_TAB) {
-            event.accept(ModItems.FIRE_BOOTS);
-            event.accept(ModItems.FIRE_LEGGINGS);
-            event.accept(ModItems.FIRE_CHESTPLATE);
-            event.accept(ModItems.FIRE_HELMET);
-
-            event.accept(ModItems.LIGHTNING_BOOTS);
-            event.accept(ModItems.LIGHTNING_LEGGINGS);
-            event.accept(ModItems.LIGHTNING_CHESTPLATE);
-            event.accept(ModItems.LIGHTNING_HELMET);
-
-            event.accept(ModItems.WATER_BOOTS);
-            event.accept(ModItems.WATER_LEGGINGS);
-            event.accept(ModItems.WATER_CHESTPLATE);
-            event.accept(ModItems.WATER_HELMET);
-
-            event.accept(ModItems.FIRE_SCYTH);
-            event.accept(ModItems.LIGHTNING_BOW);
-            event.accept(ModItems.LIGHTNING_ARROW);
-
-            event.accept(ModItems.FIRE_SCROLL);
-            event.accept(ModItems.LIGHTNING_SCROLL);
-            event.accept(ModItems.WATER_SCROLL);
-            event.accept(ModItems.EARTH_SCROLL);
-
-            event.accept(ModItems.FIRE_SCROLL_TIER_2);
-            event.accept(ModItems.LIGHTNING_SCROLL_TIER_2);
-            event.accept(ModItems.WATER_SCROLL_TIER_2);
-            event.accept(ModItems.EARTH_SCROLL_TIER_2);
-
-            event.accept(ModItems.WATER_SCROLL_TIER_3);
-            event.accept(ModItems.EARTH_SCROLL_TIER_3);
-            event.accept(ModItems.FIRE_SCROLL_TIER_3);
-            event.accept(ModItems.LIGHTNING_SCROLL_TIER_3);
-            
-            event.accept(ModItems.WATER_SCROLL_TIER_4);
-            event.accept(ModItems.EARTH_SCROLL_TIER_4);
-            event.accept(ModItems.FIRE_SCROLL_TIER_4);
-            event.accept(ModItems.LIGHTNING_SCROLL_TIER_4);
-
-            event.accept(ModItems.LIGHTNING_ESSENCE);
-            event.accept(ModItems.FIRE_ESSENCE);
-            event.accept(ModItems.WATER_ESSENCE);
-            event.accept(ModItems.EARTH_ESSENCE);
-        }
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+//        if (event.getTab() == ModCreativeModeTab.LIGHTNING_GOD_TAB) {
+//            event.accept(ModItems.FIRE_BOOTS);
+//            event.accept(ModItems.FIRE_LEGGINGS);
+//            event.accept(ModItems.FIRE_CHESTPLATE);
+//            event.accept(ModItems.FIRE_HELMET);
+//
+//            event.accept(ModItems.LIGHTNING_BOOTS);
+//            event.accept(ModItems.LIGHTNING_LEGGINGS);
+//            event.accept(ModItems.LIGHTNING_CHESTPLATE);
+//            event.accept(ModItems.LIGHTNING_HELMET);
+//
+//            event.accept(ModItems.WATER_BOOTS);
+//            event.accept(ModItems.WATER_LEGGINGS);
+//            event.accept(ModItems.WATER_CHESTPLATE);
+//            event.accept(ModItems.WATER_HELMET);
+//
+//            event.accept(ModItems.FIRE_SCYTH);
+//            event.accept(ModItems.LIGHTNING_BOW);
+//            event.accept(ModItems.LIGHTNING_ARROW);
+//
+//            event.accept(ModItems.FIRE_SCROLL);
+//            event.accept(ModItems.LIGHTNING_SCROLL);
+//            event.accept(ModItems.WATER_SCROLL);
+//            event.accept(ModItems.EARTH_SCROLL);
+//
+//            event.accept(ModItems.FIRE_SCROLL_TIER_2);
+//            event.accept(ModItems.LIGHTNING_SCROLL_TIER_2);
+//            event.accept(ModItems.WATER_SCROLL_TIER_2);
+//            event.accept(ModItems.EARTH_SCROLL_TIER_2);
+//
+//            event.accept(ModItems.WATER_SCROLL_TIER_3);
+//            event.accept(ModItems.EARTH_SCROLL_TIER_3);
+//            event.accept(ModItems.FIRE_SCROLL_TIER_3);
+//            event.accept(ModItems.LIGHTNING_SCROLL_TIER_3);
+//
+//            event.accept(ModItems.WATER_SCROLL_TIER_4);
+//            event.accept(ModItems.EARTH_SCROLL_TIER_4);
+//            event.accept(ModItems.FIRE_SCROLL_TIER_4);
+//            event.accept(ModItems.LIGHTNING_SCROLL_TIER_4);
+//
+//            event.accept(ModItems.LIGHTNING_ESSENCE);
+//            event.accept(ModItems.FIRE_ESSENCE);
+//            event.accept(ModItems.WATER_ESSENCE);
+//            event.accept(ModItems.EARTH_ESSENCE);
+//        }
     }
 
     @SubscribeEvent
@@ -434,6 +443,8 @@ public class LightningGodMod
                 setElThorCooldown(getElThorCooldown() - 1);
             } if (getIceSlideCooldown() > 0) {
                 setIceSlideCooldown(getIceSlideCooldown() - 1);
+            } if (getIceSpikeCooldown() > 0) {
+                setIceSpikeCooldown(getIceSpikeCooldown() - 1);
             } if (getFireBurstCooldown() > 0) {
                 setFireBurstCooldown(getFireBurstCooldown() - 1);
             } if (getEarthLaunchCooldown() > 0) {

@@ -1,6 +1,7 @@
 package net.darwindontcare.lighting_god.networking;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
+import net.darwindontcare.lighting_god.entities.custom.IceSpikes;
 import net.darwindontcare.lighting_god.networking.packet.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -180,6 +181,24 @@ public class ModMessage {
                 .decoder(FirePullC2SPacket::new)
                 .encoder(FirePullC2SPacket::toBytes)
                 .consumerMainThread(FirePullC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(SummonParticleC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(SummonParticleC2SPacket::new)
+                .encoder(SummonParticleC2SPacket::toBytes)
+                .consumerMainThread(SummonParticleC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(IceSpikePowerC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(IceSpikePowerC2SPacket::new)
+                .encoder(IceSpikePowerC2SPacket::toBytes)
+                .consumerMainThread(IceSpikePowerC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(IceSpikeDamageC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(IceSpikeDamageC2SPacket::new)
+                .encoder(IceSpikeDamageC2SPacket::toBytes)
+                .consumerMainThread(IceSpikeDamageC2SPacket::handle)
                 .add();
     }
 

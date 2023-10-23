@@ -46,7 +46,7 @@ public class LightningBow  extends BowItem {
 
     @Override
     public AbstractArrow customArrow(AbstractArrow arrow) {
-        LightningArrowEntity lightningArrow = new LightningArrowEntity(EntityType.ARROW, arrow.level);
+        LightningArrowEntity lightningArrow = new LightningArrowEntity(EntityType.ARROW, arrow.level());
         lightningArrow.setPos(arrow.position());
         lightningArrow.setDeltaMovement(arrow.getDeltaMovement());
         lightningArrow.setOwner(arrow.getOwner());

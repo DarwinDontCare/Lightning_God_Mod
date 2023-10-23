@@ -64,7 +64,7 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     }
 
     public void setClientData(Vec3 direction, float maxSpeed, int serverInstance) {
-        if (this.level.isClientSide) {
+        if (this.level().isClientSide) {
             this.direction = direction;
             this.maxSpeed = maxSpeed;
             this.serverInstanceId = serverInstance;
@@ -73,9 +73,9 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     }
 
     public void setServerData(boolean canStartMoving) {
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             if (!this.canStartMoving && canStartMoving)
-                this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_SHOOT, SoundSource.BLOCKS, 0.5F, (float) (0.4F / (this.getRandomY() * 0.4F + 0.8F)), false);
+                this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_SHOOT, SoundSource.BLOCKS, 0.5F, (float) (0.4F / (this.getRandomY() * 0.4F + 0.8F)), false);
             this.canStartMoving = canStartMoving;
             System.out.println(canStartMoving);
         }
@@ -84,10 +84,10 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     @Override
     protected void onHit(HitResult p_37218_) {
         super.onHit(p_37218_);
-        if (!this.level.isClientSide) {
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level, this.getOwner());
-            this.level.explode(this.getOwner(), this.position().x, this.position().y, this.position().z, this.POWER, flag, Level.ExplosionInteraction.MOB);
-            this.level.gameEvent(null, GameEvent.EXPLODE, this.position());
+        if (!this.level().isClientSide) {
+            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this.getOwner());
+            this.level().explode(this.getOwner(), this.position().x, this.position().y, this.position().z, this.POWER, flag, Level.ExplosionInteraction.NONE);
+            this.level().gameEvent(null, GameEvent.EXPLODE, this.position());
             this.discard();
         }
     }
@@ -95,7 +95,7 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     @Override
     protected void onHitEntity(EntityHitResult p_37216_) {
         super.onHitEntity(p_37216_);
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             Entity entity = p_37216_.getEntity();
             Entity entity1 = this.getOwner();
             entity.hurt(this.damageSources().fireball(this, entity1), 6.0F);
@@ -131,10 +131,10 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     public void baseTick() {
         super.baseTick();
         try {
-            if (!this.level.isClientSide) {
+            if (!this.level().isClientSide) {
                 if (!initiated) {
                     ModMessage.sendToPlayer(new SetMeteorDataS2CPacket(direction, maxSpeed, this), (ServerPlayer) this.getOwner());
-                    this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_DEATH, SoundSource.BLOCKS, 0.5F, (float) (0.4F / (this.getRandomY() * 0.4F + 0.8F)), false);
+                    this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_DEATH, SoundSource.BLOCKS, 0.5F, (float) (0.4F / (this.getRandomY() * 0.4F + 0.8F)), false);
                     initiated = true;
                 }
 
@@ -143,7 +143,7 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
                     this.setRemainingFireTicks(10);
 
                     for (int i = 0; i < 15; i++) {
-                        ((ServerLevel) this.level).sendParticles(ParticleTypes.FLAME, this.getX() + this.getRandomY() * 0.01, this.getY() + this.getRandomY() * 0.01, this.getZ() + this.getRandomY() * 0.01, 1, this.getRandomY() * 0.01, this.getRandomY() * 0.01, this.getRandomY() * 0.01, this.getRandomY() * 0.01);
+                        ((ServerLevel) this.level()).sendParticles(ParticleTypes.FLAME, this.getX() + this.getRandomY() * 0.01, this.getY() + this.getRandomY() * 0.01, this.getZ() + this.getRandomY() * 0.01, 1, this.getRandomY() * 0.01, this.getRandomY() * 0.01, this.getRandomY() * 0.01, this.getRandomY() * 0.01);
                     }
 
                     if (direction != null) {
