@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.core.jmx.Server;
 
 public class IceSlide {
-    private static final double MAX_SLIDE_SPEED = 1;
+    private static final double MAX_SLIDE_SPEED = 0.7;
     private static double CURRENT_SPEED = 0;
     private static boolean isSliding = false;
     public static void StartSlide(ServerPlayer player, int cooldown) {

@@ -200,6 +200,12 @@ public class ModMessage {
                 .encoder(IceSpikeDamageC2SPacket::toBytes)
                 .consumerMainThread(IceSpikeDamageC2SPacket::handle)
                 .add();
+
+        net.messageBuilder(ExplodeC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ExplodeC2SPacket::new)
+                .encoder(ExplodeC2SPacket::toBytes)
+                .consumerMainThread(ExplodeC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

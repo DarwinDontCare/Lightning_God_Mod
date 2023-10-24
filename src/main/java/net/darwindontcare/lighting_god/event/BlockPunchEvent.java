@@ -17,7 +17,7 @@ public class BlockPunchEvent {
     private static boolean holdingBlock = false;
 
     @SubscribeEvent
-    public static void onPlayerRightClick(PlayerInteractEvent.LeftClickEmpty event) {
+    public static void onPlayerLeftClick(PlayerInteractEvent.LeftClickEmpty event) {
         if (BlockPunchEvent.isHoldingBlock()) {
             BlockPunchEvent.resetHoldingBlock();
         }

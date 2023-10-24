@@ -1,6 +1,7 @@
 package net.darwindontcare.lighting_god.lightning_powers;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
+import net.darwindontcare.lighting_god.event.EntityGlideEvent;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.minecraft.core.BlockPos;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.projectile.Fireball;
 import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -53,43 +55,47 @@ public class FireBurst {
             player.level().explode(player, player.getX(), player.getY(), player.getZ(), (float)5, flag, Level.ExplosionInteraction.NONE);
             MobEffectInstance fireProtection = new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200, 2);
             player.addEffect(fireProtection);
-            PlaceFire(player, RANGE);
+            HeatEffect(playerPos ,player);
             ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_burst"), player);
         }
     }
 
-    private static void PlaceFire(ServerPlayer player, int maxDistance) {
+    private static void HeatEffect(Vec3 currentPos, ServerPlayer player) {
         new Thread(() -> {
-            Random random = new Random();
+            List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
+                    LivingEntity.class,
+                    new AABB(currentPos.x - RANGE, currentPos.y - RANGE, currentPos.z - RANGE, currentPos.x + RANGE, currentPos.y + RANGE, currentPos.z + RANGE)
+            );
+
+            for (LivingEntity entity : nearbyEntities) {
+                entity.setTicksFrozen(0);
+                if (EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
+                    EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
+                }
+            }
             ServerLevel serverLevel = (ServerLevel) player.level();
-            for (int distance = 1; distance < maxDistance; distance++) {
-                for (int x = -1; x < 1; x++) {
-                    for (int y = -1; y < 1; y++) {
-                        for (int z = -1; z < 1; z++) {
-                            if (x != 0 && y != 0 && z != 0) {
-                                Vec3 currentPos = new Vec3(player.position().x * distance * x, player.position().y * distance * y, player.position().z * distance * z);
-                                for (int i = 0; i < 30; i++) {
-                                    double probability = random.nextDouble(0, 1);
-                                    BlockState currentBlock = serverLevel.getBlockState(new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z));
-                                    if ((probability > 0.5 && currentBlock.getBlock().equals(Blocks.WATER))) {
-                                        serverLevel.setBlock(new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z), Blocks.AIR.defaultBlockState(), 3);
-                                        serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z));
-                                        serverLevel.sendParticles(ParticleTypes.PORTAL, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
-                                        for(int idx = 0; idx < 10; idx++) {
-                                            serverLevel.sendParticles(ParticleTypes.CLOUD, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
-                                        }
-                                        player.level().playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
-                                    } else if ((probability > 0.5 && currentBlock.getBlock().equals(Blocks.OBSIDIAN))) {
-                                        serverLevel.setBlock(new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z), Blocks.LAVA.defaultBlockState(), 3);
-                                        serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z));
-                                        serverLevel.sendParticles(ParticleTypes.PORTAL, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
-                                        for(int idx = 0; idx < 10; idx++) {
-                                            serverLevel.sendParticles(ParticleTypes.CLOUD, currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
-                                        }
-                                        player.level().playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
-                                    }
-                                }
+            Block[] iceBlocks = {Blocks.ICE, Blocks.FROSTED_ICE, Blocks.PACKED_ICE, Blocks.BLUE_ICE, Blocks.WATER};
+            for (int y = -RANGE; y < RANGE; y++) {
+                for (int x = -RANGE; x < RANGE; x++) {
+                    for (int z = -RANGE; z < RANGE; z++) {
+                        BlockPos blockPos = new BlockPos((int) currentPos.x + x, (int) currentPos.y + y, (int) currentPos.z + z);
+                        for (Block block : iceBlocks) {
+                            if (serverLevel.getBlockState(blockPos).getBlock() == block) {
+                                serverLevel.removeBlock(blockPos, false);
+                                serverLevel.gameEvent(player, GameEvent.BLOCK_DESTROY, blockPos);
+                                serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                                for (int i = 0; i < 15; i++)
+                                    serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, 0, player.getRandomY() * 0.005);
                             }
+                        }
+                        if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.OBSIDIAN) {
+                            serverLevel.removeBlock(blockPos, false);
+                            serverLevel.gameEvent(player, GameEvent.BLOCK_DESTROY, blockPos);
+                            serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                            for (int i = 0; i < 15; i++)
+                                serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, 0, player.getRandomY() * 0.005);
+                            serverLevel.setBlock(blockPos, Blocks.LAVA.defaultBlockState(), 3);
+                            serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z));
                         }
                     }
                 }

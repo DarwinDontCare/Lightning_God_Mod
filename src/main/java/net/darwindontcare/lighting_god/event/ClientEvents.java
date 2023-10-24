@@ -2,6 +2,7 @@ package net.darwindontcare.lighting_god.event;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.client.PowersCooldown;
+import net.darwindontcare.lighting_god.lightning_powers.EarthStomp;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.*;
 import net.darwindontcare.lighting_god.utils.KeyBindings;
@@ -21,7 +22,7 @@ public class ClientEvents {
     public static class ClientForgeEvents {
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
-            if (Minecraft.getInstance().player != null) {
+            if (LightningGodMod.getPlayer() != null) {
                 if (event.getAction() == 0) {
                     if (event.getKey() == KeyBindings.SECOND_POWER_KEY.getKey().getValue()) {
                         if (LightningGodMod.getCurrentPower().equals("water")) {
@@ -39,9 +40,9 @@ public class ClientEvents {
                             //ModMessage.sendToServer(new EarthWallC2SPacket(LightningGodMod.getEarthWallCooldown()));
                         }
                     }
-                    if (event.getKey() == KeyBindings.SHIFT_KEY.getKey().getValue()) {
+                    if (event.getKey() == KeyBindings.SHIFT_KEY.getKey().getValue() || LightningGodMod.getPlayer().isCrouching()) {
                         if (LightningGodMod.getCurrentPower().equals("earth")) {
-                            ModMessage.sendToServer(new StopEarthStompC2SPacket());
+                            //EarthStomp.StartStomp(LightningGodMod.getPlayer(), LightningGodMod.getPowerTier("earth"));
                         }
                     }
                 }
@@ -100,6 +101,14 @@ public class ClientEvents {
                 } else if (LightningGodMod.getShowPowerWheel()) {
                     LightningGodMod.setShowPowerWheel(false);
                 }
+            }
+        }
+
+        @SubscribeEvent
+        public void onMouseEvent(InputEvent.MouseButton event) {
+            if(event.getButton() == MouseEvent.BUTTON1) {
+                BlockPunchEvent.resetHoldingBlock();
+                System.out.println("clicked left button");
             }
         }
     }

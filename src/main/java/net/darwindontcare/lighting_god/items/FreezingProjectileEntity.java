@@ -1,5 +1,6 @@
 package net.darwindontcare.lighting_god.items;
 
+import net.darwindontcare.lighting_god.event.EntityGlideEvent;
 import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -7,6 +8,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.commands.data.DataCommands;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -24,17 +26,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class FreezingProjectileEntity extends Snowball {
@@ -51,16 +52,24 @@ public class FreezingProjectileEntity extends Snowball {
 
     @Override
     protected void onHitEntity(EntityHitResult entityHitResult) {
+        Vec3 currentPos = this.position();
+        FreezeEffect(currentPos);
         Freeze((LivingEntity) entityHitResult.getEntity());
+        this.discard();
     }
 
     @Override
-    protected void onHitBlock(BlockHitResult blockHitResult) {
-        if (!this.level().getBlockState(blockHitResult.getBlockPos()).getBlock().equals(Blocks.ICE) &&
-                !this.level().getBlockState(blockHitResult.getBlockPos()).getBlock().equals(Blocks.PACKED_ICE) &&
-                !this.level().getBlockState(blockHitResult.getBlockPos()).getBlock().equals(Blocks.BLUE_ICE) &&
-                !this.level().getBlockState(blockHitResult.getBlockPos()).getBlock().equals(Blocks.FROSTED_ICE)) {
-            this.kill();
+    protected void onHit(HitResult hitResult) {
+        if (!this.level().isClientSide) {
+            ArrayList<Block> ice = new ArrayList<>(Arrays.asList(Blocks.ICE, Blocks.PACKED_ICE, Blocks.BLUE_ICE, Blocks.FROSTED_ICE));
+            if (hitResult.getType() == HitResult.Type.BLOCK) {
+                BlockState blockState = level().getBlockState(new BlockPos((int) hitResult.getLocation().x, (int) hitResult.getLocation().y, (int) hitResult.getLocation().z));
+                if (!ice.contains(blockState.getBlock())) {
+                    Vec3 currentPos = this.position();
+                    FreezeEffect(currentPos);
+                    this.discard();
+                }
+            }
         }
     }
 
@@ -97,49 +106,14 @@ public class FreezingProjectileEntity extends Snowball {
             if (hitEntity != null) {
                 FreezeEntity(hitEntity, owner, projectile, serverLevel);
             }
-            projectile.level().playSound(null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX(), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ(), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x + 1) * 0.2), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z - 1) * 0.2), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x + 1) * 0.4), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z - 1) * 0.4), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x + 1) * 0.6), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z - 1) * 0.6), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x + 1) * 0.8), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z - 1) * 0.8), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - (projectile.getForward().x + 1), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + (projectile.getForward().z - 1), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x - 1) * 0.2), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z + 1) * 0.2), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x - 1) * 0.4), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z + 1) * 0.4), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x - 1) * 0.6), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z + 1) * 0.6), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - ((projectile.getForward().x - 1) * 0.8), projectile.getY() + this.getRandomY() * 0.0005, projectile.getZ() + ((projectile.getForward().z + 1) * 0.8), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-            serverLevel.sendParticles(ParticleTypes.END_ROD, projectile.getX() - (projectile.getForward().x - 1), projectile.getY(), projectile.getZ() + (projectile.getForward().z + 1), 1, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005, this.getRandomY() * 0.0005);
-
-            for (int idx = -1; idx < 1; idx++) {
-                ArrayList<BlockPos> blocksPos = new ArrayList<>(Arrays.asList(new BlockPos((int) (projectile.position().x + 1), (int) (projectile.position().y + idx), (int) projectile.position().z),
-                        new BlockPos((int) projectile.position().x, (int) (projectile.position().y + idx), (int) projectile.position().z),
-                        new BlockPos((int) (projectile.position().x - 1), (int) (projectile.position().y + idx), (int) projectile.position().z),
-                        new BlockPos((int) projectile.position().x, (int) (projectile.position().y + idx), (int) (projectile.position().z + 1)),
-                        new BlockPos((int) projectile.position().x, (int) (projectile.position().y + idx), (int) (projectile.position().z - 1)),
-                        new BlockPos((int) (projectile.position().x + 1), (int) (projectile.position().y + idx), (int) (projectile.position().z - 1)),
-                        new BlockPos((int) (projectile.position().x - 1), (int) (projectile.position().y + idx), (int) (projectile.position().z - 1)),
-                        new BlockPos((int) (projectile.position().x + 1), (int) (projectile.position().y + idx), (int) (projectile.position().z + 1)),
-                        new BlockPos((int) (projectile.position().x - 1), (int) (projectile.position().y + idx), (int) (projectile.position().z + 1))));
-
-                for (BlockPos blockPos : blocksPos) {
-                    BlockState block = level().getBlockState(blockPos);
-                    if (block.getBlock().equals(Blocks.WATER)) {
-                        level().setBlock(blockPos, Blocks.ICE.defaultBlockState(), 3);
-                        level().gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
-                        projectile.level().playSound((Player)null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                    } else if (block.getBlock().equals(Blocks.LAVA)) {
-                        level().setBlock(blockPos, Blocks.OBSIDIAN.defaultBlockState(), 3);
-                        level().gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
-                        projectile.level().playSound((Player)null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                    } else if (block.getBlock().equals(Blocks.FIRE)) {
-                        level().setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
-                        level().gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
-                        projectile.level().playSound((Player)null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                    }
-                }
-            }
-
             Vec3 currentPos = projectile.position();
+
+            projectile.level().playSound(null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+
+            for (int i = 0; i < 15; i++)
+                serverLevel.sendParticles(ParticleTypes.END_ROD, currentPos.x, currentPos.y, currentPos.z, 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+
+            FreezeEffect(currentPos);
             List<LivingEntity> nearbyEntities = level().getEntitiesOfClass(
                     LivingEntity.class,
                     new AABB(currentPos.x - 3, currentPos.y - 3, currentPos.z - 3, currentPos.x + 3, currentPos.y + 3, currentPos.z + 3)
@@ -154,30 +128,57 @@ public class FreezingProjectileEntity extends Snowball {
         }
     }
 
+    private void FreezeEffect(Vec3 currentPos) {
+        ServerLevel serverLevel = (ServerLevel) level();
+        for (int y = -2; y < 2; y++) {
+            for (int x = -2; x < 2; x++) {
+                for (int z = -2; z < 2; z++) {
+                    BlockPos blockPos = new BlockPos((int) currentPos.x + x, (int) currentPos.y + y, (int) currentPos.z + z);
+                    if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.LAVA) {
+                        serverLevel.removeBlock(blockPos, false);
+                        serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
+                        serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                        for (int i = 0; i < 15; i++)
+                            serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                        serverLevel.setBlock(blockPos, Blocks.OBSIDIAN.defaultBlockState(), 3);
+                    } else if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.WATER) {
+                        serverLevel.removeBlock(blockPos, false);
+                        serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
+                        serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                        for (int i = 0; i < 15; i++)
+                            serverLevel.sendParticles(ParticleTypes.END_ROD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                        serverLevel.setBlock(blockPos, Blocks.PACKED_ICE.defaultBlockState(), 3);
+                    } else if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.FIRE) {
+                        serverLevel.removeBlock(blockPos, false);
+                        serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
+                        serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                        for (int i = 0; i < 15; i++)
+                            serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                    }
+                }
+            }
+        }
+    }
+
     private void FreezeEntity(LivingEntity entity, Entity owner, Entity projectile, ServerLevel serverLevel) {
         if (!entity.equals(owner)) {
             entity.setSecondsOnFire(0);
+            Vec3 entityPos = entity.position();
             entity.hurt(owner.damageSources().playerAttack((Player) owner), FREEZE_DAMAGE);
-            ArrayList<Boolean> placedIce = new ArrayList<>();
-            int iceIndex = 0;
-            for (int x = -1; x < 1; x++) {
-                for (int z = -1; z < 1; z++) {
-                    if (!level().getBlockState(new BlockPos((int) entity.position().x + x, (int) entity.position().y, (int) entity.position().z + z)).isSolid()) {
-                        placedIce.add(level().setBlock(new BlockPos((int) entity.position().x + x, (int) entity.position().y, (int) entity.position().z + z), Blocks.PACKED_ICE.defaultBlockState(), 3));
-                        if (placedIce.get(iceIndex))
-                            level().gameEvent(owner, GameEvent.BLOCK_PLACE, new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z));
-                    } else {
-                        placedIce.add(false);
+            HashMap<Vec3, Boolean> placedIce = new HashMap<>();
+            for (int y = 0; y < entity.getEyeHeight(); y++) {
+                for (int x = -1; x < 1; x++) {
+                    for (int z = -1; z < 1; z++) {
+                        Vec3 currentPos = new Vec3((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
+                        BlockPos currentBlockPos = new BlockPos((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
+                        if (!level().getBlockState(currentBlockPos).isSolid()) {
+                            placedIce.put(currentPos, level().setBlock(currentBlockPos, Blocks.PACKED_ICE.defaultBlockState(), 3));
+                            if (placedIce.getOrDefault(currentPos, false))
+                                level().gameEvent(owner, GameEvent.BLOCK_PLACE, currentBlockPos);
+                        } else {
+                            placedIce.put(currentPos, false);
+                        }
                     }
-                    iceIndex++;
-                    if (!level().getBlockState(new BlockPos((int) entity.position().x, (int) (entity.position().y + entity.getEyeHeight()), (int) entity.position().z)).isSolid()) {
-                        placedIce.add(level().setBlock(new BlockPos((int) entity.position().x, (int) (entity.position().y + entity.getEyeHeight()), (int) entity.position().z), Blocks.PACKED_ICE.defaultBlockState(), 3));
-                        if (placedIce.get(iceIndex))
-                            level().gameEvent(owner, GameEvent.BLOCK_PLACE, new BlockPos((int) entity.position().x, (int) (entity.position().y + entity.getEyeHeight()), (int) entity.position().z));
-                    } else {
-                        placedIce.add(false);
-                    }
-                    iceIndex++;
                 }
             }
             projectile.level().playSound(null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
@@ -185,22 +186,23 @@ public class FreezingProjectileEntity extends Snowball {
             entity.setTicksFrozen(FREEZE_DAMAGE*500);
             Thread runnable = getThread(entity, this);
             new Thread(() -> {
-                Vec3 affectedEntityPos = entity.position();
                 try {
                     Thread.sleep(FREEZE_TIME*1000);
                     entity.setTicksFrozen(0);
                     runnable.interrupt();
-                    for (boolean placedIceBlock: placedIce) {
+                    for (int y = 0; y < entity.getEyeHeight(); y++) {
                         for (int x = -1; x < 1; x++) {
                             for (int z = -1; z < 1; z++) {
-                                if (placedIceBlock) {
-                                    level().destroyBlock(new BlockPos((int) affectedEntityPos.x + x, (int) affectedEntityPos.y, (int) affectedEntityPos.z + z), true);
-                                    level().gameEvent(owner, GameEvent.BLOCK_DESTROY, new BlockPos((int) affectedEntityPos.x + x, (int) affectedEntityPos.y, (int) affectedEntityPos.z + z));
+                                Vec3 currentPos = new Vec3((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
+                                BlockPos currentBlockPos = new BlockPos((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
+                                if (placedIce.get(currentPos)) {
+                                    level().destroyBlock(currentBlockPos, true);
+                                    level().gameEvent(owner, GameEvent.BLOCK_DESTROY, currentBlockPos);
                                 }
                             }
                         }
                     }
-                    entity.level().playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.GLASS_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                    entity.level().playSound(null, entityPos.x, entityPos.y, entityPos.z, SoundEvents.GLASS_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
@@ -213,12 +215,17 @@ public class FreezingProjectileEntity extends Snowball {
         Thread runnable = new Thread(() -> {
             while (projectile.getLifeTime() > 0 && entity.getTicksFrozen() > 0) {
                 if (!(entity instanceof Player)) {
-                    entity.getBrain().clearMemories();
+                    if (!EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
+                        EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
+                    }
                 } else {
                     entity.setNoGravity(true);
                     MobEffectInstance slowness = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 255, false, false);
                     entity.addEffect(slowness);
                 }
+            }
+            if (!(entity instanceof Player)) {
+                EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
             }
         });
         runnable.start();

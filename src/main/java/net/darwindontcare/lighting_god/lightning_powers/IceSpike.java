@@ -10,7 +10,7 @@ public class IceSpike {
     public static void Spike(ServerPlayer player, int cooldown) {
         if (cooldown <= 0) {
             ServerLevel serverLevel = (ServerLevel) player.level();
-            IceSpikes iceSpikes = new IceSpikes(player.level(), 0, 0, 0, player.getXRot(), 0, player);
+            IceSpikes iceSpikes = new IceSpikes(player.level(), 0, 0, 0, player.getYRot(), 0, player);
             iceSpikes.setPos(player.position().add(player.getForward()));
 
             serverLevel.addFreshEntity(iceSpikes);

@@ -51,8 +51,6 @@ public class FireFlight {
             }
         }
         if (!isFlying) {
-            System.out.println("started flying");
-            System.out.println(flyingList);
             ServerLevel serverLevel = (ServerLevel) player.level();
             for (int i = 0; i < playerList.size(); i++) {
                 if (playerList.get(i) == player.getId()) {
@@ -119,12 +117,15 @@ public class FireFlight {
 
     public static void stop_flight(ServerPlayer player, int cooldown) {
         if (cooldown <= 0) {
+            int playerIdx = 0;
             for (int i = 0; i < playerList.size(); i++) {
                 if (playerList.get(i) == player.getId()) {
-                    flyingList.set(i, false);
+                    playerIdx = i;
                     break;
                 }
             }
+            flyingList.remove(playerIdx);
+            playerList.remove(playerIdx);
             ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_flight"), player);
             player.getAbilities().flying = false;
             player.stopFallFlying();

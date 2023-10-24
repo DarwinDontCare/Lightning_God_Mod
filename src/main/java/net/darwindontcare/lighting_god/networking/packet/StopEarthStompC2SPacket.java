@@ -22,7 +22,6 @@ public class StopEarthStompC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            EarthStomp.StopStomp(player);
         });
 
         return true;

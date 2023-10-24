@@ -5,14 +5,18 @@
 			"animation_length": 3.16667,
 			"bones": {
 				"bone": {
-					"rotation": {
-						"vector": [0, -90, 0]
+					"relative_to": {
+						"rotation": "entity"
 					},
+					"rotation": [0, 0, 0.01],
 					"scale": {
 						"vector": [4.5, 4.5, 4.5]
 					}
 				},
 				"bone2": {
+					"rotation": {
+						"vector": [-6.92028, 0, 0]
+					},
 					"position": {
 						"vector": [0, 0, 0]
 					},
@@ -40,7 +44,7 @@
 				},
 				"bone3": {
 					"rotation": {
-						"vector": [0, -52.5, 0]
+						"vector": [1.52927, -52.91973, 8.22831]
 					},
 					"position": {
 						"vector": [3, 0, -2]
@@ -72,7 +76,7 @@
 				},
 				"bone4": {
 					"rotation": {
-						"vector": [0, 100, 0]
+						"vector": [163.0797, 80, -180]
 					},
 					"position": {
 						"vector": [3, 0, 2]
@@ -104,7 +108,7 @@
 				},
 				"bone5": {
 					"rotation": {
-						"vector": [0, -85, 0]
+						"vector": [13.0797, -85, 0]
 					},
 					"position": {
 						"vector": [7, 0, 0]
@@ -136,7 +140,7 @@
 				},
 				"bone6": {
 					"rotation": {
-						"vector": [0, 70, 0]
+						"vector": [-2.53062, 70.15185, 7.32715]
 					},
 					"position": {
 						"vector": [10, 0, -3]
@@ -168,7 +172,7 @@
 				},
 				"bone7": {
 					"rotation": {
-						"vector": [0, -52.5, 0]
+						"vector": [9.81828, -52.67227, 4.10555]
 					},
 					"position": {
 						"vector": [13, 0, 3]
@@ -199,6 +203,9 @@
 					}
 				},
 				"bone8": {
+					"rotation": {
+						"vector": [-4.18667, 1.78704, 14.8956]
+					},
 					"position": {
 						"vector": [18, 0, -4]
 					},
@@ -229,7 +236,7 @@
 				},
 				"bone9": {
 					"rotation": {
-						"vector": [0, -22.5, 0]
+						"vector": [8.01968, -21.52528, 13.44643]
 					},
 					"position": {
 						"vector": [22, 0, 4]
@@ -261,7 +268,7 @@
 				},
 				"bone10": {
 					"rotation": {
-						"vector": [0, -15, 0]
+						"vector": [-5.03274, -13.14958, 12.74711]
 					},
 					"position": {
 						"vector": [26, 0, -4]
@@ -293,7 +300,7 @@
 				},
 				"bone11": {
 					"rotation": {
-						"vector": [0, 15, 0]
+						"vector": [-1.61455, 2.07637, 17.38021]
 					},
 					"position": {
 						"vector": [31, 0, 0]

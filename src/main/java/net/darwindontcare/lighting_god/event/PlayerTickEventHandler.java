@@ -2,6 +2,7 @@ package net.darwindontcare.lighting_god.event;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.items.ModItems;
+import net.darwindontcare.lighting_god.lightning_powers.EarthStomp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -9,6 +10,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -57,9 +59,9 @@ public final class PlayerTickEventHandler {
 
     private static Player currentPlayer;
     
-    private static void checkArmorSet(final TickEvent.PlayerTickEvent event, Item[] armorSet, boolean[] appliedArmorBuff, int[] maxCooldown, int[] maxProcessedCooldown, String type) {
+    private static void checkArmorSet(Item[] armorSet, boolean[] appliedArmorBuff, int[] maxCooldown, int[] maxProcessedCooldown, String type) {
         for (int i = 0; i < 4; i++) {
-            if (event.player.getInventory().getArmor(i).is(armorSet[i])) {
+            if (currentPlayer.getInventory().getArmor(i).is(armorSet[i])) {
                 if (!appliedArmorBuff[i]) {
                     for (int idx = 0; idx < maxCooldown.length; idx++) {
                         maxProcessedCooldown[idx] -= (maxCooldown[idx] * 20) / 100;
@@ -123,61 +125,72 @@ public final class PlayerTickEventHandler {
         if (!loadedModDataToPlayer && event.player != null) {
             try {
                 CompoundTag data = event.player.getPersistentData();
-                currentPlayer = event.player;
-                LightningGodMod.setPlayer(currentPlayer);
-                loadedModDataToPlayer = true;
-                System.out.println(data.getString("currentPowers"));
+                if (!data.isEmpty()) {
+                    currentPlayer = event.player;
+                    LightningGodMod.setPlayer(currentPlayer);
+                    loadedModDataToPlayer = true;
+                    System.out.println(data.getString("currentPowers"));
+                }
             } catch (Exception exception) {
                 System.out.println(exception.toString());
                 loadedModDataToPlayer = true;
             }
         }
-        try {
-            Item[] lightningArmor = {ModItems.LIGHTNING_BOOTS.get(), ModItems.LIGHTNING_LEGGINGS.get(), ModItems.LIGHTNING_CHESTPLATE.get(), ModItems.LIGHTNING_HELMET.get()};
-            Item[] fireArmor = {ModItems.FIRE_BOOTS.get(), ModItems.FIRE_LEGGINGS.get(), ModItems.FIRE_CHESTPLATE.get(), ModItems.FIRE_HELMET.get()};
-            Item[] waterArmor = {ModItems.WATER_BOOTS.get(), ModItems.WATER_LEGGINGS.get(), ModItems.WATER_CHESTPLATE.get(), ModItems.WATER_HELMET.get()};
+        if (currentPlayer != null) {
+            try {
+                Item[] lightningArmor = {ModItems.LIGHTNING_BOOTS.get(), ModItems.LIGHTNING_LEGGINGS.get(), ModItems.LIGHTNING_CHESTPLATE.get(), ModItems.LIGHTNING_HELMET.get()};
+                Item[] fireArmor = {ModItems.FIRE_BOOTS.get(), ModItems.FIRE_LEGGINGS.get(), ModItems.FIRE_CHESTPLATE.get(), ModItems.FIRE_HELMET.get()};
+                Item[] waterArmor = {ModItems.WATER_BOOTS.get(), ModItems.WATER_LEGGINGS.get(), ModItems.WATER_CHESTPLATE.get(), ModItems.WATER_HELMET.get()};
 
-            maxTpCooldown = LightningGodMod.getMaxTeleportCooldown();
-            maxProcessedTpCooldown = LightningGodMod.getMaxProcessedTeleportCooldown();
-            maxElThorCooldown = LightningGodMod.getMaxElThorCooldown();
-            maxProcessedElThorCooldown = LightningGodMod.getMaxProcessedElThorCooldown();
+                maxTpCooldown = LightningGodMod.getMaxTeleportCooldown();
+                maxProcessedTpCooldown = LightningGodMod.getMaxProcessedTeleportCooldown();
+                maxElThorCooldown = LightningGodMod.getMaxElThorCooldown();
+                maxProcessedElThorCooldown = LightningGodMod.getMaxProcessedElThorCooldown();
 
-            maxFireballCooldown = LightningGodMod.getMaxFireballCooldown();
-            maxProcessedFireballCooldown = LightningGodMod.getMaxProcessedFireballCooldown();
-            maxFireBurstCooldown = LightningGodMod.getMaxFireBurstCooldown();
-            maxProcessedFireBurstCooldown = LightningGodMod.getMaxProcessedFireBurstCooldown();
-            maxFireFlightCooldown = LightningGodMod.getMaxFireFlightCooldown();
-            maxProcessedFireFlightCooldown = LightningGodMod.getMaxProcessedFireFlightCooldown();
-            maxFirePullCooldown = LightningGodMod.getMaxFirePullCooldown();
-            maxProcessedFirePullCooldown = LightningGodMod.getMaxProcessedFirePullCooldown();
+                maxFireballCooldown = LightningGodMod.getMaxFireballCooldown();
+                maxProcessedFireballCooldown = LightningGodMod.getMaxProcessedFireballCooldown();
+                maxFireBurstCooldown = LightningGodMod.getMaxFireBurstCooldown();
+                maxProcessedFireBurstCooldown = LightningGodMod.getMaxProcessedFireBurstCooldown();
+                maxFireFlightCooldown = LightningGodMod.getMaxFireFlightCooldown();
+                maxProcessedFireFlightCooldown = LightningGodMod.getMaxProcessedFireFlightCooldown();
+                maxFirePullCooldown = LightningGodMod.getMaxFirePullCooldown();
+                maxProcessedFirePullCooldown = LightningGodMod.getMaxProcessedFirePullCooldown();
 
-            maxFreezeCooldown = LightningGodMod.getMaxFreezeCooldown();
-            maxProcessedFreezeCooldown = LightningGodMod.getMaxProcessedFreezeCooldown();
-            maxIceSlideCooldown = LightningGodMod.getMaxIceSlideCooldown();
-            maxProcessedIceSlideCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
-            maxIceSpikeCooldown = LightningGodMod.getMaxIceSlideCooldown();
-            maxProcessedIceSpikeCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
+                maxFreezeCooldown = LightningGodMod.getMaxFreezeCooldown();
+                maxProcessedFreezeCooldown = LightningGodMod.getMaxProcessedFreezeCooldown();
+                maxIceSlideCooldown = LightningGodMod.getMaxIceSlideCooldown();
+                maxProcessedIceSlideCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
+                maxIceSpikeCooldown = LightningGodMod.getMaxIceSlideCooldown();
+                maxProcessedIceSpikeCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
 
-            int[] fireMaxCooldonws = {maxFireballCooldown, maxFireBurstCooldown, maxFireFlightCooldown, maxFirePullCooldown};
-            int[] fireMaxProcessedCooldonws = {maxProcessedFireballCooldown, maxProcessedFireBurstCooldown, maxProcessedFireFlightCooldown, maxProcessedFirePullCooldown};
+                int[] fireMaxCooldonws = {maxFireballCooldown, maxFireBurstCooldown, maxFireFlightCooldown, maxFirePullCooldown};
+                int[] fireMaxProcessedCooldonws = {maxProcessedFireballCooldown, maxProcessedFireBurstCooldown, maxProcessedFireFlightCooldown, maxProcessedFirePullCooldown};
 
-            int[] lightningMaxCooldonws = {maxTpCooldown, maxElThorCooldown};
-            int[] lightningMaxProcessedCooldonws = {maxProcessedTpCooldown, maxProcessedElThorCooldown};
+                int[] lightningMaxCooldonws = {maxTpCooldown, maxElThorCooldown};
+                int[] lightningMaxProcessedCooldonws = {maxProcessedTpCooldown, maxProcessedElThorCooldown};
 
-            int[] waterMaxCooldonws = {maxFreezeCooldown, maxIceSlideCooldown, maxIceSpikeCooldown};
-            int[] waterMaxProcessedCooldonws = {maxProcessedFreezeCooldown, maxProcessedIceSlideCooldown, maxProcessedIceSpikeCooldown};
+                int[] waterMaxCooldonws = {maxFreezeCooldown, maxIceSlideCooldown, maxIceSpikeCooldown};
+                int[] waterMaxProcessedCooldonws = {maxProcessedFreezeCooldown, maxProcessedIceSlideCooldown, maxProcessedIceSpikeCooldown};
 
-            checkArmorSet(event, lightningArmor, appliedLightningArmorBuff, lightningMaxCooldonws, lightningMaxProcessedCooldonws, "lightning");
-            checkArmorSet(event, fireArmor, appliedFireArmorBuff, fireMaxCooldonws, fireMaxProcessedCooldonws, "fire");
-            checkArmorSet(event, waterArmor, appliedWaterArmorBuff, waterMaxCooldonws, waterMaxProcessedCooldonws, "water");
+                checkArmorSet(lightningArmor, appliedLightningArmorBuff, lightningMaxCooldonws, lightningMaxProcessedCooldonws, "lightning");
+                checkArmorSet(fireArmor, appliedFireArmorBuff, fireMaxCooldonws, fireMaxProcessedCooldonws, "fire");
+                checkArmorSet(waterArmor, appliedWaterArmorBuff, waterMaxCooldonws, waterMaxProcessedCooldonws, "water");
 
-            AddPassives();
-            if (resistanceCooldown > 0)resistanceCooldown--;
-            if (fireResistanceTime > 0)fireResistanceTime--;
-        } catch (Exception exception) {
-            System.out.println(exception.toString());
+                if (LightningGodMod.getCurrentPower() != null && LightningGodMod.getCurrentPower().equals("earth")) {
+                    if (currentPlayer.isCrouching()) {
+                        EarthStomp.StartStomp(LightningGodMod.getPlayer(), LightningGodMod.getPowerTier("earth"));
+                    }
+                }
+
+                AddPassives();
+                if (resistanceCooldown > 0) resistanceCooldown--;
+                if (fireResistanceTime > 0) fireResistanceTime--;
+            } catch (Exception exception) {
+                System.out.println(exception.toString());
+            }
+            if (LightningGodMod.getAlternativeGliding()) currentPlayer.startFallFlying();
+            if (currentPlayer.swinging) BlockPunchEvent.resetHoldingBlock();
         }
-        if(LightningGodMod.getAlternativeGliding()) currentPlayer.startFallFlying();
     }
 
     private static void AddPassives() {
@@ -186,14 +199,20 @@ public final class PlayerTickEventHandler {
             int tier = LightningGodMod.getPowerTier("water");
             if (tier == 1) ApplyWaterBreathing(100, 1);
             else if (tier == 2) ApplyWaterBreathing(300, 2);
+            else if (tier == 3) ApplyWaterBreathing(600, 2);
+            else if (tier == 4) ApplyWaterBreathing(10000, 2);
         } else if (currentPower.equals("fire")) {
             int tier = LightningGodMod.getPowerTier("fire");
             if (tier == 1) ApplyFireResistance(100, 2);
             else if (tier == 2) ApplyFireResistance(300, 2);
+            else if (tier == 3) ApplyFireResistance(600, 2);
+            else if (tier == 4) ApplyFireResistance(10000, 2);
         } else if (currentPower.equals("earth")) {
             int tier = LightningGodMod.getPowerTier("earth");
             if (tier == 1) ApplyResistance(100, 1);
             else if (tier == 2) ApplyResistance(300, 2);
+            else if (tier == 3) ApplyResistance(600, 2);
+            else if (tier == 4) ApplyResistance(10000, 2);
         } else if (currentPower.equals("lightning")) {
 //            int tier = LightningGodMod.getPowerTier("lightning");
 //            if (tier == 1) ApplyResistance(90, 1);

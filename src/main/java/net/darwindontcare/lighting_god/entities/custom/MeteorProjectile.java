@@ -84,10 +84,9 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     @Override
     protected void onHit(HitResult p_37218_) {
         super.onHit(p_37218_);
+        boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this.getOwner());
+        this.level().explode(this.getOwner(), this.position().x, this.position().y, this.position().z, this.POWER, flag, Level.ExplosionInteraction.NONE);
         if (!this.level().isClientSide) {
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this.getOwner());
-            this.level().explode(this.getOwner(), this.position().x, this.position().y, this.position().z, this.POWER, flag, Level.ExplosionInteraction.NONE);
-            this.level().gameEvent(null, GameEvent.EXPLODE, this.position());
             this.discard();
         }
     }

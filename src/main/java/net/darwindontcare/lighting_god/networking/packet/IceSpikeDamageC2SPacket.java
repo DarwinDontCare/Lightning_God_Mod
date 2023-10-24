@@ -50,19 +50,7 @@ public class IceSpikeDamageC2SPacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (iceSpike != null) {
-                if (iceSpike instanceof IceSpikes) {
-                    List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
-                            LivingEntity.class,
-                            new AABB(position.x, position.y - 3, position.z - 3, position.x, position.y + 3, position.z + 3)
-                    );
 
-                    for (LivingEntity entity : nearbyEntities) {
-                        if (entity != ((IceSpikes) iceSpike).getOwner() && !(((Entity) entity) instanceof ItemEntity)) {
-                            AddForceToEntity.AddForce(entity, new Vec3(0, 2, 0), false);
-                            entity.hurt(((IceSpikes) iceSpike).damageSources().playerAttack((Player) ((IceSpikes) iceSpike).getOwner()), 15);
-                        }
-                    }
-                }
             }
         });
 

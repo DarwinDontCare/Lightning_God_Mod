@@ -1,13 +1,17 @@
 package net.darwindontcare.lighting_god.lightning_powers;
 
+import net.darwindontcare.lighting_god.event.EntityGlideEvent;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -57,18 +61,16 @@ public class EarthTrap {
                 placedIce1 = false;
             }
             serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-            entity.setTicksFrozen((int)DAMAGE*500);
             Thread runnable = getThread((LivingEntity) entity);
             new Thread(() -> {
                 Vec3 affectedEntityPos = entity.position();
                 try {
                     Thread.sleep((int)DAMAGE*1000);
-                    entity.setTicksFrozen(0);
                     runnable.interrupt();
                     if (placedIce1) {
                         serverLevel.destroyBlock(new BlockPos((int) affectedEntityPos.x, (int) affectedEntityPos.y, (int) affectedEntityPos.z), false);
                         serverLevel.gameEvent(caster, GameEvent.BLOCK_DESTROY,new BlockPos((int) affectedEntityPos.x, (int) affectedEntityPos.y, (int) affectedEntityPos.z));}
-                    serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.GLASS_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                    serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
@@ -79,9 +81,21 @@ public class EarthTrap {
     @NotNull
     private static Thread getThread(LivingEntity entity) {
         Thread runnable = new Thread(() -> {
-            Vec3 affectedEntityPos = entity.position();
-            while (entity.getTicksFrozen() > 0) {
-                entity.setPos(affectedEntityPos);
+            int freezeTime = (int) DAMAGE * 1000;
+            while (freezeTime > 0) {
+                if (!(entity instanceof Player)) {
+                    if (!EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
+                        EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
+                    }
+                } else {
+                    entity.setNoGravity(true);
+                    MobEffectInstance slowness = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 255, false, false);
+                    entity.addEffect(slowness);
+                }
+                freezeTime--;
+            }
+            if (!(entity instanceof Player)) {
+                EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
             }
         });
         runnable.start();
