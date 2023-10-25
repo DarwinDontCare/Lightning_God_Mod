@@ -32,6 +32,8 @@ public class PowersCooldown {
     private static final ResourceLocation EARTH_TRAP_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_trap_icon.png");
     private static final ResourceLocation ICE_SPIKE_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/ice_spike_icon.png");
     private static final ResourceLocation POWER_COOLDOWN = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/power_cooldown.png");
+    private static final ResourceLocation MANA_BAR = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/mana_bar.png");
+    private static final ResourceLocation MANA_BAR_CONTAINER = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/mana_bar_container.png");
 
     private static final ResourceLocation POWER_WHEEL = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/roda-de-poderes.png");
     private static final ResourceLocation POWER_WHEEL_BACKGROUND = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/vinheta-escura.png");
@@ -70,11 +72,21 @@ public class PowersCooldown {
             }
         }
         if (LightningGodMod.getShowPowerWheel()) PowerWheel(width, poseStack.pose(), height, gui, currentPower);
+        if (LightningGodMod.getPlayer() != null) ManaBar(width, poseStack.pose(), height, gui);
         else if (!isMouseLocked) {
             gui.getMinecraft().mouseHandler.grabMouse();
             isMouseLocked = true;
         }
     });
+
+    private static void ManaBar(int width, PoseStack poseStack, int height, ForgeGui gui) {
+        float currentMana = LightningGodMod.getCurrentMana();
+        int maxMana = LightningGodMod.getMaxMana();
+
+        guiGraphics.blit(MANA_BAR_CONTAINER, width - 110, 2, 0, 0, 100, 10, 100, 10);
+        int manaBarWidth = (int) (((currentMana * 100) / maxMana) * 100) / 100;
+        guiGraphics.blit(MANA_BAR, width - 110, 2, 0, 0, manaBarWidth, 10, 100, 10);
+    }
 
     private static void LightningPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {
         LoadPowerIcon(poseStack, width, height, TELEPORTATION_ICON, 26, 40, LightningGodMod.getTeleportCooldown(), LightningGodMod.getMaxProcessedTeleportCooldown());
@@ -197,7 +209,7 @@ public class PowersCooldown {
 
         guiGraphics.blit(icon, width - offsetWidth, height - offsetHeight, 0, 0, 16, 16, 16, 16);
 
-        if (cooldown > 0 && !Minecraft.getInstance().isPaused()) {
+        if (cooldown > 0) {
             //RenderSystem.setShaderTexture(0, POWER_COOLDOWN);
             int cooldown_width = (((cooldown * 100) / maxCooldown) * 16) / 100;
             guiGraphics.blit(POWER_COOLDOWN, width - offsetWidth, height - offsetHeight, 0, 0, cooldown_width, 16, 16, 16);

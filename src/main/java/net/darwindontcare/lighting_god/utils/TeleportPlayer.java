@@ -20,16 +20,21 @@ public class TeleportPlayer extends Event {
 
     private Vec3 position;
     private ServerPlayer player;
+    private float ManaCost;
 
     public Vec3 getPos() {
         return position;
+    }
+    public float getManaCost() {
+        return ManaCost;
     }
 
     public ServerPlayer getPlayer() {
         return player;
     }
-    public TeleportPlayer(Vec3 position, ServerPlayer player) {
+    public TeleportPlayer(Vec3 position, ServerPlayer player, float ManaCost) {
         this.position = position;
         this.player = player;
+        this.ManaCost = ManaCost;
     }
 }

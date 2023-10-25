@@ -10,16 +10,20 @@ import java.util.function.Supplier;
 
 public class ElThorC2SPacket {
     private int cooldown;
-    public ElThorC2SPacket(int cooldown) {
+    private float mana;
+    public ElThorC2SPacket(int cooldown, float mana) {
         this.cooldown = cooldown;
+        this.mana = mana;
     }
 
     public ElThorC2SPacket(FriendlyByteBuf buf) {
         cooldown = buf.readInt();
+        mana = buf.readFloat();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(cooldown);
+        buf.writeFloat(mana);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -27,7 +31,7 @@ public class ElThorC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            ElThor.Attack(player, cooldown);
+            ElThor.Attack(player, cooldown, mana);
         });
 
         return true;

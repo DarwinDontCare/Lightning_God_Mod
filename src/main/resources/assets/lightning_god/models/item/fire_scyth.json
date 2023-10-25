@@ -1,6 +1,18 @@
 {
   "parent": "minecraft:item/handheld",
-  "textures": {
-    "layer0": "lightning_god:item/fire_scyth"
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "lightning_god:item/fire_scyth_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "lightning_god:item/fire_scyth_2d"
+    },
+    "ground": {
+      "parent": "lightning_god:item/fire_scyth_2d"
+    },
+    "fixed": {
+      "parent": "lightning_god:item/fire_scyth_2d"
+    }
   }
 }

@@ -11,17 +11,20 @@ import java.util.function.Supplier;
 
 public class StartFireFlightC2SPacket {
     private int cooldown;
-    public StartFireFlightC2SPacket(int cooldown) {
-        if (cooldown <= 0) LightningGodMod.setAlternativeGliding(true);
+    private float mana;
+    public StartFireFlightC2SPacket(int cooldown, float mana) {
         this.cooldown = cooldown;
+        this.mana = mana;
     }
 
     public StartFireFlightC2SPacket(FriendlyByteBuf buf) {
         cooldown = buf.readInt();
+        mana = buf.readFloat();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(cooldown);
+        buf.writeFloat(mana);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -29,7 +32,7 @@ public class StartFireFlightC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            FireFlight.start_flight(player, cooldown);
+            FireFlight.start_flight(player, cooldown, mana);
         });
 
         return true;

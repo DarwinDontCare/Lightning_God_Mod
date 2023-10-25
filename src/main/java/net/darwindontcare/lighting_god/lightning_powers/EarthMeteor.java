@@ -15,8 +15,9 @@ import org.apache.logging.log4j.core.jmx.Server;
 
 public class EarthMeteor {
     private static final double RANGE = 100;
-    public static void Strike(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final int ManaCost = 100;
+    public static void Strike(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             HitResult resultBlock = player.pick(RANGE, 1.0f, false);
             RaycastUtil raycastUtil = new RaycastUtil();
             Entity entity = raycastUtil.getEntityInCrosshair(1.0f, RANGE);
@@ -30,7 +31,7 @@ public class EarthMeteor {
                 Vec3 strikePosition = Teleportation.GetNewPositionFromFacingDirection(player, RANGE);
                 summonMeteor(player, strikePosition);
             }
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_meteor"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_meteor", ManaCost), player);
         }
     }
 

@@ -26,8 +26,9 @@ import java.util.List;
 
 public class EarthTrap {
     private static final float DAMAGE = 5f;
-    public static void Trap(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final int ManaCost = 50;
+    public static void Trap(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             Vec3 currentPos = player.position();
             ServerLevel serverLevel = (ServerLevel) player.level();
             serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BELL_RESONATE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
@@ -46,7 +47,7 @@ public class EarthTrap {
                     TrapEntity(entity, player, serverLevel);
                 }
             }
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_trap"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_trap", ManaCost), player);
         }
     }
 

@@ -24,8 +24,9 @@ import java.util.List;
 
 public class EarthWall {
     private static int RANGE = 5;
-    public static void useWall(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final int ManaCost = 60;
+    public static void useWall(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             new Thread(() -> {
                 HitResult hitResult = player.pick(RANGE, 1f, false);
 
@@ -90,7 +91,7 @@ public class EarthWall {
                 ModMessage.sendToPlayer(new AddLaunchBlockS2CPakcet(positions), player);
             }).start();
 
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_wall"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_wall", ManaCost), player);
         }
     }
 }

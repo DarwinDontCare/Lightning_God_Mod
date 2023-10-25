@@ -17,8 +17,9 @@ import java.util.List;
 public class FirePull {
     private static final int RANGE = 15;
     private static final float FORCE = 1f;
-    public static void Pull(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final float ManaCost = 30f;
+    public static void Pull(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             RaycastUtil raycastUtil = new RaycastUtil();
             Vec3 entityPos = raycastUtil.getEntityInCrosshair(1.0f, RANGE).position();
             LivingEntity entity = null;
@@ -45,7 +46,7 @@ public class FirePull {
                     }
                 }).start();
             }
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_pull"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_pull", ManaCost), player);
         }
     }
 }

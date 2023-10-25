@@ -30,16 +30,17 @@ import java.util.Dictionary;
 public class FireFlight {
     private static final float MAX_SPEED = 1.5f;
     private static final double MIN_SPEED = 0.7f;
+    private static final float ManaCost = 0.15f;
     private static final ArrayList<Boolean> flyingList = new ArrayList<>();
     private static final ArrayList<Integer> playerList = new ArrayList<>();
-    public static void start_flight(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    public static void start_flight(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             if (!playerList.contains(player.getId())) {
                 flyingList.add(false);
                 playerList.add(player.getId());
             }
             flight_tick(player);
-        }
+        } else if (cooldown <= 0) stop_flight(player, cooldown);
     }
 
     private static void flight_tick(ServerPlayer player) {
@@ -80,7 +81,6 @@ public class FireFlight {
                         float modifier = player.getXRot() / 35;
                         if (modifier < 1) modifier = 1;
                         if (modifier > 3) modifier = 3;
-                        System.out.println(modifier);
                         if (CURRENT_SPEED < targetSpeed) {
                             CURRENT_SPEED += 0.01f * modifier;
                         } else if (CURRENT_SPEED > targetSpeed) {
@@ -106,6 +106,7 @@ public class FireFlight {
 
                         particleCooldown--;
                         player.resetFallDistance();
+                        ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("", ManaCost), player);
                         Thread.sleep(50);
                     }
                     flyingList.remove(playerIdx);
@@ -126,7 +127,7 @@ public class FireFlight {
             }
             flyingList.remove(playerIdx);
             playerList.remove(playerIdx);
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_flight"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_flight", 0), player);
             player.getAbilities().flying = false;
             player.stopFallFlying();
             player.resetFallDistance();

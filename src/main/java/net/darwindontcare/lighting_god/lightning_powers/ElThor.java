@@ -15,9 +15,10 @@ import net.minecraft.world.phys.Vec3;
 
 public class ElThor {
     private static final double RANGE = 100;
-    public static void Attack(ServerPlayer player, int cooldown) {
+    private static final int ManaCost = 50;
+    public static void Attack(ServerPlayer player, int cooldown, float mana) {
         try {
-            if (cooldown <= 0) {
+            if (cooldown <= 0 && mana >= ManaCost) {
                 HitResult resultBlock = player.pick(RANGE, 1.0f, false);
                 RaycastUtil raycastUtil = new RaycastUtil();
                 Entity entity = raycastUtil.getEntityInCrosshair(1.0f, RANGE);
@@ -31,7 +32,7 @@ public class ElThor {
                     summonLightning(player, strikePosition);
                 }
                 player.setPose(Pose.DIGGING);
-                ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("el_thor"), player);
+                ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("el_thor", ManaCost), player);
             }
         } catch (Exception e) {System.out.println(e.toString());}
     }

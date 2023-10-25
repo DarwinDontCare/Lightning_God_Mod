@@ -5,16 +5,18 @@ import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 public class IceSpike {
-    public static void Spike(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final int ManaCost = 70;
+    public static void Spike(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana > ManaCost) {
             ServerLevel serverLevel = (ServerLevel) player.level();
-            IceSpikes iceSpikes = new IceSpikes(player.level(), 0, 0, 0, player.getYRot(), 0, player);
-            iceSpikes.setPos(player.position().add(player.getForward()));
+            Vec3 position = player.position().add(player.getForward());
+            IceSpikes iceSpikes = new IceSpikes(player.level(), position.x, position.y, position.z, player.getYRot(), 0, player);
 
             serverLevel.addFreshEntity(iceSpikes);
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("ice_spike"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("ice_spike", ManaCost), player);
         }
     }
 }

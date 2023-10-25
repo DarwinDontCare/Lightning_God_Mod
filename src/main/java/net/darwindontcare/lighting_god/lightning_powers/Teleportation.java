@@ -13,21 +13,21 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 
 public class Teleportation {
-
-    public static void TeleportationPower(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final float ManaCost = 20f;
+    public static void TeleportationPower(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             double distance = 100;
             HitResult result = player.pick(distance, 1.0f, false);
             RaycastUtil raycastUtil = new RaycastUtil();
             Entity entity = raycastUtil.getEntityInCrosshair(1.0f, distance);
             if (entity != null) {
-                TeleportPlayer teleportPlayer = new TeleportPlayer(entity.position(), player);
+                TeleportPlayer teleportPlayer = new TeleportPlayer(entity.position(), player, ManaCost);
                 MinecraftForge.EVENT_BUS.post(teleportPlayer);
             } else if (result.getType() == HitResult.Type.BLOCK) {
-                TeleportPlayer teleportPlayer = new TeleportPlayer(result.getLocation(), player);
+                TeleportPlayer teleportPlayer = new TeleportPlayer(result.getLocation(), player, ManaCost);
                 MinecraftForge.EVENT_BUS.post(teleportPlayer);
             } else {
-                TeleportPlayer teleportPlayer = new TeleportPlayer(GetNewPositionFromFacingDirection(player, distance), player);
+                TeleportPlayer teleportPlayer = new TeleportPlayer(GetNewPositionFromFacingDirection(player, distance), player, ManaCost);
                 MinecraftForge.EVENT_BUS.post(teleportPlayer);
             }
         }

@@ -10,16 +10,20 @@ import java.util.function.Supplier;
 
 public class EarthLaunchC2SPacket {
     private int cooldown;
-    public EarthLaunchC2SPacket(int cooldown) {
+    private float mana;
+    public EarthLaunchC2SPacket(int cooldown, float mana) {
         this.cooldown = cooldown;
+        this.mana = mana;
     }
 
     public EarthLaunchC2SPacket(FriendlyByteBuf buf) {
         cooldown = buf.readInt();
+        mana = buf.readFloat();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(cooldown);
+        buf.writeFloat(mana);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -27,7 +31,7 @@ public class EarthLaunchC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            EarthLaunch.Launch(player, cooldown);
+            EarthLaunch.Launch(player, cooldown, mana);
         });
 
         return true;

@@ -16,9 +16,10 @@ public class Freeze {
     private static final int FREEZE_RANGE = 6;
     private static final int FREEZE_DAMAGE = 10;
     private static final int FREEZE_TIME = 3;
-    public void FreezingGust(ServerPlayer player, int cooldown) {
+    private static final float ManaCost = 30f;
+    public void FreezingGust(ServerPlayer player, int cooldown, float mana) {
         Vec3 playerPos = player.position();
-        if (cooldown <= 0) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             Vec3 currentPos = playerPos.add(player.getForward());
             FreezingProjectileEntity freezingProjectile = new FreezingProjectileEntity(player.level(), currentPos.x, currentPos.y, currentPos.z);
             freezingProjectile.setNoGravity(true);
@@ -31,7 +32,7 @@ public class Freeze {
                 player.level().addParticle(ParticleTypes.END_ROD, currentPos.x, (currentPos.y) + player.getRandom().nextDouble() * 2.0D, currentPos.z, player.getRandom().nextGaussian(), player.getRandom().nextGaussian(), player.getRandom().nextGaussian());
             }
             player.level().playSound(null, player.position().x, player.position().y + player.getEyeHeight(), player.position().z, SoundEvents.SNOW_HIT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("freeze"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("freeze", ManaCost), player);
         }
     }
 }

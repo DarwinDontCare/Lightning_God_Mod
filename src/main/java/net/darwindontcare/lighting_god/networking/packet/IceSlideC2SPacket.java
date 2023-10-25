@@ -1,5 +1,6 @@
 package net.darwindontcare.lighting_god.networking.packet;
 
+import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.lightning_powers.Freeze;
 import net.darwindontcare.lighting_god.lightning_powers.IceSlide;
 import net.minecraft.network.FriendlyByteBuf;
@@ -10,16 +11,20 @@ import java.util.function.Supplier;
 
 public class IceSlideC2SPacket {
     private int cooldown;
-    public IceSlideC2SPacket(int cooldown) {
+    private float mana;
+    public IceSlideC2SPacket(int cooldown, float mana) {
         this.cooldown = cooldown;
+        this.mana = mana;
     }
 
     public IceSlideC2SPacket(FriendlyByteBuf buf) {
         cooldown = buf.readInt();
+        mana = buf.readFloat();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(cooldown);
+        buf.writeFloat(mana);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -27,7 +32,7 @@ public class IceSlideC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            IceSlide.StartSlide(player, cooldown);
+            IceSlide.StartSlide(player, cooldown, mana);
         });
 
         return true;

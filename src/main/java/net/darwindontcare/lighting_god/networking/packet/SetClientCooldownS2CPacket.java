@@ -9,16 +9,20 @@ import java.util.function.Supplier;
 
 public class SetClientCooldownS2CPacket {
     private String powerName;
-    public SetClientCooldownS2CPacket(String powerName) {
+    private float cost;
+    public SetClientCooldownS2CPacket(String powerName, float cost) {
         this.powerName = powerName;
+        this.cost = cost;
     }
 
     public SetClientCooldownS2CPacket(FriendlyByteBuf buf) {
         powerName = buf.readUtf();
+        cost = buf.readFloat();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeUtf(powerName);
+        buf.writeFloat(cost);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -58,6 +62,8 @@ public class SetClientCooldownS2CPacket {
             } else if (powerName.equals("earth_trap")) {
                 LightningGodMod.setEarthTrapCooldown(LightningGodMod.getMaxProcessedEarthTrapCooldown());
             }
+
+            LightningGodMod.removeCurrentMana(cost);
         });
 
         return true;

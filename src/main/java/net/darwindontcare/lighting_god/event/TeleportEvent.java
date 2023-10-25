@@ -44,7 +44,7 @@ public class TeleportEvent {
                     }
                     player.teleportTo(position.x, position.y + 1, position.z);
                     player.resetFallDistance();
-                    ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("teleport"), player);
+                    ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("teleport", event.getManaCost()), player);
 
                     break;
                 } else if (!block_feet.isSolid() && !block_ground.isSolid()) {
@@ -53,7 +53,7 @@ public class TeleportEvent {
                     player.level().playSound((Player)null, player.position().x, player.position().y, player.position().z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                     player.teleportTo(position.x, position.y, position.z);
                     player.resetFallDistance();
-                    ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("teleport"), player);
+                    ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("teleport", event.getManaCost()), player);
 
                     break;
                 }

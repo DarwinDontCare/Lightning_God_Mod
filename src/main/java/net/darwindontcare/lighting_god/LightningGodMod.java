@@ -79,9 +79,15 @@ public class LightningGodMod
     private static int ICE_SPIKE_COOLDOWN = 0;
     private static final int MAX_ICE_SPIKE_COOLDOWN = 200;
     private static int MAX_ICE_SPIKE_COOLDOWN_PROCESSED = MAX_ICE_SPIKE_COOLDOWN;
+
+    private static final int MAX_MANA = 100;
+    private static float CURRENT_MANA = MAX_MANA;
+    private static float MANA_REGEN = 0.5f;
+    private static int MANA_BUFF = 0;
     private static boolean showPowerWheel = false;
     private static Player player;
     private static boolean alternativeGliding = false;
+    private static boolean isIceSing = false;
     private static final ArrayList<Vec3> launchBlockPositions = new ArrayList<>();
 
     public static void setShowPowerWheel(boolean value) {
@@ -92,6 +98,12 @@ public class LightningGodMod
     }
     public static void setAlternativeGliding(boolean value) {
         alternativeGliding = value;
+    }
+    public static boolean getIsIceSliding() {
+        return isIceSing;
+    }
+    public static void setIsIceSliding(boolean value) {
+        isIceSing = value;
     }
 
     public static void AddLaunchBlockToArray(ArrayList<Vec3> positions) {
@@ -124,6 +136,28 @@ public class LightningGodMod
     }
     
     public static Player getPlayer() {return player;}
+    public static void setManaBuff(int value) {
+        MANA_BUFF = value;
+    }
+    public static int getManaBuff() {return MANA_BUFF;}
+
+    public static void setManaRegen(int value) {
+        MANA_REGEN = value;
+    }
+    public static float getManaRegen() {return MANA_REGEN;}
+
+    public static void addCurrentMana(float value) {
+        CURRENT_MANA += value;
+    }
+
+    public static void removeCurrentMana(float value) {
+        CURRENT_MANA -= value;
+    }
+    public static float getCurrentMana() {
+        return CURRENT_MANA;
+    }
+
+    public static int getMaxMana() {return MAX_MANA;}
 
     public static boolean getShowPowerWheel() {
         return showPowerWheel;
@@ -383,51 +417,6 @@ public class LightningGodMod
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-//        if (event.getTab() == ModCreativeModeTab.LIGHTNING_GOD_TAB) {
-//            event.accept(ModItems.FIRE_BOOTS);
-//            event.accept(ModItems.FIRE_LEGGINGS);
-//            event.accept(ModItems.FIRE_CHESTPLATE);
-//            event.accept(ModItems.FIRE_HELMET);
-//
-//            event.accept(ModItems.LIGHTNING_BOOTS);
-//            event.accept(ModItems.LIGHTNING_LEGGINGS);
-//            event.accept(ModItems.LIGHTNING_CHESTPLATE);
-//            event.accept(ModItems.LIGHTNING_HELMET);
-//
-//            event.accept(ModItems.WATER_BOOTS);
-//            event.accept(ModItems.WATER_LEGGINGS);
-//            event.accept(ModItems.WATER_CHESTPLATE);
-//            event.accept(ModItems.WATER_HELMET);
-//
-//            event.accept(ModItems.FIRE_SCYTH);
-//            event.accept(ModItems.LIGHTNING_BOW);
-//            event.accept(ModItems.LIGHTNING_ARROW);
-//
-//            event.accept(ModItems.FIRE_SCROLL);
-//            event.accept(ModItems.LIGHTNING_SCROLL);
-//            event.accept(ModItems.WATER_SCROLL);
-//            event.accept(ModItems.EARTH_SCROLL);
-//
-//            event.accept(ModItems.FIRE_SCROLL_TIER_2);
-//            event.accept(ModItems.LIGHTNING_SCROLL_TIER_2);
-//            event.accept(ModItems.WATER_SCROLL_TIER_2);
-//            event.accept(ModItems.EARTH_SCROLL_TIER_2);
-//
-//            event.accept(ModItems.WATER_SCROLL_TIER_3);
-//            event.accept(ModItems.EARTH_SCROLL_TIER_3);
-//            event.accept(ModItems.FIRE_SCROLL_TIER_3);
-//            event.accept(ModItems.LIGHTNING_SCROLL_TIER_3);
-//
-//            event.accept(ModItems.WATER_SCROLL_TIER_4);
-//            event.accept(ModItems.EARTH_SCROLL_TIER_4);
-//            event.accept(ModItems.FIRE_SCROLL_TIER_4);
-//            event.accept(ModItems.LIGHTNING_SCROLL_TIER_4);
-//
-//            event.accept(ModItems.LIGHTNING_ESSENCE);
-//            event.accept(ModItems.FIRE_ESSENCE);
-//            event.accept(ModItems.WATER_ESSENCE);
-//            event.accept(ModItems.EARTH_ESSENCE);
-//        }
     }
 
     @SubscribeEvent
@@ -460,6 +449,9 @@ public class LightningGodMod
             } if (getFirePullCooldown() > 0) {
                 setFirePullCooldown(getFirePullCooldown() - 1);
             }
+
+            if (CURRENT_MANA < MAX_MANA + MANA_BUFF && !isIceSing && !alternativeGliding) CURRENT_MANA += MANA_REGEN;
+            if (CURRENT_MANA > MAX_MANA + MANA_BUFF) CURRENT_MANA = MAX_MANA + MANA_BUFF;
         }
     }
 }

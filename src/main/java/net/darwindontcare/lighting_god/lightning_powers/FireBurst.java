@@ -35,8 +35,9 @@ import java.util.Random;
 public class FireBurst {
     private static final int RANGE = 10;
     private static final int DAMAGE = 10;
-    public static void Burst(ServerPlayer player, int cooldown) {
-        if (cooldown <= 0) {
+    private static final int ManaCost = 100;
+    public static void Burst(ServerPlayer player, int cooldown, float mana) {
+        if (cooldown <= 0 && mana >= ManaCost) {
             Vec3 playerPos = player.position();
             ServerLevel serverLevel = (ServerLevel) player.level();
             List<LivingEntity> nearbyEntities = serverLevel.getEntitiesOfClass(
@@ -56,7 +57,7 @@ public class FireBurst {
             MobEffectInstance fireProtection = new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200, 2);
             player.addEffect(fireProtection);
             HeatEffect(playerPos ,player);
-            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_burst"), player);
+            ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_burst", ManaCost), player);
         }
     }
 

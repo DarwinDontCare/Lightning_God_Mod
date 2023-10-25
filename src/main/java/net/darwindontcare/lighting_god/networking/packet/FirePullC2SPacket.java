@@ -10,16 +10,20 @@ import java.util.function.Supplier;
 
 public class FirePullC2SPacket {
     private int cooldown;
-    public FirePullC2SPacket(int cooldown) {
+    private float mana;
+    public FirePullC2SPacket(int cooldown, float mana) {
         this.cooldown = cooldown;
+        this.mana = mana;
     }
 
     public FirePullC2SPacket(FriendlyByteBuf buf) {
         cooldown = buf.readInt();
+        mana = buf.readFloat();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(cooldown);
+        buf.writeFloat(mana);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -27,7 +31,7 @@ public class FirePullC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            FirePull.Pull(player, cooldown);
+            FirePull.Pull(player, cooldown, mana);
         });
 
         return true;

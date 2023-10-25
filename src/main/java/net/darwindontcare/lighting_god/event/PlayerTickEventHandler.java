@@ -66,19 +66,22 @@ public final class PlayerTickEventHandler {
                     for (int idx = 0; idx < maxCooldown.length; idx++) {
                         maxProcessedCooldown[idx] -= (maxCooldown[idx] * 20) / 100;
                         if (type.equals("lightning")) {
-                            if (idx == 0)
-                                LightningGodMod.setMaxProcessedTeleportCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 0) LightningGodMod.setMaxProcessedTeleportCooldown(maxProcessedCooldown[idx]);
                             if (idx == 1) LightningGodMod.setMaxProcessedElThorCooldown(maxProcessedCooldown[idx]);
                         } else if (type.equals("fire")) {
-                            if (idx == 0)
-                                LightningGodMod.setMaxProcessedFireballCooldown(maxProcessedCooldown[idx]);
-                            if (idx == 1)
-                                LightningGodMod.setMaxProcessedFireBurstCooldown(maxProcessedCooldown[idx]);
-                            if (idx == 2)
-                                LightningGodMod.setMaxProcessedFireFlightCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 0) LightningGodMod.setMaxProcessedFireballCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 1) LightningGodMod.setMaxProcessedFirePullCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 2) LightningGodMod.setMaxProcessedFireFlightCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 3) LightningGodMod.setMaxProcessedFireBurstCooldown(maxProcessedCooldown[idx]);
                         } else if (type.equals("water")) {
                             if (idx == 0) LightningGodMod.setMaxProcessedFreezeCooldown(maxProcessedCooldown[idx]);
                             if (idx == 1) LightningGodMod.setMaxProcessedIceSlideCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 2) LightningGodMod.setMaxProcessedIceSpikeCooldown(maxProcessedCooldown[idx]);
+                        } else if (type.equals("earth")) {
+                            if (idx == 0) LightningGodMod.setMaxProcessedEarthLaunchCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 1) LightningGodMod.setMaxProcessedEarthWallCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 2) LightningGodMod.setMaxProcessedEarthTrapCooldown(maxProcessedCooldown[idx]);
+                            if (idx == 3) LightningGodMod.setMaxProcessedEarthMeteorCooldown(maxProcessedCooldown[idx]);
                         }
                         System.out.println(type +" power "+ idx + ": " + maxProcessedCooldown[idx] + ", power cooldown removed: "+(maxCooldown[idx] * 20) / 100);
                     }
@@ -104,11 +107,18 @@ public final class PlayerTickEventHandler {
                         if (idx == 1) LightningGodMod.setMaxProcessedElThorCooldown(maxProcessedCooldown[idx]);
                     } else if (type.equals("fire")) {
                         if (idx == 0) LightningGodMod.setMaxProcessedFireballCooldown(maxProcessedCooldown[idx]);
-                        if (idx == 1) LightningGodMod.setMaxProcessedFireBurstCooldown(maxProcessedCooldown[idx]);
+                        if (idx == 1) LightningGodMod.setMaxProcessedFirePullCooldown(maxProcessedCooldown[idx]);
                         if (idx == 2) LightningGodMod.setMaxProcessedFireFlightCooldown(maxProcessedCooldown[idx]);
+                        if (idx == 3) LightningGodMod.setMaxProcessedFireBurstCooldown(maxProcessedCooldown[idx]);
                     } else if (type.equals("water")) {
                         if (idx == 0) LightningGodMod.setMaxProcessedFreezeCooldown(maxProcessedCooldown[idx]);
                         if (idx == 1) LightningGodMod.setMaxProcessedIceSlideCooldown(maxProcessedCooldown[idx]);
+                        if (idx == 2) LightningGodMod.setMaxProcessedIceSpikeCooldown(maxProcessedCooldown[idx]);
+                    } else if (type.equals("earth")) {
+                        if (idx == 0) LightningGodMod.setMaxProcessedEarthLaunchCooldown(maxProcessedCooldown[idx]);
+                        if (idx == 1) LightningGodMod.setMaxProcessedEarthWallCooldown(maxProcessedCooldown[idx]);
+                        if (idx == 2) LightningGodMod.setMaxProcessedEarthTrapCooldown(maxProcessedCooldown[idx]);
+                        if (idx == 3) LightningGodMod.setMaxProcessedEarthMeteorCooldown(maxProcessedCooldown[idx]);
                     }
                     if (type.equals("lightning") && appliedLightningArmorBuff[i]) appliedLightningArmorBuff[i] = false;
                     else if (type.equals("fire") && appliedFireArmorBuff[i]) appliedFireArmorBuff[i] = false;
@@ -189,7 +199,6 @@ public final class PlayerTickEventHandler {
                 System.out.println(exception.toString());
             }
             if (LightningGodMod.getAlternativeGliding()) currentPlayer.startFallFlying();
-            if (currentPlayer.swinging) BlockPunchEvent.resetHoldingBlock();
         }
     }
 
