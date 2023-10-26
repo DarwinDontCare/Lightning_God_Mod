@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ElytraItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -69,6 +70,7 @@ public class FireFlight {
                 try {
                     double CURRENT_SPEED = player.getSpeed();
                     int particleCooldown = 0;
+                    boolean canAlreadyFly = true;
 
                     double xSquared = player.getDeltaMovement().x * player.getDeltaMovement().x;
                     double ySquared = player.getDeltaMovement().y * player.getDeltaMovement().y;
@@ -101,7 +103,6 @@ public class FireFlight {
                         double motionY = player.getForward().y * CURRENT_SPEED;
                         double motionZ = player.getForward().z * CURRENT_SPEED;
 
-                        player.startFallFlying();
                         ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, motionY, motionZ), player, false), player);
 
                         particleCooldown--;

@@ -27,7 +27,7 @@ public class IceSpikesRenderer  extends GeoEntityRenderer<IceSpikes> {
     public void actuallyRender(PoseStack poseStack, IceSpikes animatable, BakedGeoModel model, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         try {
             if (animatable != null) {
-                poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toRadians(animatable.getYRot())));
+                poseStack.mulPose(Axis.YP.rotation(animatable.getYRot()));
                 //System.out.println("animation y: "+animatable.getYRot());
                 //poseStack.mulPose(Axis.XP.rotationDegrees(-animatable.getXRot()));
                 super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);

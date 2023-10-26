@@ -3,6 +3,7 @@ package net.darwindontcare.lighting_god.lightning_powers;
 import net.darwindontcare.lighting_god.entities.EntityInit;
 import net.darwindontcare.lighting_god.entities.custom.MeteorProjectile;
 import net.darwindontcare.lighting_god.networking.ModMessage;
+import net.darwindontcare.lighting_god.networking.packet.AddForceToEntityS2CPacket;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.darwindontcare.lighting_god.utils.RaycastUtil;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.core.jmx.Server;
 public class EarthMeteor {
     private static final double RANGE = 100;
     private static final int ManaCost = 100;
+    private static final int NO_MOVEMENT_TIME = 10;
     public static void Strike(ServerPlayer player, int cooldown, float mana) {
         if (cooldown <= 0 && mana >= ManaCost) {
             HitResult resultBlock = player.pick(RANGE, 1.0f, false);
@@ -31,6 +33,22 @@ public class EarthMeteor {
                 Vec3 strikePosition = Teleportation.GetNewPositionFromFacingDirection(player, RANGE);
                 summonMeteor(player, strikePosition);
             }
+            new Thread(() -> {
+                int currentTime = NO_MOVEMENT_TIME;
+                float playerSpeed = player.getSpeed();
+                try {
+                    while (currentTime > 0) {
+                        player.setSpeed(0);
+                        player.setNoGravity(true);
+                        ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(0, 0, 0), player, false), player);
+                        player.setJumping(false);
+                        currentTime--;
+                        Thread.sleep(50);
+                    }
+                    player.setSpeed(playerSpeed);
+                    player.setNoGravity(false);
+                } catch (Exception e) {System.out.println(e.toString());}
+            }).start();
             ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("earth_meteor", ManaCost), player);
         }
     }

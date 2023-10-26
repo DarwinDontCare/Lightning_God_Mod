@@ -72,11 +72,11 @@ public class PowersCooldown {
             }
         }
         if (LightningGodMod.getShowPowerWheel()) PowerWheel(width, poseStack.pose(), height, gui, currentPower);
-        if (LightningGodMod.getPlayer() != null) ManaBar(width, poseStack.pose(), height, gui);
         else if (!isMouseLocked) {
             gui.getMinecraft().mouseHandler.grabMouse();
             isMouseLocked = true;
         }
+        if (LightningGodMod.getPlayer() != null) ManaBar(width, poseStack.pose(), height, gui);
     });
 
     private static void ManaBar(int width, PoseStack poseStack, int height, ForgeGui gui) {

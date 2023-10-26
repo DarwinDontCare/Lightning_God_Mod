@@ -55,7 +55,6 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
         double zSquared = direction.z * direction.z;
 
         maxSpeed = (float) Math.sqrt(xSquared + ySquared + zSquared);
-        System.out.println("max speed: "+maxSpeed);
     }
 
     public MeteorProjectile(EntityType<? extends Fireball> p_37006_, Level p_37007_) {
@@ -68,7 +67,6 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
             this.direction = direction;
             this.maxSpeed = maxSpeed;
             this.serverInstanceId = serverInstance;
-            System.out.println("received data: \ndirection="+direction+"\nmax speed="+maxSpeed+"\nserver instance id="+serverInstanceId);
         }
     }
 
@@ -77,7 +75,6 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
             if (!this.canStartMoving && canStartMoving)
                 this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_SHOOT, SoundSource.BLOCKS, 0.5F, (float) (0.4F / (this.getRandomY() * 0.4F + 0.8F)), false);
             this.canStartMoving = canStartMoving;
-            System.out.println(canStartMoving);
         }
     }
 
@@ -109,7 +106,6 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
     public void tick() {
         super.tick();
         if (canStartMoving) {
-            System.out.println(this);
             this.setRemainingFireTicks(10);
             if (direction != null) {
                 if (currentSpeed < maxSpeed) currentSpeed += 0.1f;
@@ -138,7 +134,6 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
                 }
 
                 if (canStartMoving) {
-                    System.out.println("is server");
                     this.setRemainingFireTicks(10);
 
                     for (int i = 0; i < 15; i++) {
@@ -146,7 +141,6 @@ public class MeteorProjectile extends Fireball implements GeoEntity {
                     }
 
                     if (direction != null) {
-                        System.out.println(currentSpeed);
                         Vec3 movement = new Vec3(direction.x * currentSpeed, direction.y * currentSpeed, direction.z * currentSpeed);
                         this.setDeltaMovement(movement);
                         ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(movement, this, false), (ServerPlayer) this.getOwner());

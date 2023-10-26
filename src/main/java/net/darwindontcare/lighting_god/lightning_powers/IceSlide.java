@@ -75,6 +75,9 @@ public class IceSlide {
                             double motionX = player.getForward().x * CURRENT_SPEED;
                             double motionZ = player.getForward().z * CURRENT_SPEED;
 
+                            player.walkDist = 1;
+                            player.walkDistO = 1;
+
                             ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, 0, motionZ), player, true), player);
                         } else {
                             if (particleCooldown <= 0) {
@@ -87,7 +90,8 @@ public class IceSlide {
                             double motionY = player.getForward().y * CURRENT_SPEED;
                             double motionZ = player.getForward().z * CURRENT_SPEED;
 
-                            //player.setForcedPose(Pose.SWIMMING);
+                            player.setSwimming(true);
+                            player.setSprinting(true);
 
                             ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, motionY, motionZ), player, false), player);
                         }

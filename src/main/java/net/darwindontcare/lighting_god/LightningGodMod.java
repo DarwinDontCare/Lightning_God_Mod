@@ -2,6 +2,19 @@ package net.darwindontcare.lighting_god;
 
 import com.mojang.logging.LogUtils;
 
+import dev.kosmx.playerAnim.api.TransformType;
+import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
+import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
+import dev.kosmx.playerAnim.api.layered.IAnimation;
+import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.AbstractModifier;
+import dev.kosmx.playerAnim.core.util.Ease;
+import dev.kosmx.playerAnim.core.util.Vec3f;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.darwindontcare.lighting_god.blocks.ModBlocks;
 import net.darwindontcare.lighting_god.blocks.entity.ModBlockEntities;
 import net.darwindontcare.lighting_god.client.SetPlayerData;
@@ -15,8 +28,11 @@ import net.darwindontcare.lighting_god.items.ModItems;
 import net.darwindontcare.lighting_god.loot.ModLootModifiers;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.utils.ModItemProperties;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,6 +44,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import software.bernie.geckolib.GeckoLib;
 
@@ -98,6 +116,7 @@ public class LightningGodMod
     }
     public static void setAlternativeGliding(boolean value) {
         alternativeGliding = value;
+        if (!value) StopAnimation("fire_flyght");
     }
     public static boolean getIsIceSliding() {
         return isIceSing;
@@ -413,6 +432,16 @@ public class LightningGodMod
             EntityRenderers.register(EntityInit.EARTH_METEOR.get(), MeteorProjectileRenderer::new);
             EntityRenderers.register(EntityInit.ICE_SPIKES.get(), IceSpikesRenderer::new);
             EntityRenderers.register(EntityInit.LIGHTNING_ARROW.get(), LightningArrowRender::new);
+
+            String[] animations = {"earth_meteor_cast", "fireball_cast", "fire_flyght", "fire_flyght_turn"};
+
+            for (String animation: animations) {
+                PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(new ResourceLocation(MOD_ID, animation), 42, (player) -> {
+                    ModifierLayer<IAnimation> customAnimation = new ModifierLayer<>();
+
+                    return customAnimation;
+                });
+            }
         }
     }
 
@@ -421,7 +450,7 @@ public class LightningGodMod
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
+        if (event.phase == TickEvent.Phase.START && !Minecraft.getInstance().isPaused()) {
             if (getTeleportCooldown() > 0) {
                 setTeleportCooldown(getTeleportCooldown() - 1);
             } if (getFireballCooldown() > 0) {
@@ -452,6 +481,138 @@ public class LightningGodMod
 
             if (CURRENT_MANA < MAX_MANA + MANA_BUFF && !isIceSing && !alternativeGliding) CURRENT_MANA += MANA_REGEN;
             if (CURRENT_MANA > MAX_MANA + MANA_BUFF) CURRENT_MANA = MAX_MANA + MANA_BUFF;
+        }
+    }
+
+    public static void ReproduceAnimation(String animation) {
+        try {
+            ModifierLayer<IAnimation> customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
+            if (customAnimation.getAnimation() != null) {
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), null);
+            }
+
+            if (!animation.equals("fire_flyght") && !animation.equals("fire_flyght_turn")) {
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
+                        .setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL)
+                        .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(true)));
+            } else {
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(0, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
+                        .setFirstPersonMode(FirstPersonMode.VANILLA));
+            }
+
+            customAnimation.addModifier(new AbstractModifier() {
+                public final float ninetyDegree = (float) Math.toRadians(90);
+                public final float fortyFiveDegree = (float) Math.toRadians(45);
+                public Vec3 prevPlayerPos = player.position();
+                public float timeToPrint = 0;
+
+                @Override
+                public boolean canRemove() {
+                    return super.canRemove();
+                }
+
+                @Override
+                public void setHost(@Nullable ModifierLayer host) {
+                    super.setHost(host);
+                }
+
+                @Override
+                public void setAnim(@Nullable IAnimation newAnim) {
+                    super.setAnim(newAnim);
+                }
+
+                @Override
+                public @Nullable IAnimation getAnim() {
+                    return super.getAnim();
+                }
+
+                @Override
+                public boolean isActive() {
+                    return super.isActive();
+                }
+
+                @Override
+                public void tick() {
+                    super.tick();
+                }
+
+                @Override
+                public @NotNull Vec3f get3DTransform(@NotNull String modelName, @NotNull TransformType type, float tickDelta, @NotNull Vec3f value0) {
+                    if (animation.equals("fire_flyght") || animation.equals("fire_flyght_turn")) {
+                        if (modelName.equals("body") && type == TransformType.ROTATION) {
+                            float desiredXRot = (float) -(Math.toRadians(player.getXRot()) + ninetyDegree);
+                            float changeValue = getChangeValue(value0);
+                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(desiredXRot, value0.getY(), changeValue));
+                        }
+                    }
+                    return super.get3DTransform(modelName, type, tickDelta, value0);
+                }
+
+                private float getChangeValue(@NotNull Vec3f value0) {
+                    double d1 = player.getX() - prevPlayerPos.x;
+                    double d0 = player.getZ() - prevPlayerPos.z;
+                    float f = (float)(d1 * d1 + d0 * d0);
+                    float f1 = Minecraft.getInstance().getCameraEntity().getYRot();
+                    float f2 = 0.0F;
+                    float f3 = 0.0F;
+                    if (f > 0.0025000002F) {
+                        f3 = 1.0F;
+                        f2 = (float)Math.sqrt((double)f) * 3.0F;
+                        float f4 = (float) Mth.atan2(d0, d1) * (180F / (float)Math.PI) - 90.0F;
+                        float f5 = Mth.abs(Mth.wrapDegrees(player.getYRot()) - f4);
+                        f1 = f4;
+//                        if (95.0F < f5 && f5 < 265.0F) {
+//                            f1 = f4 - 180.0F;
+//                        } else {
+//                            f1 = f4;
+//                        }
+                    }
+
+                    //double currentCameraYRot = Minecraft.getInstance().getCameraEntity().getYRot() - player.getYRot();
+                    double deltaXRot = Math.tan(Math.toRadians(f1)) * 0.1;
+                    float changeValue = 0;
+                    if (value0.getZ() > deltaXRot && Math.abs(value0.getZ() - deltaXRot) > 0.005f) changeValue = 0.005f;
+                    else if (value0.getZ() < deltaXRot && Math.abs(value0.getZ() - deltaXRot) > 0.005f) changeValue = -0.005f;
+
+                    if (timeToPrint <= 0) {
+                        System.out.println(deltaXRot);
+                        prevPlayerPos = player.position();
+                        timeToPrint = 100;
+                    }
+                    timeToPrint--;
+
+                    return value0.getZ() + changeValue;
+                }
+
+                @Override
+                public void setupAnim(float tickDelta) {
+                    super.setupAnim(tickDelta);
+                }
+
+                @Override
+                public @NotNull FirstPersonMode getFirstPersonMode(float tickDelta) {
+                    return super.getFirstPersonMode(tickDelta);
+                }
+
+                @Override
+                public @NotNull FirstPersonConfiguration getFirstPersonConfiguration(float tickDelta) {
+                    return super.getFirstPersonConfiguration(tickDelta);
+                }
+            }, 1);
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    public static void StopAnimation(String animation) {
+        try {
+            ModifierLayer<IAnimation> customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
+            if (customAnimation.getAnimation() != null) {
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
         }
     }
 }

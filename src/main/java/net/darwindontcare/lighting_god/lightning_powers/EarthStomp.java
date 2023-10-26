@@ -41,7 +41,7 @@ public class EarthStomp {
                 break;
             }
         }
-        if (!StartedStomp.get(playerIdx)) {
+        if (DAMAGE.size() >= playerIdx && !StartedStomp.get(playerIdx)) {
             StartedStomp.set(playerIdx, true);
             int finalPlayerIdx = playerIdx;
             new Thread(() -> {

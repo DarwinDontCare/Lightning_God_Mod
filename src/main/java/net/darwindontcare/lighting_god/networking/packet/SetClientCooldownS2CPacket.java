@@ -31,14 +31,12 @@ public class SetClientCooldownS2CPacket {
         context.enqueueWork(() -> {
             if (powerName.equals("freeze")) {
                 LightningGodMod.setFreezeCooldown(LightningGodMod.getMaxProcessedFreezeCooldown());
-                LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("ice_slide")) {
                 LightningGodMod.setIceSlideCooldown(LightningGodMod.getMaxProcessedIceSlideCooldown());
             } else if (powerName.equals("ice_spike")) {
                 LightningGodMod.setIceSpikeCooldown(LightningGodMod.getMaxProcessedIceSpikeCooldown());
             } else if (powerName.equals("fireball")) {
                 LightningGodMod.setFireballCooldown(LightningGodMod.getMaxProcessedFireballCooldown());
-                LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("fire_burst")) {
                 LightningGodMod.setFireBurstCooldown(LightningGodMod.getMaxProcessedFireBurstCooldown());
             } else if (powerName.equals("fire_flight")) {
@@ -49,16 +47,12 @@ public class SetClientCooldownS2CPacket {
                 LightningGodMod.setTeleportCooldown(LightningGodMod.getMaxProcessedTeleportCooldown());
             } else if (powerName.equals("el_thor")) {
                 LightningGodMod.setElThorCooldown(LightningGodMod.getMaxProcessedElThorCooldown());
-                LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("earth_launch")) {
                 LightningGodMod.setEarthLaunchCooldown(LightningGodMod.getMaxProcessedEarthLaunchCooldown());
-                LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("earth_wall")) {
                 LightningGodMod.setEarthWallCooldown(LightningGodMod.getMaxProcessedEarthWallCooldown());
-                LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("earth_meteor")) {
                 LightningGodMod.setEarthMeteorCooldown(LightningGodMod.getMaxProcessedEarthMeteorCooldown());
-                LightningGodMod.getPlayer().swing(InteractionHand.MAIN_HAND);
             } else if (powerName.equals("earth_trap")) {
                 LightningGodMod.setEarthTrapCooldown(LightningGodMod.getMaxProcessedEarthTrapCooldown());
             }

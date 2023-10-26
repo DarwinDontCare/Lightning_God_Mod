@@ -111,7 +111,7 @@ public class FreezingProjectileEntity extends Snowball {
             projectile.level().playSound(null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
 
             for (int i = 0; i < 15; i++)
-                serverLevel.sendParticles(ParticleTypes.END_ROD, currentPos.x, currentPos.y, currentPos.z, 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                serverLevel.sendParticles(ParticleTypes.END_ROD, currentPos.x, currentPos.y, currentPos.z, 1, this.getRandomY() * 0.001, this.getRandomY() * 0.001, 0, this.getRandomY() * 0.001);
 
             FreezeEffect(currentPos);
             List<LivingEntity> nearbyEntities = level().getEntitiesOfClass(

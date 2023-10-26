@@ -13,18 +13,22 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.TraceableEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.BreathAirGoal;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
@@ -36,6 +40,7 @@ import software.bernie.geckolib.core.object.PlayState;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
     private static final float ATTACK_DAMAGE = 10;
@@ -46,6 +51,8 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
     private LivingEntity owner;
     @javax.annotation.Nullable
     private UUID ownerUUID;
+
+    public AttributeSupplier.Builder supplier;
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     protected static final RawAnimation GROW_SPIKES_ANIM = RawAnimation.begin().thenPlayAndHold("grow_spikes");
 
@@ -53,10 +60,10 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
         super(p_36923_, p_36924_);
     }
 
-    public IceSpikes(Level p_36926_, double x, double y, double z, float rotY, int rotX, LivingEntity p_36932_) {
-        this(EntityInit.ICE_SPIKES.get(), p_36926_);
+    public IceSpikes(Level level, double x, double y, double z, float rotY, int rotX, LivingEntity p_36932_) {
+        this(EntityInit.ICE_SPIKES.get(), level);
         this.setOwner(p_36932_);
-        this.setYRot(rotY);
+        this.setYRot(rotY * (180F / (float)Math.PI));
         System.out.println("spikes y: "+rotY * (180F / (float)Math.PI));
         this.setPos(x, y, z);
     }
@@ -105,9 +112,9 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
                     for (LivingEntity entity : nearbyEntities) {
                         if (entity != this.getOwner() && !(((Entity) entity instanceof ItemEntity))) {
                             if (entity instanceof Player) {
-                                ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(0, 15, 0).multiply(direction), entity, false), (ServerPlayer) entity);
+                                ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(0, 150, 0).multiply(direction), entity, false), (ServerPlayer) entity);
                             } else {
-                                AddForceToEntity.AddForce(entity, new Vec3(0, 15, 0).multiply(direction), false);
+                                AddForceToEntity.AddForce(entity, new Vec3(0, 150, 0).multiply(direction), false);
                             }
                             entity.hurt(this.damageSources().playerAttack((Player) this.getOwner()), ATTACK_DAMAGE);
                             entity.setTicksFrozen(50);
@@ -121,6 +128,10 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
             } catch (Exception e) {System.out.println(e.toString());}
         }
     }
+    @Override
+    public boolean hurt(DamageSource p_21016_, float p_21017_) {
+        return false;
+    }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag p_20052_) {
@@ -129,6 +140,16 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag p_20139_) {
+
+    }
+
+    @Override
+    public Iterable<ItemStack> getArmorSlots() {
+        return null;
+    }
+
+    @Override
+    public void setItemSlot(EquipmentSlot p_21036_, ItemStack p_21037_) {
 
     }
 

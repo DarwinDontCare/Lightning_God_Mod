@@ -198,7 +198,10 @@ public final class PlayerTickEventHandler {
             } catch (Exception exception) {
                 System.out.println(exception.toString());
             }
-            if (LightningGodMod.getAlternativeGliding()) currentPlayer.startFallFlying();
+            if (LightningGodMod.getIsIceSliding()) {
+                currentPlayer.walkDist = 1;
+                currentPlayer.walkDistO = 1;
+            }
         }
     }
 
