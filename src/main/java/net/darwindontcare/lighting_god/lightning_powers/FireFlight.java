@@ -23,6 +23,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -78,6 +79,8 @@ public class FireFlight {
 
                     CURRENT_SPEED = Math.sqrt(xSquared + ySquared + zSquared);
                     double targetSpeed = CURRENT_SPEED;
+                    AABB playerHitBox = player.getBoundingBox();
+                    System.out.println(playerHitBox);
 
                     while (flyingList.get(playerIdx)) {
                         float modifier = player.getXRot() / 35;
@@ -92,6 +95,9 @@ public class FireFlight {
                         else targetSpeed = 1f;
                         if (targetSpeed > MAX_SPEED) targetSpeed = MAX_SPEED;
                         else if (targetSpeed < MIN_SPEED) targetSpeed = MIN_SPEED;
+
+                        player.refreshDimensions();
+                        player.setBoundingBox(player.getLocalBoundsForPose(Pose.FALL_FLYING));
 
                         for (int i = 0; i < 2; i++)
                             serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
@@ -112,6 +118,7 @@ public class FireFlight {
                     }
                     flyingList.remove(playerIdx);
                     playerList.remove(playerIdx);
+                    player.setBoundingBox(playerHitBox);
                 } catch (Exception e) {System.out.println(e.toString());}
             }).start();
         }

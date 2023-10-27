@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -130,6 +131,9 @@ public final class PlayerTickEventHandler {
         }
     }
 
+    private static boolean setIceSlideAnim = false;
+    private static boolean setFireFlightAnim = false;
+
     @SubscribeEvent()
     public static void onPlayerTick(final TickEvent.PlayerTickEvent event) {
         if (!loadedModDataToPlayer && event.player != null) {
@@ -201,6 +205,21 @@ public final class PlayerTickEventHandler {
             if (LightningGodMod.getIsIceSliding()) {
                 currentPlayer.walkDist = 1;
                 currentPlayer.walkDistO = 1;
+                if (currentPlayer.isInWater() && !setFireFlightAnim) {
+                    LightningGodMod.StopAnimation();
+                    LightningGodMod.ReproduceAnimation("fire_flyght");
+                    setFireFlightAnim = true;
+                    setIceSlideAnim = false;
+                }
+                else if (!setIceSlideAnim) {
+                    LightningGodMod.StopAnimation();
+                    LightningGodMod.ReproduceAnimation("ice_slide");
+                    setFireFlightAnim = false;
+                    setIceSlideAnim = true;
+                }
+            } else if (LightningGodMod.getAlternativeGliding()) {
+                currentPlayer.refreshDimensions();
+                currentPlayer.setBoundingBox(currentPlayer.getLocalBoundsForPose(Pose.FALL_FLYING));
             }
         }
     }

@@ -2,7 +2,7 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"earth_meteor_cast": {
-			"loop": "hold_on_last_frame",
+			"loop": false,
 			"animation_length": 0.78333,
 			"bones": {
 				"head": {

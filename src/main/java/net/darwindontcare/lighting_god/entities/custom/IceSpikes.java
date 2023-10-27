@@ -63,8 +63,8 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
     public IceSpikes(Level level, double x, double y, double z, float rotY, int rotX, LivingEntity p_36932_) {
         this(EntityInit.ICE_SPIKES.get(), level);
         this.setOwner(p_36932_);
-        this.setYRot(rotY * (180F / (float)Math.PI));
-        System.out.println("spikes y: "+rotY * (180F / (float)Math.PI));
+        this.setYRot(rotY);
+        System.out.println("spikes y: "+rotY);
         this.setPos(x, y, z);
     }
 
@@ -101,25 +101,27 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
         if (!this.level().isClientSide) {
             try {
                 if (spikeCooldown <= 0) {
-                    Vec3 position = this.position().add(this.getForward().multiply(new Vec3(positionModifier, positionModifier, positionModifier)));
-                    Vec3 direction = new Vec3(this.getForward().x * 2, 1, this.getForward().z * 2);
-                    positionModifier++;
-                    List<LivingEntity> nearbyEntities = this.level().getEntitiesOfClass(
-                            LivingEntity.class,
-                            new AABB(position.x - 4, position.y - 4, position.z - 4, position.x + 4, position.y + 4, position.z + 4)
-                    );
+                    Vec3 position = this.position().add(this.getForward().multiply(new Vec3(positionModifier, 1, positionModifier)));
+                    Vec3 direction = new Vec3(this.getForward().x * 2, 2, this.getForward().z * 2);
+                    if (positionModifier < 16) {
+                        List<LivingEntity> nearbyEntities = this.level().getEntitiesOfClass(
+                                LivingEntity.class,
+                                new AABB(position.x - 4, position.y - 4, position.z - 4, position.x + 4, position.y + 4, position.z + 4)
+                        );
 
-                    for (LivingEntity entity : nearbyEntities) {
-                        if (entity != this.getOwner() && !(((Entity) entity instanceof ItemEntity))) {
-                            if (entity instanceof Player) {
-                                ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(0, 150, 0).multiply(direction), entity, false), (ServerPlayer) entity);
-                            } else {
-                                AddForceToEntity.AddForce(entity, new Vec3(0, 150, 0).multiply(direction), false);
+                        for (LivingEntity entity : nearbyEntities) {
+                            if (entity != this.getOwner() && !(((Entity) entity instanceof ItemEntity))) {
+                                entity.hurt(this.damageSources().playerAttack((Player) this.getOwner()), ATTACK_DAMAGE);
+                                if (entity instanceof Player) {
+                                    ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(direction, entity, false), (ServerPlayer) entity);
+                                } else {
+                                    AddForceToEntity.AddForce(entity, direction, false);
+                                }
+                                entity.setTicksFrozen(50);
                             }
-                            entity.hurt(this.damageSources().playerAttack((Player) this.getOwner()), ATTACK_DAMAGE);
-                            entity.setTicksFrozen(50);
                         }
                     }
+                    positionModifier += 4;
                     spikeCooldown = 10;
                 }
                 spikeCooldown--;

@@ -10,6 +10,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -42,6 +44,8 @@ public class TeleportEvent {
                         serverLevel.sendParticles(ParticleTypes.PORTAL, player.getX() + player.getRandomY() * 0.005, player.getY() + player.getRandomY() * 0.005, player.getZ() + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                         serverLevel.sendParticles(ParticleTypes.PORTAL, player.getX() + player.getRandomY() * 0.005, player.getY() + player.getEyeHeight() + player.getRandomY() * 0.005, player.getZ() + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                     }
+                    MobEffectInstance invisibility = new MobEffectInstance(MobEffects.INVISIBILITY, 50, 1, false, false);
+                    player.addEffect(invisibility);
                     player.teleportTo(position.x, position.y + 1, position.z);
                     player.resetFallDistance();
                     ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("teleport", event.getManaCost()), player);

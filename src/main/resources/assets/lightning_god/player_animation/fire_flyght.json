@@ -23,7 +23,7 @@
 				},
 				"right_arm": {
 					"rotation": {
-						"vector": [2.5, 0, 0]
+						"vector": [0, 0, 0]
 					},
 					"position": {
 						"vector": [0, 0, 0]
@@ -31,7 +31,7 @@
 				},
 				"left_arm": {
 					"rotation": {
-						"vector": [-2.5, 0, 0]
+						"vector": [0, 0, 0]
 					},
 					"position": {
 						"vector": [0, 0, 0]
@@ -41,16 +41,9 @@
 					"rotation": {
 						"vector": [0, 0, 0]
 					}
-				},
-				"head": {
-					"rotation": {
-						"vector": [-57.5, 0, 0]
-					},
-					"position": {
-						"vector": [0, 0, 0]
-					}
 				}
 			}
 		}
-	}
+	},
+	"geckolib_format_version": 2
 }

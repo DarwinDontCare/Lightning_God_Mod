@@ -69,7 +69,10 @@ public class ClientEvents {
                     } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 1) {
                         ModMessage.sendToServer(new FirePullC2SPacket(LightningGodMod.getFirePullCooldown(), currentMana));
                     } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 1) {
-                        if (LightningGodMod.getFireFlightCooldown() <= 0) LightningGodMod.setIsIceSliding(true);
+                        if (LightningGodMod.getFireFlightCooldown() <= 0) {
+                            if (!LightningGodMod.getIsIceSliding()) LightningGodMod.ReproduceAnimation("ice_slide");
+                            LightningGodMod.setIsIceSliding(true);
+                        }
                         else LightningGodMod.setIsIceSliding(false);
                         ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown(), currentMana));
                     } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 1) {
@@ -81,8 +84,8 @@ public class ClientEvents {
                         //ModMessage.sendToServer(new ElThorC2SPacket(LightningGodMod.getElThorCooldown()));
                     } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 2) {
                         if (LightningGodMod.getFireFlightCooldown() <= 0) {
+                            if (!LightningGodMod.getAlternativeGliding()) LightningGodMod.ReproduceAnimation("fire_flyght");
                             LightningGodMod.setAlternativeGliding(true);
-                            LightningGodMod.ReproduceAnimation("fire_flyght");
                         }
                         else LightningGodMod.setAlternativeGliding(false);
                         ModMessage.sendToServer(new StartFireFlightC2SPacket(LightningGodMod.getFireFlightCooldown(), currentMana));

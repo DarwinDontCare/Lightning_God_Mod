@@ -83,9 +83,9 @@ public class PowersCooldown {
         float currentMana = LightningGodMod.getCurrentMana();
         int maxMana = LightningGodMod.getMaxMana();
 
-        guiGraphics.blit(MANA_BAR_CONTAINER, width - 110, 2, 0, 0, 100, 10, 100, 10);
+        guiGraphics.blit(MANA_BAR_CONTAINER, 10, 2, 0, 0, 100, 10, 100, 10);
         int manaBarWidth = (int) (((currentMana * 100) / maxMana) * 100) / 100;
-        guiGraphics.blit(MANA_BAR, width - 110, 2, 0, 0, manaBarWidth, 10, 100, 10);
+        guiGraphics.blit(MANA_BAR, 10, 2, 0, 0, manaBarWidth, 10, 100, 10);
     }
 
     private static void LightningPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {

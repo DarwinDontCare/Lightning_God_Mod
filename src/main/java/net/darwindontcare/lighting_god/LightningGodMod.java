@@ -10,6 +10,7 @@ import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
@@ -51,6 +52,8 @@ import software.bernie.geckolib.GeckoLib;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static net.darwindontcare.lighting_god.utils.SummonEntity.clamp;
 
 @Mod(LightningGodMod.MOD_ID)
 public class LightningGodMod
@@ -106,6 +109,7 @@ public class LightningGodMod
     private static Player player;
     private static boolean alternativeGliding = false;
     private static boolean isIceSing = false;
+    public static long lastTickTime;
     private static final ArrayList<Vec3> launchBlockPositions = new ArrayList<>();
 
     public static void setShowPowerWheel(boolean value) {
@@ -116,13 +120,19 @@ public class LightningGodMod
     }
     public static void setAlternativeGliding(boolean value) {
         alternativeGliding = value;
-        if (!value) StopAnimation("fire_flyght");
+        if (!value) {
+            StopAnimation();
+            ReproduceAnimation("stop_fire_flight");
+        }
     }
     public static boolean getIsIceSliding() {
         return isIceSing;
     }
     public static void setIsIceSliding(boolean value) {
         isIceSing = value;
+        if (!value) {
+            StopAnimation();
+        }
     }
 
     public static void AddLaunchBlockToArray(ArrayList<Vec3> positions) {
@@ -433,7 +443,7 @@ public class LightningGodMod
             EntityRenderers.register(EntityInit.ICE_SPIKES.get(), IceSpikesRenderer::new);
             EntityRenderers.register(EntityInit.LIGHTNING_ARROW.get(), LightningArrowRender::new);
 
-            String[] animations = {"earth_meteor_cast", "fireball_cast", "fire_flyght", "fire_flyght_turn"};
+            String[] animations = {"earth_meteor_cast", "fireball_cast", "fire_flyght", "fire_flyght_turn", "start_fire_flight", "stop_fire_flight", "ice_slide"};
 
             for (String animation: animations) {
                 PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(new ResourceLocation(MOD_ID, animation), 42, (player) -> {
@@ -481,30 +491,40 @@ public class LightningGodMod
 
             if (CURRENT_MANA < MAX_MANA + MANA_BUFF && !isIceSing && !alternativeGliding) CURRENT_MANA += MANA_REGEN;
             if (CURRENT_MANA > MAX_MANA + MANA_BUFF) CURRENT_MANA = MAX_MANA + MANA_BUFF;
+
+            long currentTime = System.nanoTime();
+            float deltaTime = (currentTime - lastTickTime) / 1.0E9F; // Converter para segundos
+            lastTickTime = currentTime;
         }
     }
 
+    private static ModifierLayer<IAnimation> customAnimation;
     public static void ReproduceAnimation(String animation) {
         try {
-            ModifierLayer<IAnimation> customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
+            customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
             if (customAnimation.getAnimation() != null) {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), null);
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.LINEAR), null);
             }
 
-            if (!animation.equals("fire_flyght") && !animation.equals("fire_flyght_turn")) {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
+            if (!animation.contains("fire_flyght") && !animation.contains("fire_flight") && !animation.contains("ice_slide")) {
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
                         .setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL)
                         .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(true)));
             } else {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(0, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
+                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
                         .setFirstPersonMode(FirstPersonMode.VANILLA));
             }
 
             customAnimation.addModifier(new AbstractModifier() {
                 public final float ninetyDegree = (float) Math.toRadians(90);
-                public final float fortyFiveDegree = (float) Math.toRadians(45);
+                public float desiredZRot = 0f;
+                public double prevRotY = Math.toRadians(player.getViewYRot(1) - player.getYRot()) * 2;
                 public Vec3 prevPlayerPos = player.position();
-                public float timeToPrint = 0;
+                public float speed = 1;
+
+                private float delta = 0;
+
+                private float shiftedDelta = 0;
 
                 @Override
                 public boolean canRemove() {
@@ -533,60 +553,66 @@ public class LightningGodMod
 
                 @Override
                 public void tick() {
-                    super.tick();
+                    float delta = 1f - this.delta;
+                    this.delta = 0;
+                    if (animation.equals("ice_slide")) {
+                        double deltaX = player.position().x - prevPlayerPos.x;
+                        double deltaZ = player.position().z - prevPlayerPos.z;
+                        float CURRENT_SPEED = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+
+                        if (CURRENT_SPEED > 0.05) speed = CURRENT_SPEED * 2;
+                        prevPlayerPos = player.position();
+                    }
+                    step(delta);
                 }
 
                 @Override
                 public @NotNull Vec3f get3DTransform(@NotNull String modelName, @NotNull TransformType type, float tickDelta, @NotNull Vec3f value0) {
-                    if (animation.equals("fire_flyght") || animation.equals("fire_flyght_turn")) {
+                    if (animation.equals("fire_flyght")) {
                         if (modelName.equals("body") && type == TransformType.ROTATION) {
-                            float desiredXRot = (float) -(Math.toRadians(player.getXRot()) + ninetyDegree);
-                            float changeValue = getChangeValue(value0);
+                            double XRot = (float) -(Math.toRadians(player.getXRot()) + ninetyDegree);
+                            float desiredXRot = (float) (Mth.smoothstep(0) * (value0.getX() - XRot) + XRot);
+                            float changeValue = getChangeValue();
                             return super.get3DTransform(modelName, type, tickDelta, new Vec3f(desiredXRot, value0.getY(), changeValue));
+                        } else if (modelName.equals("head") && type == TransformType.ROTATION) {
+                            desiredZRot = -value0.getY();
+                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f((float) -Math.toRadians(60), value0.getY(), value0.getZ()));
+                        }
+                    } else if (animation.equals("ice_slide")) {
+                        if (modelName.equals("body") && type == TransformType.ROTATION) {
+                            float changeValue = getChangeValue();
+                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(value0.getX(), value0.getY(), changeValue));
+                        } else if (modelName.equals("head") && type == TransformType.ROTATION) {
+                            desiredZRot = -value0.getY();
+                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(value0.getX(), value0.getY(), value0.getZ()));
                         }
                     }
                     return super.get3DTransform(modelName, type, tickDelta, value0);
                 }
 
-                private float getChangeValue(@NotNull Vec3f value0) {
-                    double d1 = player.getX() - prevPlayerPos.x;
-                    double d0 = player.getZ() - prevPlayerPos.z;
-                    float f = (float)(d1 * d1 + d0 * d0);
-                    float f1 = Minecraft.getInstance().getCameraEntity().getYRot();
-                    float f2 = 0.0F;
-                    float f3 = 0.0F;
-                    if (f > 0.0025000002F) {
-                        f3 = 1.0F;
-                        f2 = (float)Math.sqrt((double)f) * 3.0F;
-                        float f4 = (float) Mth.atan2(d0, d1) * (180F / (float)Math.PI) - 90.0F;
-                        float f5 = Mth.abs(Mth.wrapDegrees(player.getYRot()) - f4);
-                        f1 = f4;
-//                        if (95.0F < f5 && f5 < 265.0F) {
-//                            f1 = f4 - 180.0F;
-//                        } else {
-//                            f1 = f4;
-//                        }
-                    }
-
-                    //double currentCameraYRot = Minecraft.getInstance().getCameraEntity().getYRot() - player.getYRot();
-                    double deltaXRot = Math.tan(Math.toRadians(f1)) * 0.1;
-                    float changeValue = 0;
-                    if (value0.getZ() > deltaXRot && Math.abs(value0.getZ() - deltaXRot) > 0.005f) changeValue = 0.005f;
-                    else if (value0.getZ() < deltaXRot && Math.abs(value0.getZ() - deltaXRot) > 0.005f) changeValue = -0.005f;
-
-                    if (timeToPrint <= 0) {
-                        System.out.println(deltaXRot);
-                        prevPlayerPos = player.position();
-                        timeToPrint = 100;
-                    }
-                    timeToPrint--;
-
-                    return value0.getZ() + changeValue;
+                private float getChangeValue() {
+                    double currentRotY = desiredZRot;
+                    double deltaYRot = (float) (Mth.smoothstep(0.05f) * (prevRotY - currentRotY) + currentRotY);
+                    prevRotY = desiredZRot;
+                    return (float) deltaYRot;
                 }
 
                 @Override
                 public void setupAnim(float tickDelta) {
-                    super.setupAnim(tickDelta);
+                    float delta = tickDelta - this.delta; //this should stay positive
+                    this.delta = tickDelta;
+                    step(delta);
+                }
+
+                protected void step(float delta) {
+                    delta *= speed;
+                    delta += shiftedDelta;
+                    while (delta > 1) {
+                        delta -= 1;
+                        super.tick();
+                    }
+                    super.setupAnim(delta);
+                    this.shiftedDelta = delta;
                 }
 
                 @Override
@@ -598,17 +624,16 @@ public class LightningGodMod
                 public @NotNull FirstPersonConfiguration getFirstPersonConfiguration(float tickDelta) {
                     return super.getFirstPersonConfiguration(tickDelta);
                 }
-            }, 1);
+            }, 0);
 
         } catch (Exception e) {
             System.out.println(e.toString());
         }
     }
 
-    public static void StopAnimation(String animation) {
+    public static void StopAnimation() {
         try {
-            ModifierLayer<IAnimation> customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
-            if (customAnimation.getAnimation() != null) {
+            if (customAnimation != null) {
                 customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
             }
         } catch (Exception e) {
