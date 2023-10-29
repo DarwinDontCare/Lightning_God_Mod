@@ -74,7 +74,7 @@ public class EarthWall {
                                     serverLevel.setBlock(blockPos, Blocks.STONE.defaultBlockState(), 3);
                                     serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
                                     for (int t = 0; t < 25; t++)
-                                        serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GLASS.defaultBlockState()), currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
+                                        serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState()), currentPos.x + player.getRandomY() * 0.005, currentPos.y + player.getRandomY() * 0.005, currentPos.z + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                                     serverLevel.playSound(null, currentPos.x, currentPos.y, currentPos.z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                                     wallBlocksPos.add(blockPos.getCenter());
                                 }

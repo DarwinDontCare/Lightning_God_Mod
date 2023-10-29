@@ -560,7 +560,7 @@ public class LightningGodMod
                         double deltaZ = player.position().z - prevPlayerPos.z;
                         float CURRENT_SPEED = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
-                        if (CURRENT_SPEED > 0.05) speed = CURRENT_SPEED * 2;
+                        if (CURRENT_SPEED > 0.05) speed = CURRENT_SPEED * 4;
                         prevPlayerPos = player.position();
                     }
                     step(delta);
@@ -633,7 +633,7 @@ public class LightningGodMod
 
     public static void StopAnimation() {
         try {
-            if (customAnimation != null) {
+            if (customAnimation != null && customAnimation.getAnimation() != null) {
                 customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
             }
         } catch (Exception e) {

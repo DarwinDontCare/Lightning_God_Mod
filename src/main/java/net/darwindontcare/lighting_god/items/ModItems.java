@@ -16,7 +16,7 @@ public class ModItems {
     public static final RegistryObject<Item> LIGHTNING_BOW = ITEMS.register("lightning_bow",
             () -> new LightningBow(new Item.Properties().durability(1000).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> FIRE_SCYTH = ITEMS.register("fire_scyth",
-            () -> new FireScyth(new FireTiers(1000, 4, 4, 2, 300, Ingredient.of(MinecartItem.byId(266))), 4, 0.08f, new Item.Properties().durability(1000).rarity(Rarity.EPIC)));
+            () -> new FireScyth(new FireTiers(1000, 4, 4, 2, 300, Ingredient.of(MinecartItem.byId(266))), 4, 0.00001f, new Item.Properties().durability(1000).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> LIGHTNING_ARROW = ITEMS.register("lightning_arrow",
             () -> new LightningArrowItem(new Item.Properties()));
     public static final RegistryObject<Item> LIGHTNING_SCROLL = ITEMS.register("lightning_scroll",

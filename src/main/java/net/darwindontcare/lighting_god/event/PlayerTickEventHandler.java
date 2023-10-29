@@ -203,23 +203,20 @@ public final class PlayerTickEventHandler {
                 System.out.println(exception.toString());
             }
             if (LightningGodMod.getIsIceSliding()) {
-                currentPlayer.walkDist = 1;
-                currentPlayer.walkDistO = 1;
+                //currentPlayer.walkDist = 1;
+                //currentPlayer.walkDistO = 1;
                 if (currentPlayer.isInWater() && !setFireFlightAnim) {
                     LightningGodMod.StopAnimation();
                     LightningGodMod.ReproduceAnimation("fire_flyght");
                     setFireFlightAnim = true;
                     setIceSlideAnim = false;
                 }
-                else if (!setIceSlideAnim) {
+                else if (!setIceSlideAnim && !currentPlayer.isInWater()) {
                     LightningGodMod.StopAnimation();
                     LightningGodMod.ReproduceAnimation("ice_slide");
                     setFireFlightAnim = false;
                     setIceSlideAnim = true;
                 }
-            } else if (LightningGodMod.getAlternativeGliding()) {
-                currentPlayer.refreshDimensions();
-                currentPlayer.setBoundingBox(currentPlayer.getLocalBoundsForPose(Pose.FALL_FLYING));
             }
         }
     }

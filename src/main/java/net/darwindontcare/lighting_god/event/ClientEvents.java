@@ -70,7 +70,7 @@ public class ClientEvents {
                         ModMessage.sendToServer(new FirePullC2SPacket(LightningGodMod.getFirePullCooldown(), currentMana));
                     } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 1) {
                         if (LightningGodMod.getFireFlightCooldown() <= 0) {
-                            if (!LightningGodMod.getIsIceSliding()) LightningGodMod.ReproduceAnimation("ice_slide");
+                            //if (!LightningGodMod.getIsIceSliding()) LightningGodMod.ReproduceAnimation("ice_slide");
                             LightningGodMod.setIsIceSliding(true);
                         }
                         else LightningGodMod.setIsIceSliding(false);

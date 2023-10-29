@@ -3,6 +3,7 @@ package net.darwindontcare.lighting_god.lightning_powers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.entities.CustomPlayer;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.AddForceToEntityS2CPacket;
@@ -71,7 +72,7 @@ public class FireFlight {
                 try {
                     double CURRENT_SPEED = player.getSpeed();
                     int particleCooldown = 0;
-                    boolean canAlreadyFly = true;
+                    //boolean canAlreadyFly = true;
 
                     double xSquared = player.getDeltaMovement().x * player.getDeltaMovement().x;
                     double ySquared = player.getDeltaMovement().y * player.getDeltaMovement().y;
@@ -79,8 +80,8 @@ public class FireFlight {
 
                     CURRENT_SPEED = Math.sqrt(xSquared + ySquared + zSquared);
                     double targetSpeed = CURRENT_SPEED;
-                    AABB playerHitBox = player.getBoundingBox();
-                    System.out.println(playerHitBox);
+                    //AABB playerHitBox = player.getBoundingBox();
+                    //System.out.println(playerHitBox);
 
                     while (flyingList.get(playerIdx)) {
                         float modifier = player.getXRot() / 35;
@@ -95,9 +96,6 @@ public class FireFlight {
                         else targetSpeed = 1f;
                         if (targetSpeed > MAX_SPEED) targetSpeed = MAX_SPEED;
                         else if (targetSpeed < MIN_SPEED) targetSpeed = MIN_SPEED;
-
-                        player.refreshDimensions();
-                        player.setBoundingBox(player.getLocalBoundsForPose(Pose.FALL_FLYING));
 
                         for (int i = 0; i < 2; i++)
                             serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
@@ -118,7 +116,7 @@ public class FireFlight {
                     }
                     flyingList.remove(playerIdx);
                     playerList.remove(playerIdx);
-                    player.setBoundingBox(playerHitBox);
+                    //player.setBoundingBox(playerHitBox);
                 } catch (Exception e) {System.out.println(e.toString());}
             }).start();
         }
