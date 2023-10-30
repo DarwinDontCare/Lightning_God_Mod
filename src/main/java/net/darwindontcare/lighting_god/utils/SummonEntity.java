@@ -33,6 +33,7 @@ import java.util.List;
 
 public class SummonEntity {
     private static final int FORCE_MULTIPLIER = 4;
+    private static boolean holdBlock = false;
     public static void Summon(ServerPlayer player, Entity entity, Vec3 position, Vec3 motion, boolean isEarthAttack, boolean holdEntity) {
         ServerLevel serverLevel = (ServerLevel) player.level();
         if (isEarthAttack) {
@@ -52,8 +53,8 @@ public class SummonEntity {
         new Thread(() -> {
             try {
 
-                while (!owner.swinging) {
-                    Vec3 ownerEyePos = new Vec3(owner.position().x, owner.position().y + owner.getEyeHeight() - 0.1, owner.position().z);
+                while (holdBlock) {
+                    Vec3 ownerEyePos = owner.getEyePosition();
 
                     double destinationX = clamp((ownerEyePos.x + (owner.getForward().x * 1.5)) - fallingBlockEntity.position().x, -0.5, 0.5);
                     double destinationY = clamp((ownerEyePos.y + (owner.getForward().y * 1.5)) - fallingBlockEntity.position().y, -0.5, 0.5);
@@ -61,7 +62,7 @@ public class SummonEntity {
 
                     Vec3 destination = new Vec3(destinationX, destinationY, destinationZ);
 
-                    fallingBlockEntity.lerpMotion(destinationX, destinationY, destinationZ);
+                    fallingBlockEntity.lerpMotion(destination.x, destination.y, destination.z);
                     fallingBlockEntity.setYRot(-owner.getYRot());
                     ModMessage.sendToPlayer(new SetEntityMovementS2CPacket(fallingBlockEntity, destination, -owner.getYRot(), fallingBlockEntity.getXRot()), owner);
                     fallingBlockEntity.noPhysics = true;
@@ -86,12 +87,16 @@ public class SummonEntity {
 
             Vec3 playerForward = new Vec3(forwardX, forwardY, forwardZ);
 
-            level.removeBlock(pos, true);
-            FallingBlockEntity fallingBlockEntity = FallingBlockEntity.fall(level, pos, Blocks.STONE.defaultBlockState());
-            fallingBlockEntity.setNoGravity(true);
-            fallingBlockEntity.disableDrop();
-            if (!holdEntity) FallingBlockTick(fallingBlockEntity, player, playerForward, pos.getCenter());
-            else HoldBlock(fallingBlockEntity, player);
+            if (level.getBlockState(pos).isSolid()) {
+                level.removeBlock(pos, true);
+                FallingBlockEntity fallingBlockEntity = FallingBlockEntity.fall(level, pos, Blocks.STONE.defaultBlockState());
+                fallingBlockEntity.setNoGravity(true);
+                fallingBlockEntity.setInvulnerable(true);
+                fallingBlockEntity.disableDrop();
+                if (!holdEntity) FallingBlockTick(fallingBlockEntity, player, playerForward, pos.getCenter());
+                else HoldBlock(fallingBlockEntity, player);
+            }
+            holdBlock = holdEntity;
         } catch (Exception e) {System.out.println(e.toString());}
     }
 
@@ -125,7 +130,7 @@ public class SummonEntity {
                             new AABB(currentPos.x, currentPos.y - 3, currentPos.z - 3, currentPos.x, currentPos.y + 3, currentPos.z + 3)
                     );
                     for (Entity entity : nearbyEntities) {
-                        if (entity != owner && !(entity instanceof ItemEntity)) {
+                        if (entity != owner && !(entity instanceof ItemEntity) && entity != fallingBlockEntity) {
                             level.explode(owner, currentPos.x, currentPos.y, currentPos.z, 2, Level.ExplosionInteraction.NONE);
                             foundBlock = true;
                             fallingBlockEntity.kill();

@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -41,7 +42,7 @@ public class EarthWall {
 
                     if (hitResult.getType() == HitResult.Type.BLOCK) {
                         playerForward = new Vec3(0, 0, 0);
-                        playerPos = new Vec3(hitResult.getLocation().x, hitResult.getLocation().y, hitResult.getLocation().z);
+                        playerPos = ((BlockHitResult)hitResult).getBlockPos().getCenter().add(new Vec3(-0.5, -0.5, -0.5));
                     }
 
                     List<LivingEntity> hitEntities = player.level().getEntitiesOfClass(
@@ -57,7 +58,7 @@ public class EarthWall {
 
                     ServerLevel serverLevel = (ServerLevel) player.level();
                     ArrayList<Vec3> wallBlocksPos = new ArrayList<>();
-                    for (int height = 0; height < 3; height++) {
+                    for (int height = 0; height < 4; height++) {
                         try {
                             Vec3 pos1 = new Vec3(playerLeft.x, playerLeft.y, playerLeft.z);
                             Vec3 pos2 = new Vec3(0, playerLeft.y, 0);

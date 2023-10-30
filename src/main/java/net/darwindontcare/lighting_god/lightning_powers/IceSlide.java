@@ -32,8 +32,7 @@ public class IceSlide {
     private static boolean isSliding = false;
     private static final float ManaCost = 0.1f;
     public static void StartSlide(ServerPlayer player, int cooldown, float mana) {
-        if (cooldown <= 0 && mana >= ManaCost) Slide(player);
-        else if (cooldown <= 0) FinishSlide(player, cooldown);
+        if (cooldown <= 0) Slide(player, mana, cooldown);
     }
 
     public static void FinishSlide(ServerPlayer player, int cooldown) {
@@ -44,13 +43,13 @@ public class IceSlide {
         }
     }
 
-    private static void Slide(ServerPlayer player) {
-        if (!isSliding) {
+    private static void Slide(ServerPlayer player, float mana, int cooldown) {
+        if (!isSliding && mana >= ManaCost) {
             CURRENT_SPEED = player.getSpeed();
             isSliding = true;
             ServerLevel serverLevel = (ServerLevel) player.level();
             new Thread(() -> {
-                while (isSliding) {
+                while (isSliding && cooldown <= 0) {
                     try {
                         ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("", ManaCost), player);
                         if (CURRENT_SPEED < MAX_SLIDE_SPEED) {
@@ -63,9 +62,9 @@ public class IceSlide {
                             if (serverLevel.getBlockState(nextBlockPos).isSolid() && !serverLevel.getBlockState(nextBlockPosUp).isSolid()) {
                                 player.teleportTo(player.position().x, player.position().y + 1, player.position().z);
                             }
-                            generateIce(player, serverLevel, new BlockPos((int) player.position().x, (int) player.position().y, (int) player.position().z), 2);
+                            if (!player.isCrouching()) generateIce(player, serverLevel, new BlockPos((int) player.position().x, (int) player.position().y, (int) player.position().z), 2);
 
-                            for (int i = 0; i < 10; i++) serverLevel.sendParticles(ParticleTypes.END_ROD, player.getX() + player.getRandomY() * 0.0005, player.getY() + 0.5 + player.getRandomY() * 0.0005, player.getZ() + player.getRandomY() * 0.0005, 1, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005);
+                            for (int i = 0; i < 10; i++) serverLevel.sendParticles(ParticleTypes.END_ROD, player.getX() + player.getRandomY() * 0.0005, player.getY() + 0.1 + player.getRandomY() * 0.0005, player.getZ() + player.getRandomY() * 0.0005, 1, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005);
                             player.level().playSound(player, player.position().x, player.position().y, player.position().z, SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
 
                             double motionX = -Math.sin(Math.toRadians(player.getYRot())) * CURRENT_SPEED;
@@ -76,7 +75,7 @@ public class IceSlide {
 
                             ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, 0, motionZ), player, true), player);
                         } else {
-                            for (int i = 0; i < 10; i++)serverLevel.sendParticles(ParticleTypes.BUBBLE, player.getX() + player.getRandomY() * 0.0005, player.getY() + 0.5 + player.getRandomY() * 0.0005, player.getZ() + player.getRandomY() * 0.0005, 1, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005);
+                            for (int i = 0; i < 10; i++)serverLevel.sendParticles(ParticleTypes.BUBBLE, player.getX() + player.getRandomY() * 0.0005, player.getY() + 0.6 + player.getRandomY() * 0.0005, player.getZ() + player.getRandomY() * 0.0005, 1, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005);
                             player.level().playSound(player, player.position().x, player.position().y, player.position().z, SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
 
                             double motionX = player.getForward().x * CURRENT_SPEED;
@@ -93,6 +92,7 @@ public class IceSlide {
                         System.out.println(e.toString());
                     }
                 }
+                FinishSlide(player, cooldown);
             }).start();
         }
     }

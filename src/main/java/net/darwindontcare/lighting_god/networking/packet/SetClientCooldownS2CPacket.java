@@ -32,6 +32,7 @@ public class SetClientCooldownS2CPacket {
             if (powerName.equals("freeze")) {
                 LightningGodMod.setFreezeCooldown(LightningGodMod.getMaxProcessedFreezeCooldown());
             } else if (powerName.equals("ice_slide")) {
+                LightningGodMod.setIsIceSliding(false);
                 LightningGodMod.setIceSlideCooldown(LightningGodMod.getMaxProcessedIceSlideCooldown());
             } else if (powerName.equals("ice_spike")) {
                 LightningGodMod.setIceSpikeCooldown(LightningGodMod.getMaxProcessedIceSpikeCooldown());
@@ -40,6 +41,7 @@ public class SetClientCooldownS2CPacket {
             } else if (powerName.equals("fire_burst")) {
                 LightningGodMod.setFireBurstCooldown(LightningGodMod.getMaxProcessedFireBurstCooldown());
             } else if (powerName.equals("fire_flight")) {
+                LightningGodMod.setAlternativeGliding(false);
                 LightningGodMod.setFireFlightCooldown(LightningGodMod.getMaxProcessedFireFlightCooldown());
             } else if (powerName.equals("fire_pull")) {
                 LightningGodMod.setFirePullCooldown(LightningGodMod.getMaxProcessedFirePullCooldown());

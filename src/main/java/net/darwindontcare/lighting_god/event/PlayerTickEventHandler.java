@@ -59,17 +59,73 @@ public final class PlayerTickEventHandler {
     private static int fireResistanceTime = 0;
 
     private static Player currentPlayer;
+
+    private static void addManaBuff(int armorPieceIndex, String type) {
+        int currentManaBuff = LightningGodMod.getManaBuff();
+
+        if (type.equals("lightning")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+        } else if (type.equals("fire")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+        } else if (type.equals("water")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+        } else if (type.equals("earth")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff + (LightningGodMod.getMaxMana() * 10) / 100);
+        }
+    }
+    private static void removeManaBuff(int armorPieceIndex, String type) {
+        int currentManaBuff = LightningGodMod.getManaBuff();
+
+        if (type.equals("lightning")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+        } else if (type.equals("fire")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+        } else if (type.equals("water")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+        } else if (type.equals("earth")) {
+            if (armorPieceIndex == 0) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 1) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else if (armorPieceIndex == 2) LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+            else LightningGodMod.setManaBuff(currentManaBuff - (LightningGodMod.getMaxMana() * 10) / 100);
+        }
+    }
     
     private static void checkArmorSet(Item[] armorSet, boolean[] appliedArmorBuff, int[] maxCooldown, int[] maxProcessedCooldown, String type) {
         for (int i = 0; i < 4; i++) {
             if (currentPlayer.getInventory().getArmor(i).is(armorSet[i])) {
                 if (!appliedArmorBuff[i]) {
+                    addManaBuff(i, type);
                     for (int idx = 0; idx < maxCooldown.length; idx++) {
                         maxProcessedCooldown[idx] -= (maxCooldown[idx] * 20) / 100;
                         if (type.equals("lightning")) {
                             if (idx == 0) LightningGodMod.setMaxProcessedTeleportCooldown(maxProcessedCooldown[idx]);
                             if (idx == 1) LightningGodMod.setMaxProcessedElThorCooldown(maxProcessedCooldown[idx]);
                         } else if (type.equals("fire")) {
+                            if (i == 0) LightningGodMod.setManaBuff((LightningGodMod.getMaxMana() * 10) / 100);
+                            else if (i == 1) LightningGodMod.setManaBuff((LightningGodMod.getMaxMana() * 10) / 100);
+                            else if (i == 2) LightningGodMod.setManaBuff((LightningGodMod.getMaxMana() * 10) / 100);
+                            else LightningGodMod.setManaBuff((LightningGodMod.getMaxMana() * 10) / 100);
                             if (idx == 0) LightningGodMod.setMaxProcessedFireballCooldown(maxProcessedCooldown[idx]);
                             if (idx == 1) LightningGodMod.setMaxProcessedFirePullCooldown(maxProcessedCooldown[idx]);
                             if (idx == 2) LightningGodMod.setMaxProcessedFireFlightCooldown(maxProcessedCooldown[idx]);
@@ -101,6 +157,7 @@ public final class PlayerTickEventHandler {
                     appliedArmorBuff = appliedEarthArmorBuff;
                 }
             } else if (appliedArmorBuff[i]) {
+                removeManaBuff(i, type);
                 for (int idx = 0; idx < maxCooldown.length; idx++) {
                     maxProcessedCooldown[idx] += (maxCooldown[idx] * 20) / 100;
                     if (type.equals("lightning")) {
@@ -206,16 +263,21 @@ public final class PlayerTickEventHandler {
                 //currentPlayer.walkDist = 1;
                 //currentPlayer.walkDistO = 1;
                 if (currentPlayer.isInWater() && !setFireFlightAnim) {
-                    LightningGodMod.StopAnimation();
+                    LightningGodMod.StopAnimation("ice_slide");
                     LightningGodMod.ReproduceAnimation("fire_flyght");
                     setFireFlightAnim = true;
                     setIceSlideAnim = false;
                 }
-                else if (!setIceSlideAnim && !currentPlayer.isInWater()) {
-                    LightningGodMod.StopAnimation();
+                else if (!setIceSlideAnim && !currentPlayer.isInWater() && currentPlayer.onGround()) {
+                    LightningGodMod.StopAnimation("fire_flyght");
                     LightningGodMod.ReproduceAnimation("ice_slide");
                     setFireFlightAnim = false;
                     setIceSlideAnim = true;
+                } else if (!currentPlayer.onGround()) {
+                    setIceSlideAnim = false;
+                    setFireFlightAnim = false;
+                    LightningGodMod.StopAnimation("fire_flyght");
+                    LightningGodMod.StopAnimation("ice_slide");
                 }
             }
         }

@@ -22,7 +22,7 @@ public class LightningArmor extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, list, tooltipFlag);
-        list.add(Component.literal("20% less cooldown on lightning powers"));
+        list.add(Component.literal("-20% lightning cooldown\n+10% mana"));
     }
 
     @Override

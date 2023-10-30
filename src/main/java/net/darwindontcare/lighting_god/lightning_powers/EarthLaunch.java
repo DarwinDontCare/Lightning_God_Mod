@@ -7,10 +7,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+
 public class EarthLaunch {
-    private static final int POWER = 6;
-    private static final int ManaCost = 20;
-    public static void Launch(ServerPlayer player, int cooldown, float mana) {
+    public static final int ManaCost = 20;
+
+    public static void Launch(ServerPlayer player, int cooldown, float mana, float POWER) {
+        System.out.println("final force: "+POWER);
         if (cooldown <= 0 && mana >= ManaCost) {
             double motionX = player.getForward().x * POWER;
             double motionY = player.getForward().y * POWER;

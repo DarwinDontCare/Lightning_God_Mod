@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import org.lwjgl.glfw.GLFW;
@@ -34,6 +36,8 @@ public class PowersCooldown {
     private static final ResourceLocation POWER_COOLDOWN = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/power_cooldown.png");
     private static final ResourceLocation MANA_BAR = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/mana_bar.png");
     private static final ResourceLocation MANA_BAR_CONTAINER = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/mana_bar_container.png");
+    private static final ResourceLocation JUMP_BAR = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/jump_bar.png");
+    private static final ResourceLocation JUMP_BAR_CONTAINER = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/jump_bar_container.png");
 
     private static final ResourceLocation POWER_WHEEL = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/roda-de-poderes.png");
     private static final ResourceLocation POWER_WHEEL_BACKGROUND = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/vinheta-escura.png");
@@ -55,6 +59,8 @@ public class PowersCooldown {
     private static final ResourceLocation EARTH_LOCK = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/power_selector/lock_earth.png");
     private static boolean isMouseLocked = true;
     public static GuiGraphics guiGraphics;
+    public static float EarthJumpPower = 0f;
+    public static float MaxEarthJumpPower = 0f;
 
     public static final IGuiOverlay HUD_POWERS = ((gui, poseStack, partialTick, width, height) -> {
 
@@ -71,6 +77,7 @@ public class PowersCooldown {
                 EarthPowerUI(width, poseStack.pose(), height, gui);
             }
         }
+        if (EarthJumpPower > 0) EarthJumpBar(width, poseStack.pose(), height, gui);
         if (LightningGodMod.getShowPowerWheel()) PowerWheel(width, poseStack.pose(), height, gui, currentPower);
         else if (!isMouseLocked) {
             gui.getMinecraft().mouseHandler.grabMouse();
@@ -79,13 +86,29 @@ public class PowersCooldown {
         if (LightningGodMod.getPlayer() != null) ManaBar(width, poseStack.pose(), height, gui);
     });
 
+    private static void EarthJumpBar(int width, PoseStack poseStack, int height, ForgeGui gui) {
+        int maxSize = 100;
+        int heightOffset = 60;
+        if (LightningGodMod.getPlayer().isCreative()) heightOffset = 40;
+        float currentWidth = (((EarthJumpPower * 100) / MaxEarthJumpPower) * maxSize) / 100;
+        for (int i = 10; i < maxSize; i += 10) {
+            if (currentWidth > i && currentWidth < (i + 10) || currentWidth < i) {
+                currentWidth = i;
+                break;
+            }
+        }
+        guiGraphics.blit(JUMP_BAR, width / 2 - (maxSize / 2), height - heightOffset, 0, 0, (int) currentWidth, 5, maxSize, 5);
+        guiGraphics.blit(JUMP_BAR_CONTAINER, width / 2 - (maxSize / 2), height - heightOffset, 0, 0, maxSize, 5,  maxSize, 5);
+    }
+
     private static void ManaBar(int width, PoseStack poseStack, int height, ForgeGui gui) {
         float currentMana = LightningGodMod.getCurrentMana();
         int maxMana = LightningGodMod.getMaxMana();
+        int manaBuff = LightningGodMod.getManaBuff();
 
-        guiGraphics.blit(MANA_BAR_CONTAINER, 10, 2, 0, 0, 100, 10, 100, 10);
-        int manaBarWidth = (int) (((currentMana * 100) / maxMana) * 100) / 100;
-        guiGraphics.blit(MANA_BAR, 10, 2, 0, 0, manaBarWidth, 10, 100, 10);
+        guiGraphics.blit(MANA_BAR_CONTAINER, 10, 2, 0, 0, maxMana + manaBuff, 10,  maxMana + manaBuff, 10);
+        int manaBarWidth = (int) currentMana;
+        guiGraphics.blit(MANA_BAR, 10, 2, 0, 0, manaBarWidth, 10, maxMana + manaBuff, 10);
     }
 
     private static void LightningPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {

@@ -53,29 +53,35 @@ public class EarthTrap {
 
     private static void TrapEntity(Entity entity, Entity caster, ServerLevel serverLevel) {
         if (!entity.equals(caster)) {
-            entity.hurt(caster.damageSources().playerAttack((Player) caster), DAMAGE);
-            boolean placedIce1;
-            if (!serverLevel.getBlockState(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().y)).isSolid()) {
-                placedIce1 = serverLevel.setBlock(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z), Blocks.STONE.defaultBlockState(), 3);
-                if (placedIce1) serverLevel.gameEvent(caster, GameEvent.BLOCK_PLACE, new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z));
-            } else {
-                placedIce1 = false;
-            }
-            serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-            Thread runnable = getThread((LivingEntity) entity);
-            new Thread(() -> {
-                Vec3 affectedEntityPos = entity.position();
-                try {
-                    Thread.sleep((int)DAMAGE*1000);
-                    runnable.interrupt();
-                    if (placedIce1) {
-                        serverLevel.destroyBlock(new BlockPos((int) affectedEntityPos.x, (int) affectedEntityPos.y, (int) affectedEntityPos.z), false);
-                        serverLevel.gameEvent(caster, GameEvent.BLOCK_DESTROY,new BlockPos((int) affectedEntityPos.x, (int) affectedEntityPos.y, (int) affectedEntityPos.z));}
-                    serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                } catch (Exception e) {
-                    System.out.println(e.toString());
+            try {
+                if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && EntityGlideEvent.cancelLivingEntityUpdate.contains(entity))
+                    return;
+                entity.hurt(caster.damageSources().playerAttack((Player) caster), DAMAGE);
+                boolean placedIce1;
+                if (!serverLevel.getBlockState(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().y)).isSolid()) {
+                    placedIce1 = serverLevel.setBlock(new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z), Blocks.STONE.defaultBlockState(), 3);
+                    if (placedIce1)
+                        serverLevel.gameEvent(caster, GameEvent.BLOCK_PLACE, new BlockPos((int) entity.position().x, (int) entity.position().y, (int) entity.position().z));
+                } else {
+                    placedIce1 = false;
                 }
-            }).start();
+                serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                Thread runnable = getThread((LivingEntity) entity);
+                new Thread(() -> {
+                    Vec3 affectedEntityPos = entity.position();
+                    try {
+                        Thread.sleep((int) DAMAGE * 1000);
+                        runnable.interrupt();
+                        if (placedIce1) {
+                            serverLevel.destroyBlock(new BlockPos((int) affectedEntityPos.x, (int) affectedEntityPos.y, (int) affectedEntityPos.z), false);
+                            serverLevel.gameEvent(caster, GameEvent.BLOCK_DESTROY, new BlockPos((int) affectedEntityPos.x, (int) affectedEntityPos.y, (int) affectedEntityPos.z));
+                        }
+                        serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                    } catch (Exception e) {
+                        System.out.println(e.toString());
+                    }
+                }).start();
+            } catch (Exception exception) {System.out.println(exception.toString());}
         }
     }
 
@@ -85,7 +91,7 @@ public class EarthTrap {
             int freezeTime = (int) DAMAGE * 1000;
             while (freezeTime > 0) {
                 if (!(entity instanceof Player)) {
-                    if (!EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
+                    if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && !EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
                         EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
                     }
                 } else {
@@ -96,7 +102,7 @@ public class EarthTrap {
                 freezeTime--;
             }
             if (!(entity instanceof Player)) {
-                EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
+                if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty()) EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
             }
         });
         runnable.start();

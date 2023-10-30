@@ -2,12 +2,16 @@ package net.darwindontcare.lighting_god.event;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.client.PowersCooldown;
+import net.darwindontcare.lighting_god.lightning_powers.EarthLaunch;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.*;
 import net.darwindontcare.lighting_god.utils.KeyBindings;
+import net.darwindontcare.lighting_god.utils.RaycastUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -23,11 +27,21 @@ import java.awt.event.MouseEvent;
 public class ClientEvents {
     @Mod.EventBusSubscriber(modid = LightningGodMod.MOD_ID, value = Dist.CLIENT)
     public static class ClientForgeEvents {
+
+        private static float earthLaunchPower = 1.5f;
+
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
             if (LightningGodMod.getPlayer() != null) {
                 float currentMana = LightningGodMod.getCurrentMana();
                 if (event.getAction() == 0) {
+                    if (event.getKey() == KeyBindings.FIRST_POWER_KEY.getKey().getValue()) {
+                        if (LightningGodMod.getCurrentPower().equals("earth")) {
+                            ModMessage.sendToServer(new EarthLaunchC2SPacket(LightningGodMod.getEarthLaunchCooldown(), currentMana, earthLaunchPower));
+                            earthLaunchPower = 1.5f;
+                            PowersCooldown.EarthJumpPower = 0;
+                        }
+                    }
                     if (event.getKey() == KeyBindings.SECOND_POWER_KEY.getKey().getValue()) {
                         if (LightningGodMod.getCurrentPower().equals("water")) {
                             ModMessage.sendToServer(new StopIceSlideC2SPacket(LightningGodMod.getIceSlideCooldown()));
@@ -60,7 +74,7 @@ public class ClientEvents {
                     } else if (LightningGodMod.getCurrentPower().equals("water")) {
                         ModMessage.sendToServer(new FreezeC2SPacket(LightningGodMod.getFreezeCooldown(), currentMana));
                     } else if (LightningGodMod.getCurrentPower().equals("earth")) {
-                        ModMessage.sendToServer(new EarthLaunchC2SPacket(LightningGodMod.getEarthLaunchCooldown(), currentMana));
+                        calcEarthLaunchForce(LightningGodMod.getEarthLaunchCooldown(), LightningGodMod.getPowerTier("earth"));
                     }
                 }
                 if (KeyBindings.SECOND_POWER_KEY.consumeClick()) {
@@ -119,18 +133,39 @@ public class ClientEvents {
                 }
             }
         }
+        private static final float[] FORCE_TABLE = {3, 4, 5, 6};
+        public static void calcEarthLaunchForce(int cooldown, int level) {
+            float maxForce = FORCE_TABLE[level - 1];
+            if (cooldown <= 0 && earthLaunchPower < maxForce && LightningGodMod.getCurrentMana() >= EarthLaunch.ManaCost) {
+                earthLaunchPower += 0.1f;
+                PowersCooldown.EarthJumpPower = earthLaunchPower;
+                PowersCooldown.MaxEarthJumpPower = maxForce;
+            }
+        }
+
 
         @SubscribeEvent
         public static void mouseEvent(InputEvent.MouseButton event) {
             if (LightningGodMod.getCurrentPower() != null) {
                 Player player = LightningGodMod.getPlayer();
                 if (event.getButton() == MouseEvent.NOBUTTON) {
-                    System.out.println("clicked button " + event.getButton() + " button");
-                    BlockPunchEvent.resetHoldingBlock();
-                } else if (event.getButton() == MouseEvent.BUTTON1 && LightningGodMod.getCurrentPower().equals("earth")) {
-                    for (double reach = 0; reach < player.getBlockReach(); reach++) {
-                        Vec3 currentPos = player.getEyePosition().multiply(player.getForward().multiply(new Vec3(reach, reach, reach)));
-                        BlockPunchEvent.GrabBlock(new BlockPos((int) currentPos.x, (int) currentPos.y, (int) currentPos.z), player);
+                    if (LightningGodMod.getCurrentPower().equals("earth")) {
+                        HitResult hitResult = player.pick(player.getBlockReach(), 1, true);
+                        if (hitResult.getType() == HitResult.Type.BLOCK && !BlockPunchEvent.isHoldingBlock()) {
+                            BlockPos currentBlockPos = ((BlockHitResult)hitResult).getBlockPos();
+                            BlockPunchEvent.LaunchBlock(currentBlockPos, player);
+                        } else {
+                            BlockPunchEvent.resetHoldingBlock(player);
+                        }
+                    }
+                }
+                if (event.getButton() == MouseEvent.BUTTON1) {
+                    if (LightningGodMod.getCurrentPower().equals("earth") && !BlockPunchEvent.isHoldingBlock()) {
+                        HitResult hitResult = player.pick(player.getBlockReach(), 1, true);
+                        if (hitResult.getType() == HitResult.Type.BLOCK) {
+                            BlockPos currentBlockPos = ((BlockHitResult)hitResult).getBlockPos();
+                            BlockPunchEvent.GrabBlock(currentBlockPos, player);
+                        }
                     }
                 }
             }

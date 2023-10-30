@@ -25,23 +25,23 @@ public class EntityGlideEvent {
     @SubscribeEvent
     public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
-        if (entity == LightningGodMod.getPlayer() && LightningGodMod.getAlternativeGliding()) {
-            EntityDimensions newDims = entity.getDimensions(entity.getPose()).scale(1.0F, 1.0F);
-            try {
-                System.out.println("changing bounding box");
-                Field field = Entity.class.getDeclaredField("dimensions");
-                field.setAccessible(true);
-                field.set(entity, newDims);
-                EntityDimensions newEntityDimensions = (EntityDimensions) field.get(entity);
-                entity.setBoundingBox(newEntityDimensions.makeBoundingBox(
-                        entity.getX(),
-                        entity.getY(),
-                        entity.getZ()
-                ));
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (entity == LightningGodMod.getPlayer() && LightningGodMod.getAlternativeGliding()) {
+//            EntityDimensions newDims = entity.getDimensions(entity.getPose()).scale(1.0F, 1.0F);
+//            try {
+//                System.out.println("changing bounding box");
+//                Field field = Entity.class.getDeclaredField("dimensions");
+//                field.setAccessible(true);
+//                field.set(entity, newDims);
+//                EntityDimensions newEntityDimensions = (EntityDimensions) field.get(entity);
+//                entity.setBoundingBox(newEntityDimensions.makeBoundingBox(
+//                        entity.getX(),
+//                        entity.getY(),
+//                        entity.getZ()
+//                ));
+//            } catch (NoSuchFieldException | IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         try {
             event.setCanceled(cancelLivingEntityUpdate.contains(entity));

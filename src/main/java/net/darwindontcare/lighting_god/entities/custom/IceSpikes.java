@@ -4,6 +4,7 @@ import net.darwindontcare.lighting_god.entities.EntityInit;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.AddForceToEntityS2CPacket;
 import net.darwindontcare.lighting_god.utils.AddForceToEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
@@ -103,6 +105,9 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
                 if (spikeCooldown <= 0) {
                     Vec3 position = this.position().add(this.getForward().multiply(new Vec3(positionModifier, 1, positionModifier)));
                     Vec3 direction = new Vec3(this.getForward().x * 2, 2, this.getForward().z * 2);
+
+                    FreezeEffect(position, 4);
+
                     if (positionModifier < 16) {
                         List<LivingEntity> nearbyEntities = this.level().getEntitiesOfClass(
                                 LivingEntity.class,
@@ -130,6 +135,39 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
             } catch (Exception e) {System.out.println(e.toString());}
         }
     }
+
+    private void FreezeEffect(Vec3 currentPos, int modifier) {
+        ServerLevel serverLevel = (ServerLevel) level();
+        for (int y = -modifier; y < modifier; y++) {
+            for (int x = -modifier; x < modifier; x++) {
+                for (int z = -modifier; z < modifier; z++) {
+                    BlockPos blockPos = new BlockPos((int) currentPos.x + x, (int) currentPos.y + y, (int) currentPos.z + z);
+                    if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.LAVA) {
+                        serverLevel.removeBlock(blockPos, false);
+                        serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
+                        serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                        for (int i = 0; i < 15; i++)
+                            serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                        serverLevel.setBlock(blockPos, Blocks.OBSIDIAN.defaultBlockState(), 3);
+                    } else if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.WATER) {
+                        serverLevel.removeBlock(blockPos, false);
+                        serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
+                        serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                        for (int i = 0; i < 15; i++)
+                            serverLevel.sendParticles(ParticleTypes.END_ROD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                        serverLevel.setBlock(blockPos, Blocks.PACKED_ICE.defaultBlockState(), 3);
+                    } else if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.FIRE) {
+                        serverLevel.removeBlock(blockPos, false);
+                        serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
+                        serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
+                        for (int i = 0; i < 15; i++)
+                            serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public boolean hurt(DamageSource p_21016_, float p_21017_) {
         return false;

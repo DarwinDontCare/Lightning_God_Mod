@@ -42,11 +42,11 @@ public class FireFlight {
                 flyingList.add(false);
                 playerList.add(player.getId());
             }
-            flight_tick(player);
+            flight_tick(player, cooldown, mana);
         } else if (cooldown <= 0) stop_flight(player, cooldown);
     }
 
-    private static void flight_tick(ServerPlayer player) {
+    private static void flight_tick(ServerPlayer player, int cooldown, float mana) {
         boolean isFlying = false;
         for (int i = 0; i < playerList.size(); i++) {
             if (playerList.get(i) == player.getId()) {
@@ -54,7 +54,7 @@ public class FireFlight {
                 break;
             }
         }
-        if (!isFlying) {
+        if (!isFlying && mana >= ManaCost) {
             ServerLevel serverLevel = (ServerLevel) player.level();
             for (int i = 0; i < playerList.size(); i++) {
                 if (playerList.get(i) == player.getId()) {
@@ -83,7 +83,7 @@ public class FireFlight {
                     //AABB playerHitBox = player.getBoundingBox();
                     //System.out.println(playerHitBox);
 
-                    while (flyingList.get(playerIdx)) {
+                    while (flyingList.get(playerIdx) && cooldown <= 0 && !player.isInWater()) {
                         float modifier = player.getXRot() / 35;
                         if (modifier < 1) modifier = 1;
                         if (modifier > 3) modifier = 3;
@@ -98,7 +98,7 @@ public class FireFlight {
                         else if (targetSpeed < MIN_SPEED) targetSpeed = MIN_SPEED;
 
                         for (int i = 0; i < 2; i++)
-                            serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
+                            serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + 0.6 + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
                         if (particleCooldown <= 0) {
                             player.level().playSound(null, player.position().x, player.position().y, player.position().z, SoundEvents.FIRE_AMBIENT, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
                             particleCooldown = 10;
@@ -114,8 +114,7 @@ public class FireFlight {
                         ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("", ManaCost), player);
                         Thread.sleep(50);
                     }
-                    flyingList.remove(playerIdx);
-                    playerList.remove(playerIdx);
+                    stop_flight(player, cooldown);
                     //player.setBoundingBox(playerHitBox);
                 } catch (Exception e) {System.out.println(e.toString());}
             }).start();

@@ -54,7 +54,7 @@ public class WaterArmorItem extends ArmorItem implements GeoItem {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, list, tooltipFlag);
-        list.add(Component.literal("20% less cooldown on water powers"));
+        list.add(Component.literal("-20% water cooldown\n+10% mana"));
     }
 
     @Override

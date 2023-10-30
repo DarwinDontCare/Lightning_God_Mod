@@ -110,6 +110,7 @@ public class LightningGodMod
     private static boolean alternativeGliding = false;
     private static boolean isIceSing = false;
     public static long lastTickTime;
+    public static float deltaTime;
     private static final ArrayList<Vec3> launchBlockPositions = new ArrayList<>();
 
     public static void setShowPowerWheel(boolean value) {
@@ -121,7 +122,7 @@ public class LightningGodMod
     public static void setAlternativeGliding(boolean value) {
         alternativeGliding = value;
         if (!value) {
-            StopAnimation();
+            StopAnimation("fire_flyght");
             ReproduceAnimation("stop_fire_flight");
         }
     }
@@ -131,7 +132,8 @@ public class LightningGodMod
     public static void setIsIceSliding(boolean value) {
         isIceSing = value;
         if (!value) {
-            StopAnimation();
+            StopAnimation("ice_slide");
+            StopAnimation("fire_flyght");
         }
     }
 
@@ -489,11 +491,11 @@ public class LightningGodMod
                 setFirePullCooldown(getFirePullCooldown() - 1);
             }
 
-            if (CURRENT_MANA < MAX_MANA + MANA_BUFF && !isIceSing && !alternativeGliding) CURRENT_MANA += MANA_REGEN;
-            if (CURRENT_MANA > MAX_MANA + MANA_BUFF) CURRENT_MANA = MAX_MANA + MANA_BUFF;
+            if (CURRENT_MANA < (MAX_MANA + MANA_BUFF) && !isIceSing && !alternativeGliding) CURRENT_MANA += MANA_REGEN;
+            if (CURRENT_MANA > (MAX_MANA + MANA_BUFF)) CURRENT_MANA = (MAX_MANA + MANA_BUFF);
 
             long currentTime = System.nanoTime();
-            float deltaTime = (currentTime - lastTickTime) / 1.0E9F; // Converter para segundos
+            deltaTime = (currentTime - lastTickTime) / 1.0E9F; // Converter para segundos
             lastTickTime = currentTime;
         }
     }
@@ -631,11 +633,10 @@ public class LightningGodMod
         }
     }
 
-    public static void StopAnimation() {
+    public static void StopAnimation(String animation) {
         try {
-            if (customAnimation != null && customAnimation.getAnimation() != null) {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
-            }
+            customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
+            customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
         } catch (Exception e) {
             System.out.println(e.toString());
         }

@@ -162,6 +162,7 @@ public class FreezingProjectileEntity extends Snowball {
 
     private void FreezeEntity(LivingEntity entity, Entity owner, Entity projectile, ServerLevel serverLevel) {
         if (!entity.equals(owner)) {
+            if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) return;
             entity.setSecondsOnFire(0);
             Vec3 entityPos = entity.position();
             entity.hurt(owner.damageSources().playerAttack((Player) owner), FREEZE_DAMAGE);
@@ -215,7 +216,7 @@ public class FreezingProjectileEntity extends Snowball {
         Thread runnable = new Thread(() -> {
             while (projectile.getLifeTime() > 0 && entity.getTicksFrozen() > 0) {
                 if (!(entity instanceof Player)) {
-                    if (!EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
+                    if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && !EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
                         EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
                     }
                 } else {
@@ -225,7 +226,7 @@ public class FreezingProjectileEntity extends Snowball {
                 }
             }
             if (!(entity instanceof Player)) {
-                EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
+                if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty()) EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
             }
         });
         runnable.start();

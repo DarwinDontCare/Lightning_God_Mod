@@ -23,7 +23,7 @@ public class FireArmor extends ArmorItem {
     @Override
     public void appendHoverText(@NotNull ItemStack itemStack, @Nullable Level level, @NotNull List<Component> list, @NotNull TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, level, list, tooltipFlag);
-        list.add(Component.literal("20% less cooldown on fire powers"));
+        list.add(Component.literal("-20% fire cooldown\n+10% mana"));
     }
 
     @Override
