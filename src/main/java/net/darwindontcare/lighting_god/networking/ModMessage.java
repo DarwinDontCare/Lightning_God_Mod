@@ -199,6 +199,18 @@ public class ModMessage {
                 .encoder(ExplodeC2SPacket::toBytes)
                 .consumerMainThread(ExplodeC2SPacket::handle)
                 .add();
+
+        net.messageBuilder(StartLightningBeamC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(StartLightningBeamC2SPacket::new)
+                .encoder(StartLightningBeamC2SPacket::toBytes)
+                .consumerMainThread(StartLightningBeamC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(StopLightningBeamC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(StopLightningBeamC2SPacket::new)
+                .encoder(StopLightningBeamC2SPacket::toBytes)
+                .consumerMainThread(StopLightningBeamC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

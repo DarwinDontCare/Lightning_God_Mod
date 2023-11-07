@@ -44,7 +44,7 @@ public class LightningArrowEntity extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult ray) {
         super.onHitEntity(ray);
-        CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, level(), false, getOwner());
+        CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityInit.CUSTOM_LIGHTNING.get(), level(), false, getOwner());
         lightningBolt.setPos(ray.getLocation());
         lightningBolt.setVisualOnly(true);
         this.level().addFreshEntity(lightningBolt);
@@ -53,7 +53,7 @@ public class LightningArrowEntity extends AbstractArrow {
     @Override
     protected void tickDespawn() {
         if (this.inGroundTime > 0){
-            CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, level(), false, getOwner());
+            CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityInit.CUSTOM_LIGHTNING.get(), level(), false, getOwner());
             lightningBolt.setPos(this.position());
             lightningBolt.setVisualOnly(true);
             this.level().addFreshEntity(lightningBolt);

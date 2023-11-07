@@ -42,6 +42,7 @@ public class CustomLightningBolt extends LightningBolt {
     public long seed;
     private int flashes;
     private boolean visualOnly;
+    public boolean shouldRender;
     @Nullable
     private ServerPlayer cause;
     private final Set<Entity> hitEntities = Sets.newHashSet();
@@ -49,8 +50,9 @@ public class CustomLightningBolt extends LightningBolt {
     private float damage = 5.0F;
     public Entity owner;
     public boolean spawnFireFlag;
-
-    public CustomLightningBolt(EntityType<? extends LightningBolt> p_20865_, Level p_20866_, boolean spawnFire, Entity owner) {
+    public Vec3 startPoint;
+    public float[] color;
+    public CustomLightningBolt(EntityType<? extends CustomLightningBolt> p_20865_, Level p_20866_, boolean spawnFire, Entity owner) {
         super(p_20865_, p_20866_);
         this.noCulling = true;
         this.life = START_LIFE;
@@ -59,6 +61,11 @@ public class CustomLightningBolt extends LightningBolt {
         this.spawnFireFlag = spawnFire;
         this.owner = owner;
     }
+
+    public CustomLightningBolt(EntityType<CustomLightningBolt> customLightningBoltEntityType, Level level) {
+        super(customLightningBoltEntityType, level);
+    }
+
     public Entity getOwner() {return this.owner;}
 
     public void setVisualOnly(boolean p_20875_) {

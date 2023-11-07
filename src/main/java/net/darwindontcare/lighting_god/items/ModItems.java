@@ -16,7 +16,7 @@ public class ModItems {
     public static final RegistryObject<Item> LIGHTNING_BOW = ITEMS.register("lightning_bow",
             () -> new LightningBow(new Item.Properties().durability(1000).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> FIRE_SCYTH = ITEMS.register("fire_scyth",
-            () -> new FireScyth(new FireTiers(1000, 4, 4, 2, 300, Ingredient.of(MinecartItem.byId(266))), 4, 0.00001f, new Item.Properties().durability(1000).rarity(Rarity.EPIC)));
+            () -> new FireScyth(ElementalTiers.FIRE, 4, -100.2F, new Item.Properties().durability(1000).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> LIGHTNING_ARROW = ITEMS.register("lightning_arrow",
             () -> new LightningArrowItem(new Item.Properties()));
     public static final RegistryObject<Item> LIGHTNING_SCROLL = ITEMS.register("lightning_scroll",
@@ -82,6 +82,15 @@ public class ModItems {
             () -> new WaterArmorItem(ArmorItemMaterial.WATER, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static final RegistryObject<Item> WATER_HELMET = ITEMS.register("water_helmet",
             () -> new WaterArmorItem(ArmorItemMaterial.WATER, ArmorItem.Type.HELMET, new Item.Properties()));
+
+    public static final RegistryObject<Item> EARTH_BOOTS = ITEMS.register("earth_boots",
+            () -> new EarthArmor(ArmorItemMaterial.EARTH, ArmorItem.Type.BOOTS, new Item.Properties()));
+    public static final RegistryObject<Item> EARTH_CHESTPLATE = ITEMS.register("earth_chestplate",
+            () -> new EarthArmor(ArmorItemMaterial.EARTH, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+    public static final RegistryObject<Item> EARTH_LEGGINGS = ITEMS.register("earth_leggings",
+            () -> new EarthArmor(ArmorItemMaterial.EARTH, ArmorItem.Type.LEGGINGS, new Item.Properties()));
+    public static final RegistryObject<Item> EARTH_HELMET = ITEMS.register("earth_helmet",
+            () -> new EarthArmor(ArmorItemMaterial.EARTH, ArmorItem.Type.HELMET, new Item.Properties()));
 
     public static final RegistryObject<Item> LIGHTNING_ESSENCE = ITEMS.register("lightning_essence",
             () -> new Item(new Item.Properties().rarity(Rarity.RARE)));

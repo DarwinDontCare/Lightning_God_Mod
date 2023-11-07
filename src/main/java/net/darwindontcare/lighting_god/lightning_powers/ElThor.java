@@ -2,6 +2,7 @@ package net.darwindontcare.lighting_god.lightning_powers;
 
 import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.entities.CustomLightningBolt;
+import net.darwindontcare.lighting_god.entities.EntityInit;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.darwindontcare.lighting_god.utils.RaycastUtil;
@@ -31,7 +32,6 @@ public class ElThor {
                     Vec3 strikePosition = Teleportation.GetNewPositionFromFacingDirection(player, RANGE);
                     summonLightning(player, strikePosition);
                 }
-                player.setPose(Pose.DIGGING);
                 ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("el_thor", ManaCost), player);
             }
         } catch (Exception e) {System.out.println(e.toString());}
@@ -40,25 +40,25 @@ public class ElThor {
     private static void summonLightning(ServerPlayer player, Vec3 position) {
         new Thread(() -> {
             try {
-                CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
+                CustomLightningBolt lightningBolt = new CustomLightningBolt(EntityInit.CUSTOM_LIGHTNING.get(), player.level(), true, player);
                 lightningBolt.setPos(position);
                 player.level().addFreshEntity(lightningBolt);
 
                 Thread.sleep(200);
 
-                CustomLightningBolt lightningBolt2 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
+                CustomLightningBolt lightningBolt2 = new CustomLightningBolt(EntityInit.CUSTOM_LIGHTNING.get(), player.level(), true, player);
                 lightningBolt2.setPos(new Vec3(position.x, position.y, position.z + 1));
                 player.level().addFreshEntity(lightningBolt2);
 
                 Thread.sleep(200);
 
-                CustomLightningBolt lightningBolt3 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
+                CustomLightningBolt lightningBolt3 = new CustomLightningBolt(EntityInit.CUSTOM_LIGHTNING.get(), player.level(), true, player);
                 lightningBolt3.setPos(new Vec3(position.x + 1, position.y, position.z + 1));
                 player.level().addFreshEntity(lightningBolt3);
 
                 Thread.sleep(200);
 
-                CustomLightningBolt lightningBolt4 = new CustomLightningBolt(EntityType.LIGHTNING_BOLT, player.level(), true, player);
+                CustomLightningBolt lightningBolt4 = new CustomLightningBolt(EntityInit.CUSTOM_LIGHTNING.get(), player.level(), true, player);
                 lightningBolt4.setPos(new Vec3(position.x + 1, position.y, position.z));
                 player.level().addFreshEntity(lightningBolt4);
             } catch (Exception exception) {

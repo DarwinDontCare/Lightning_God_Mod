@@ -33,6 +33,7 @@ public class PowersCooldown {
     private static final ResourceLocation EARTH_METEOR_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_meteor_icon.png");
     private static final ResourceLocation EARTH_TRAP_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/earth_trap_icon.png");
     private static final ResourceLocation ICE_SPIKE_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/ice_spike_icon.png");
+    private static final ResourceLocation LIGHTNING_BEAM_ICON = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/lightning_beam_icon.png");
     private static final ResourceLocation POWER_COOLDOWN = new ResourceLocation(LightningGodMod.MOD_ID, "textures/icons/power_cooldown.png");
     private static final ResourceLocation MANA_BAR = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/mana_bar.png");
     private static final ResourceLocation MANA_BAR_CONTAINER = new ResourceLocation(LightningGodMod.MOD_ID, "textures/ui/mana_bar/mana_bar_container.png");
@@ -114,6 +115,7 @@ public class PowersCooldown {
     private static void LightningPowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {
         LoadPowerIcon(poseStack, width, height, TELEPORTATION_ICON, 26, 40, LightningGodMod.getTeleportCooldown(), LightningGodMod.getMaxProcessedTeleportCooldown());
         if (LightningGodMod.getPowerTier("lightning") > 1) LoadPowerIcon(poseStack, width, height, EL_THOR_ICON, 26, 58, LightningGodMod.getElThorCooldown(), LightningGodMod.getMaxProcessedElThorCooldown());
+        if (LightningGodMod.getPowerTier("lightning") > 2) LoadPowerIcon(poseStack, width, height, LIGHTNING_BEAM_ICON, 26, 76, LightningGodMod.getLightningBeamCooldown(), LightningGodMod.getMaxProcessedLightningBeamCooldown());
     }
 
     private static void FirePowerUI(int width, PoseStack poseStack, int height, ForgeGui gui) {

@@ -41,6 +41,8 @@ public final class PlayerTickEventHandler {
     private static int maxProcessedEarthTrapCooldown = LightningGodMod.getMaxProcessedEarthTrapCooldown();
     private static int maxEarthMeteorCooldown = LightningGodMod.getMaxEarthMeteorCooldown();
     private static int maxProcessedEarthMeteorCooldown = LightningGodMod.getMaxProcessedEarthMeteorCooldown();
+    private static int maxEarthWallCooldown = LightningGodMod.getMaxEarthWallCooldown();
+    private static int maxProcessedEarthWallCooldown = LightningGodMod.getMaxProcessedEarthWallCooldown();
     private static int maxFireFlightCooldown = LightningGodMod.getMaxEarthLaunchCooldown();
     private static int maxProcessedFireFlightCooldown = LightningGodMod.getMaxProcessedEarthLaunchCooldown();
     private static int maxFirePullCooldown = LightningGodMod.getMaxFirePullCooldown();
@@ -51,7 +53,6 @@ public final class PlayerTickEventHandler {
     private static boolean[] appliedFireArmorBuff = {false, false, false, false};
     private static boolean[] appliedWaterArmorBuff = {false, false, false, false};
     private static boolean[] appliedEarthArmorBuff = {false, false, false, false};
-    private static boolean loadedModDataToPlayer = false;
 
     private static boolean appliedWaterBreathing = false;
     private static boolean appliedFireResistance = false;
@@ -189,29 +190,27 @@ public final class PlayerTickEventHandler {
     }
 
     private static boolean setIceSlideAnim = false;
-    private static boolean setFireFlightAnim = false;
+    private static boolean loadedPlayerInfo = false;
+
 
     @SubscribeEvent()
     public static void onPlayerTick(final TickEvent.PlayerTickEvent event) {
-        if (!loadedModDataToPlayer && event.player != null) {
+        if (event.player != null && !loadedPlayerInfo && !event.player.isDeadOrDying()) {
             try {
-                CompoundTag data = event.player.getPersistentData();
-                if (!data.isEmpty()) {
-                    currentPlayer = event.player;
-                    LightningGodMod.setPlayer(currentPlayer);
-                    loadedModDataToPlayer = true;
-                    System.out.println(data.getString("currentPowers"));
-                }
+                currentPlayer = event.player;
+                LightningGodMod.setPlayer(currentPlayer);
+                loadedPlayerInfo = true;
             } catch (Exception exception) {
                 System.out.println(exception.toString());
-                loadedModDataToPlayer = true;
             }
-        }
+            loadedPlayerInfo = true;
+        } else if (event.player == null && loadedPlayerInfo || event.player.isDeadOrDying() && loadedPlayerInfo) loadedPlayerInfo = false;
         if (currentPlayer != null) {
             try {
                 Item[] lightningArmor = {ModItems.LIGHTNING_BOOTS.get(), ModItems.LIGHTNING_LEGGINGS.get(), ModItems.LIGHTNING_CHESTPLATE.get(), ModItems.LIGHTNING_HELMET.get()};
                 Item[] fireArmor = {ModItems.FIRE_BOOTS.get(), ModItems.FIRE_LEGGINGS.get(), ModItems.FIRE_CHESTPLATE.get(), ModItems.FIRE_HELMET.get()};
                 Item[] waterArmor = {ModItems.WATER_BOOTS.get(), ModItems.WATER_LEGGINGS.get(), ModItems.WATER_CHESTPLATE.get(), ModItems.WATER_HELMET.get()};
+                Item[] earthArmor = {ModItems.EARTH_BOOTS.get(), ModItems.EARTH_LEGGINGS.get(), ModItems.EARTH_CHESTPLATE.get(), ModItems.EARTH_HELMET.get()};
 
                 maxTpCooldown = LightningGodMod.getMaxTeleportCooldown();
                 maxProcessedTpCooldown = LightningGodMod.getMaxProcessedTeleportCooldown();
@@ -234,6 +233,15 @@ public final class PlayerTickEventHandler {
                 maxIceSpikeCooldown = LightningGodMod.getMaxIceSlideCooldown();
                 maxProcessedIceSpikeCooldown = LightningGodMod.getMaxProcessedIceSlideCooldown();
 
+                maxEarthLaunchCooldown = LightningGodMod.getMaxEarthLaunchCooldown();
+                maxProcessedEarthLaunchCooldown = LightningGodMod.getMaxProcessedEarthLaunchCooldown();
+                maxEarthMeteorCooldown = LightningGodMod.getMaxEarthMeteorCooldown();
+                maxProcessedEarthMeteorCooldown = LightningGodMod.getMaxProcessedEarthMeteorCooldown();
+                maxEarthTrapCooldown = LightningGodMod.getMaxEarthTrapCooldown();
+                maxProcessedEarthTrapCooldown = LightningGodMod.getMaxProcessedEarthTrapCooldown();
+                maxEarthWallCooldown = LightningGodMod.getMaxEarthWallCooldown();
+                maxProcessedEarthWallCooldown = LightningGodMod.getMaxProcessedEarthWallCooldown();
+
                 int[] fireMaxCooldonws = {maxFireballCooldown, maxFireBurstCooldown, maxFireFlightCooldown, maxFirePullCooldown};
                 int[] fireMaxProcessedCooldonws = {maxProcessedFireballCooldown, maxProcessedFireBurstCooldown, maxProcessedFireFlightCooldown, maxProcessedFirePullCooldown};
 
@@ -243,9 +251,13 @@ public final class PlayerTickEventHandler {
                 int[] waterMaxCooldonws = {maxFreezeCooldown, maxIceSlideCooldown, maxIceSpikeCooldown};
                 int[] waterMaxProcessedCooldonws = {maxProcessedFreezeCooldown, maxProcessedIceSlideCooldown, maxProcessedIceSpikeCooldown};
 
+                int[] earthMaxCooldonws = {maxEarthLaunchCooldown, maxEarthMeteorCooldown, maxEarthTrapCooldown, maxEarthWallCooldown};
+                int[] earthMaxProcessedCooldonws = {maxProcessedEarthLaunchCooldown, maxProcessedEarthMeteorCooldown, maxProcessedEarthTrapCooldown, maxProcessedEarthWallCooldown};
+
                 checkArmorSet(lightningArmor, appliedLightningArmorBuff, lightningMaxCooldonws, lightningMaxProcessedCooldonws, "lightning");
                 checkArmorSet(fireArmor, appliedFireArmorBuff, fireMaxCooldonws, fireMaxProcessedCooldonws, "fire");
                 checkArmorSet(waterArmor, appliedWaterArmorBuff, waterMaxCooldonws, waterMaxProcessedCooldonws, "water");
+                checkArmorSet(earthArmor, appliedEarthArmorBuff, earthMaxCooldonws, earthMaxProcessedCooldonws, "earth");
 
                 if (LightningGodMod.getCurrentPower() != null && LightningGodMod.getCurrentPower().equals("earth")) {
                     if (currentPlayer.isCrouching()) {
@@ -259,27 +271,28 @@ public final class PlayerTickEventHandler {
             } catch (Exception exception) {
                 System.out.println(exception.toString());
             }
-            if (LightningGodMod.getIsIceSliding()) {
+
+            //if (LightningGodMod.getIsIceSliding()) {
                 //currentPlayer.walkDist = 1;
                 //currentPlayer.walkDistO = 1;
-                if (currentPlayer.isInWater() && !setFireFlightAnim) {
-                    LightningGodMod.StopAnimation("ice_slide");
-                    LightningGodMod.ReproduceAnimation("fire_flyght");
-                    setFireFlightAnim = true;
-                    setIceSlideAnim = false;
-                }
-                else if (!setIceSlideAnim && !currentPlayer.isInWater() && currentPlayer.onGround()) {
-                    LightningGodMod.StopAnimation("fire_flyght");
-                    LightningGodMod.ReproduceAnimation("ice_slide");
-                    setFireFlightAnim = false;
-                    setIceSlideAnim = true;
-                } else if (!currentPlayer.onGround()) {
-                    setIceSlideAnim = false;
-                    setFireFlightAnim = false;
-                    LightningGodMod.StopAnimation("fire_flyght");
-                    LightningGodMod.StopAnimation("ice_slide");
-                }
-            }
+//                if (currentPlayer.isInWater() && !setFireFlightAnim) {
+////                    LightningGodMod.StopAnimation("ice_slide");
+////                    LightningGodMod.ReproduceAnimation("fire_flyght");
+//                    setFireFlightAnim = true;
+//                    setIceSlideAnim = false;
+//                }
+//                else if (!setIceSlideAnim && !currentPlayer.isInWater() && currentPlayer.onGround()) {
+//                    LightningGodMod.StopAnimation("fire_flyght");
+//                    LightningGodMod.ReproduceAnimation("ice_slide");
+//                    setFireFlightAnim = false;
+//                    setIceSlideAnim = true;
+//                } else if (!currentPlayer.onGround()) {
+//                    setIceSlideAnim = false;
+//                    setFireFlightAnim = false;
+//                    LightningGodMod.StopAnimation("fire_flyght");
+//                    LightningGodMod.StopAnimation("ice_slide");
+//                }
+            //}
         }
     }
 

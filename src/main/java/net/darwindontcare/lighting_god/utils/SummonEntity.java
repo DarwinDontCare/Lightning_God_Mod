@@ -103,7 +103,6 @@ public class SummonEntity {
     private static void FallingBlockTick(FallingBlockEntity fallingBlockEntity, Entity owner, Vec3 direction, Vec3 origin) {
         new Thread(() -> {
             try {
-                Thread.sleep(100);
                 fallingBlockEntity.noPhysics = false;
                 Vec3 originForward = origin.add(new Vec3(owner.getForward().x, 0, owner.getForward().z));
                 Vec3 processedDirection = direction;
@@ -114,7 +113,7 @@ public class SummonEntity {
                 fallingBlockEntity.setNoGravity(false);
                 fallingBlockEntity.addDeltaMovement(processedDirection);
                 Vec3 lastDirection = fallingBlockEntity.getDeltaMovement();
-                while (true) {
+                while (owner.isAlive()) {
                     Level level = fallingBlockEntity.level();
                     Vec3 currentPos = fallingBlockEntity.position();
                     boolean foundBlock = false;
@@ -127,7 +126,7 @@ public class SummonEntity {
                     }
                     List<LivingEntity> nearbyEntities = level.getEntitiesOfClass(
                             LivingEntity.class,
-                            new AABB(currentPos.x, currentPos.y - 3, currentPos.z - 3, currentPos.x, currentPos.y + 3, currentPos.z + 3)
+                            new AABB(currentPos.x - 3, currentPos.y - 3, currentPos.z - 3, currentPos.x + 3, currentPos.y + 3, currentPos.z + 3)
                     );
                     for (Entity entity : nearbyEntities) {
                         if (entity != owner && !(entity instanceof ItemEntity) && entity != fallingBlockEntity) {
@@ -139,7 +138,7 @@ public class SummonEntity {
                     }
                     if (foundBlock) break;
                     lastDirection = fallingBlockEntity.getDeltaMovement();
-                    Thread.sleep(50);
+                    Thread.sleep(10);
                 }
             } catch (Exception e) {System.out.println(e.toString());}
         }).start();

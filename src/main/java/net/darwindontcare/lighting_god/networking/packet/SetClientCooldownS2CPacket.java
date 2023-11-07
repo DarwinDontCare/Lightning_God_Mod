@@ -49,6 +49,9 @@ public class SetClientCooldownS2CPacket {
                 LightningGodMod.setTeleportCooldown(LightningGodMod.getMaxProcessedTeleportCooldown());
             } else if (powerName.equals("el_thor")) {
                 LightningGodMod.setElThorCooldown(LightningGodMod.getMaxProcessedElThorCooldown());
+            }  else if (powerName.equals("lightning_beam")) {
+                LightningGodMod.setLightningBeamCooldown(LightningGodMod.getMaxProcessedLightningBeamCooldown());
+                LightningGodMod.setCanRegenMana(true);
             } else if (powerName.equals("earth_launch")) {
                 LightningGodMod.setEarthLaunchCooldown(LightningGodMod.getMaxProcessedEarthLaunchCooldown());
             } else if (powerName.equals("earth_wall")) {

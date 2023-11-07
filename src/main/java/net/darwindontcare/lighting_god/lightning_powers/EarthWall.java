@@ -4,6 +4,7 @@ import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.AddLaunchBlockS2CPakcet;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
 import net.darwindontcare.lighting_god.utils.AddForceToEntity;
+import net.darwindontcare.lighting_god.utils.RaycastUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -11,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,6 +33,8 @@ public class EarthWall {
             new Thread(() -> {
                 try {
                     HitResult hitResult = player.pick(RANGE, 1f, false);
+                    RaycastUtil raycastUtil = new RaycastUtil();
+                    Entity hitEntity = raycastUtil.getEntityInCrosshair(1.0f, RANGE);
 
                     double forwardX = -Math.sin(Math.toRadians(player.getYRot())) * 2;
                     double forwardZ = Math.cos(Math.toRadians(player.getYRot())) * 2;
@@ -43,6 +47,9 @@ public class EarthWall {
                     if (hitResult.getType() == HitResult.Type.BLOCK) {
                         playerForward = new Vec3(0, 0, 0);
                         playerPos = ((BlockHitResult)hitResult).getBlockPos().getCenter().add(new Vec3(-0.5, -0.5, -0.5));
+                    } else if (hitEntity != null && hitEntity.getFeetBlockState().isSolid()) {
+                        playerForward = new Vec3(0, 0, 0);
+                        playerPos = hitEntity.position();
                     }
 
                     List<LivingEntity> hitEntities = player.level().getEntitiesOfClass(

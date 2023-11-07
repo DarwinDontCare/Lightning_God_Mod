@@ -33,7 +33,7 @@ import java.util.Dictionary;
 public class FireFlight {
     private static final float MAX_SPEED = 1.5f;
     private static final double MIN_SPEED = 0.7f;
-    private static final float ManaCost = 0.15f;
+    public static final float ManaCost = 0.15f;
     private static final ArrayList<Boolean> flyingList = new ArrayList<>();
     private static final ArrayList<Integer> playerList = new ArrayList<>();
     public static void start_flight(ServerPlayer player, int cooldown, float mana) {
@@ -83,7 +83,7 @@ public class FireFlight {
                     //AABB playerHitBox = player.getBoundingBox();
                     //System.out.println(playerHitBox);
 
-                    while (flyingList.get(playerIdx) && cooldown <= 0 && !player.isInWater()) {
+                    while (flyingList.get(playerIdx) && cooldown <= 0 && !player.isInWater() && !player.isDeadOrDying()) {
                         float modifier = player.getXRot() / 35;
                         if (modifier < 1) modifier = 1;
                         if (modifier > 3) modifier = 3;
@@ -98,7 +98,7 @@ public class FireFlight {
                         else if (targetSpeed < MIN_SPEED) targetSpeed = MIN_SPEED;
 
                         for (int i = 0; i < 2; i++)
-                            serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + 0.6 + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
+                            serverLevel.sendParticles(ParticleTypes.FLAME, player.getX() + player.getRandomY() * 0.001, player.getY() + player.getRandomY() * 0.001, player.getZ() + player.getRandomY() * 0.001, 1, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001, player.getRandomY() * 0.001);
                         if (particleCooldown <= 0) {
                             player.level().playSound(null, player.position().x, player.position().y, player.position().z, SoundEvents.FIRE_AMBIENT, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
                             particleCooldown = 10;

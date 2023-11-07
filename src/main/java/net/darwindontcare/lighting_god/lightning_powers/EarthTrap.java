@@ -66,7 +66,7 @@ public class EarthTrap {
                     placedIce1 = false;
                 }
                 serverLevel.playSound(null, entity.position().x, entity.position().y, entity.position().z, SoundEvents.STONE_PLACE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                Thread runnable = getThread((LivingEntity) entity);
+                Thread runnable = getThread((LivingEntity) entity, entity.position());
                 new Thread(() -> {
                     Vec3 affectedEntityPos = entity.position();
                     try {
@@ -86,24 +86,35 @@ public class EarthTrap {
     }
 
     @NotNull
-    private static Thread getThread(LivingEntity entity) {
+    private static Thread getThread(LivingEntity entity, Vec3 position) {
         Thread runnable = new Thread(() -> {
-            int freezeTime = (int) DAMAGE * 1000;
-            while (freezeTime > 0) {
-                if (!(entity instanceof Player)) {
-                    if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && !EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
-                        EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
+            try {
+                int freezeTime = (int) DAMAGE * 1000 / 50;
+                CompoundTag compoundTag = entity.getPersistentData();
+                compoundTag.putBoolean("isStuckInPlace", true);
+                entity.addAdditionalSaveData(compoundTag);
+
+                MobEffectInstance slowness = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1, 255, false, false);
+                while (freezeTime > 0) {
+                    entity.makeStuckInBlock(Blocks.PACKED_ICE.defaultBlockState(), position);
+                    if (!(entity instanceof Player)) {
+                        if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && !EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
+                            EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
+                        }
+                    } else {
+                        entity.setJumping(false);
+                        entity.addEffect(slowness);
                     }
-                } else {
-                    entity.setNoGravity(true);
-                    MobEffectInstance slowness = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 255, false, false);
-                    entity.addEffect(slowness);
+                    Thread.sleep(50);
+                    freezeTime--;
                 }
-                freezeTime--;
-            }
-            if (!(entity instanceof Player)) {
-                if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty()) EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
-            }
+                if (!(entity instanceof Player)) {
+                    if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty())
+                        EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
+                }
+                compoundTag.putBoolean("isStuckInPlace", false);
+                entity.addAdditionalSaveData(compoundTag);
+            } catch (Exception e) {System.out.println(e.toString());}
         });
         runnable.start();
         return runnable;

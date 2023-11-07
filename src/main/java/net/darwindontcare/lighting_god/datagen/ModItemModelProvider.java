@@ -32,10 +32,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.LIGHTNING_HELMET);
         simpleItem(ModItems.LIGHTNING_LEGGINGS);
         simpleItem(ModItems.LIGHTNING_SCROLL);
-//        simpleItem(ModItems.WATER_BOOTS);
-//        simpleItem(ModItems.WATER_CHESTPLATE);
-//        simpleItem(ModItems.WATER_HELMET);
-//        simpleItem(ModItems.WATER_LEGGINGS);
+
         handheldItem(ModItems.WATER_SCROLL);
         handheldItem(ModItems.WATER_SCROLL_TIER_2);
         handheldItem(ModItems.EARTH_SCROLL_TIER_2);

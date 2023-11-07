@@ -2,25 +2,26 @@ package net.darwindontcare.lighting_god;
 
 import com.mojang.logging.LogUtils;
 
-import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
-import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
-import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
-import dev.kosmx.playerAnim.api.layered.ModifierLayer;
-import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
-import dev.kosmx.playerAnim.api.layered.modifier.AbstractModifier;
-import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
-import dev.kosmx.playerAnim.core.util.Ease;
-import dev.kosmx.playerAnim.core.util.Vec3f;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
+//import dev.kosmx.playerAnim.api.TransformType;
+//import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
+//import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
+//import dev.kosmx.playerAnim.api.layered.IAnimation;
+//import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+//import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+//import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
+//import dev.kosmx.playerAnim.api.layered.modifier.AbstractModifier;
+//import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
+//import dev.kosmx.playerAnim.core.util.Ease;
+//import dev.kosmx.playerAnim.core.util.Vec3f;
+//import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+//import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
+//import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.darwindontcare.lighting_god.blocks.ModBlocks;
 import net.darwindontcare.lighting_god.blocks.entity.ModBlockEntities;
 import net.darwindontcare.lighting_god.client.SetPlayerData;
 import net.darwindontcare.lighting_god.client.render.LightningArrowRender;
 import net.darwindontcare.lighting_god.entities.EntityInit;
+import net.darwindontcare.lighting_god.entities.client.CustomLightningRenderer;
 import net.darwindontcare.lighting_god.entities.client.IceSpikesRenderer;
 import net.darwindontcare.lighting_god.entities.client.MeteorProjectileRenderer;
 import net.darwindontcare.lighting_god.event.TeleportEvent;
@@ -32,8 +33,6 @@ import net.darwindontcare.lighting_god.utils.ModItemProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,15 +44,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import software.bernie.geckolib.GeckoLib;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static net.darwindontcare.lighting_god.utils.SummonEntity.clamp;
 
 @Mod(LightningGodMod.MOD_ID)
 public class LightningGodMod
@@ -100,6 +95,9 @@ public class LightningGodMod
     private static int ICE_SPIKE_COOLDOWN = 0;
     private static final int MAX_ICE_SPIKE_COOLDOWN = 200;
     private static int MAX_ICE_SPIKE_COOLDOWN_PROCESSED = MAX_ICE_SPIKE_COOLDOWN;
+    private static int LIGHTNING_BEAM_COOLDOWN = 0;
+    private static final int MAX_LIGHTNING_BEAM_COOLDOWN = 300;
+    private static int MAX_LIGHTNING_BEAM_COOLDOWN_PROCESSED = MAX_LIGHTNING_BEAM_COOLDOWN;
 
     private static final int MAX_MANA = 100;
     private static float CURRENT_MANA = MAX_MANA;
@@ -109,6 +107,7 @@ public class LightningGodMod
     private static Player player;
     private static boolean alternativeGliding = false;
     private static boolean isIceSing = false;
+    private static boolean canRegenMana = true;
     public static long lastTickTime;
     public static float deltaTime;
     private static final ArrayList<Vec3> launchBlockPositions = new ArrayList<>();
@@ -121,20 +120,29 @@ public class LightningGodMod
     }
     public static void setAlternativeGliding(boolean value) {
         alternativeGliding = value;
-        if (!value) {
-            StopAnimation("fire_flyght");
-            ReproduceAnimation("stop_fire_flight");
-        }
+        canRegenMana = !alternativeGliding;
+//        if (!value) {
+//            StopAnimation("fire_flyght");
+//            ReproduceAnimation("stop_fire_flight");
+//        }
     }
     public static boolean getIsIceSliding() {
         return isIceSing;
     }
     public static void setIsIceSliding(boolean value) {
         isIceSing = value;
-        if (!value) {
-            StopAnimation("ice_slide");
-            StopAnimation("fire_flyght");
-        }
+        canRegenMana = !isIceSing;
+//        if (!value) {
+//            StopAnimation("ice_slide");
+//            StopAnimation("fire_flyght");
+//        }
+    }
+
+    public static boolean getCanRegenMana() {
+        return canRegenMana;
+    }
+    public static void setCanRegenMana(boolean value) {
+        canRegenMana = value;
     }
 
     public static void AddLaunchBlockToArray(ArrayList<Vec3> positions) {
@@ -388,6 +396,21 @@ public class LightningGodMod
     public static void setMaxProcessedIceSpikeCooldown(int value) {
         MAX_ICE_SPIKE_COOLDOWN_PROCESSED = value;
     }
+    public static int getLightningBeamCooldown() {
+        return LIGHTNING_BEAM_COOLDOWN;
+    }
+    public static void setLightningBeamCooldown(int value) {
+        LIGHTNING_BEAM_COOLDOWN = value;
+    }
+    public static int getMaxLightningBeamCooldown() {
+        return MAX_LIGHTNING_BEAM_COOLDOWN;
+    }
+    public static int getMaxProcessedLightningBeamCooldown() {
+        return MAX_LIGHTNING_BEAM_COOLDOWN_PROCESSED;
+    }
+    public static void setMaxProcessedLightningBeamCooldown(int value) {
+        MAX_LIGHTNING_BEAM_COOLDOWN_PROCESSED = value;
+    }
 
     public static int getPowerTier(String power) {
         if (player != null) {
@@ -444,16 +467,17 @@ public class LightningGodMod
             EntityRenderers.register(EntityInit.EARTH_METEOR.get(), MeteorProjectileRenderer::new);
             EntityRenderers.register(EntityInit.ICE_SPIKES.get(), IceSpikesRenderer::new);
             EntityRenderers.register(EntityInit.LIGHTNING_ARROW.get(), LightningArrowRender::new);
+            EntityRenderers.register(EntityInit.CUSTOM_LIGHTNING.get(), CustomLightningRenderer::new);
 
             String[] animations = {"earth_meteor_cast", "fireball_cast", "fire_flyght", "fire_flyght_turn", "start_fire_flight", "stop_fire_flight", "ice_slide"};
 
-            for (String animation: animations) {
-                PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(new ResourceLocation(MOD_ID, animation), 42, (player) -> {
-                    ModifierLayer<IAnimation> customAnimation = new ModifierLayer<>();
-
-                    return customAnimation;
-                });
-            }
+//            for (String animation: animations) {
+//                PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(new ResourceLocation(MOD_ID, animation), 42, (player) -> {
+//                    ModifierLayer<IAnimation> customAnimation = new ModifierLayer<>();
+//
+//                    return customAnimation;
+//                });
+//            }
         }
     }
 
@@ -489,9 +513,11 @@ public class LightningGodMod
                 setFireFlightCooldown(getFireFlightCooldown() - 1);
             } if (getFirePullCooldown() > 0) {
                 setFirePullCooldown(getFirePullCooldown() - 1);
+            } if (getLightningBeamCooldown() > 0) {
+                setLightningBeamCooldown(getLightningBeamCooldown() - 1);
             }
 
-            if (CURRENT_MANA < (MAX_MANA + MANA_BUFF) && !isIceSing && !alternativeGliding) CURRENT_MANA += MANA_REGEN;
+            if (CURRENT_MANA < (MAX_MANA + MANA_BUFF) && canRegenMana) CURRENT_MANA += MANA_REGEN;
             if (CURRENT_MANA > (MAX_MANA + MANA_BUFF)) CURRENT_MANA = (MAX_MANA + MANA_BUFF);
 
             long currentTime = System.nanoTime();
@@ -500,145 +526,145 @@ public class LightningGodMod
         }
     }
 
-    private static ModifierLayer<IAnimation> customAnimation;
-    public static void ReproduceAnimation(String animation) {
-        try {
-            customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
-            if (customAnimation.getAnimation() != null) {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.LINEAR), null);
-            }
-
-            if (!animation.contains("fire_flyght") && !animation.contains("fire_flight") && !animation.contains("ice_slide")) {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
-                        .setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL)
-                        .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(true)));
-            } else {
-                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
-                        .setFirstPersonMode(FirstPersonMode.VANILLA));
-            }
-
-            customAnimation.addModifier(new AbstractModifier() {
-                public final float ninetyDegree = (float) Math.toRadians(90);
-                public float desiredZRot = 0f;
-                public double prevRotY = Math.toRadians(player.getViewYRot(1) - player.getYRot()) * 2;
-                public Vec3 prevPlayerPos = player.position();
-                public float speed = 1;
-
-                private float delta = 0;
-
-                private float shiftedDelta = 0;
-
-                @Override
-                public boolean canRemove() {
-                    return super.canRemove();
-                }
-
-                @Override
-                public void setHost(@Nullable ModifierLayer host) {
-                    super.setHost(host);
-                }
-
-                @Override
-                public void setAnim(@Nullable IAnimation newAnim) {
-                    super.setAnim(newAnim);
-                }
-
-                @Override
-                public @Nullable IAnimation getAnim() {
-                    return super.getAnim();
-                }
-
-                @Override
-                public boolean isActive() {
-                    return super.isActive();
-                }
-
-                @Override
-                public void tick() {
-                    float delta = 1f - this.delta;
-                    this.delta = 0;
-                    if (animation.equals("ice_slide")) {
-                        double deltaX = player.position().x - prevPlayerPos.x;
-                        double deltaZ = player.position().z - prevPlayerPos.z;
-                        float CURRENT_SPEED = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-
-                        if (CURRENT_SPEED > 0.05) speed = CURRENT_SPEED * 4;
-                        prevPlayerPos = player.position();
-                    }
-                    step(delta);
-                }
-
-                @Override
-                public @NotNull Vec3f get3DTransform(@NotNull String modelName, @NotNull TransformType type, float tickDelta, @NotNull Vec3f value0) {
-                    if (animation.equals("fire_flyght")) {
-                        if (modelName.equals("body") && type == TransformType.ROTATION) {
-                            double XRot = (float) -(Math.toRadians(player.getXRot()) + ninetyDegree);
-                            float desiredXRot = (float) (Mth.smoothstep(0) * (value0.getX() - XRot) + XRot);
-                            float changeValue = getChangeValue();
-                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(desiredXRot, value0.getY(), changeValue));
-                        } else if (modelName.equals("head") && type == TransformType.ROTATION) {
-                            desiredZRot = -value0.getY();
-                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f((float) -Math.toRadians(60), value0.getY(), value0.getZ()));
-                        }
-                    } else if (animation.equals("ice_slide")) {
-                        if (modelName.equals("body") && type == TransformType.ROTATION) {
-                            float changeValue = getChangeValue();
-                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(value0.getX(), value0.getY(), changeValue));
-                        } else if (modelName.equals("head") && type == TransformType.ROTATION) {
-                            desiredZRot = -value0.getY();
-                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(value0.getX(), value0.getY(), value0.getZ()));
-                        }
-                    }
-                    return super.get3DTransform(modelName, type, tickDelta, value0);
-                }
-
-                private float getChangeValue() {
-                    double currentRotY = desiredZRot;
-                    double deltaYRot = (float) (Mth.smoothstep(0.05f) * (prevRotY - currentRotY) + currentRotY);
-                    prevRotY = desiredZRot;
-                    return (float) deltaYRot;
-                }
-
-                @Override
-                public void setupAnim(float tickDelta) {
-                    float delta = tickDelta - this.delta; //this should stay positive
-                    this.delta = tickDelta;
-                    step(delta);
-                }
-
-                protected void step(float delta) {
-                    delta *= speed;
-                    delta += shiftedDelta;
-                    while (delta > 1) {
-                        delta -= 1;
-                        super.tick();
-                    }
-                    super.setupAnim(delta);
-                    this.shiftedDelta = delta;
-                }
-
-                @Override
-                public @NotNull FirstPersonMode getFirstPersonMode(float tickDelta) {
-                    return super.getFirstPersonMode(tickDelta);
-                }
-
-                @Override
-                public @NotNull FirstPersonConfiguration getFirstPersonConfiguration(float tickDelta) {
-                    return super.getFirstPersonConfiguration(tickDelta);
-                }
-            }, 0);
-
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-    }
-
-    public static void StopAnimation(String animation) {
-        try {
-            customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
-            customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-    }
+//    private static ModifierLayer<IAnimation> customAnimation;
+//    public static void ReproduceAnimation(String animation) {
+//        try {
+//            customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
+//            if (customAnimation.getAnimation() != null) {
+//                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.LINEAR), null);
+//            }
+//
+//            if (!animation.contains("fire_flyght") && !animation.contains("fire_flight") && !animation.contains("ice_slide")) {
+//                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
+//                        .setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL)
+//                        .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(true)));
+//            } else {
+//                customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), new KeyframeAnimationPlayer(PlayerAnimationRegistry.getAnimation(new ResourceLocation(MOD_ID, animation)))
+//                        .setFirstPersonMode(FirstPersonMode.VANILLA));
+//            }
+//
+//            customAnimation.addModifier(new AbstractModifier() {
+//                public final float ninetyDegree = (float) Math.toRadians(90);
+//                public float desiredZRot = 0f;
+//                public double prevRotY = Math.toRadians(player.getViewYRot(1) - player.getYRot()) * 2;
+//                public Vec3 prevPlayerPos = player.position();
+//                public float speed = 1;
+//
+//                private float delta = 0;
+//
+//                private float shiftedDelta = 0;
+//
+//                @Override
+//                public boolean canRemove() {
+//                    return super.canRemove();
+//                }
+//
+//                @Override
+//                public void setHost(@Nullable ModifierLayer host) {
+//                    super.setHost(host);
+//                }
+//
+//                @Override
+//                public void setAnim(@Nullable IAnimation newAnim) {
+//                    super.setAnim(newAnim);
+//                }
+//
+//                @Override
+//                public @Nullable IAnimation getAnim() {
+//                    return super.getAnim();
+//                }
+//
+//                @Override
+//                public boolean isActive() {
+//                    return super.isActive();
+//                }
+//
+//                @Override
+//                public void tick() {
+//                    float delta = 1f - this.delta;
+//                    this.delta = 0;
+//                    if (animation.equals("ice_slide")) {
+//                        double deltaX = player.position().x - prevPlayerPos.x;
+//                        double deltaZ = player.position().z - prevPlayerPos.z;
+//                        float CURRENT_SPEED = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+//
+//                        if (CURRENT_SPEED > 0.05) speed = CURRENT_SPEED * 4;
+//                        prevPlayerPos = player.position();
+//                    }
+//                    step(delta);
+//                }
+//
+//                @Override
+//                public @NotNull Vec3f get3DTransform(@NotNull String modelName, @NotNull TransformType type, float tickDelta, @NotNull Vec3f value0) {
+//                    if (animation.equals("fire_flyght")) {
+//                        if (modelName.equals("body") && type == TransformType.ROTATION) {
+//                            double XRot = (float) -(Math.toRadians(player.getXRot()) + ninetyDegree);
+//                            float desiredXRot = (float) (Mth.smoothstep(0) * (value0.getX() - XRot) + XRot);
+//                            float changeValue = getChangeValue();
+//                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(desiredXRot, value0.getY(), changeValue));
+//                        } else if (modelName.equals("head") && type == TransformType.ROTATION) {
+//                            desiredZRot = -value0.getY();
+//                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f((float) -Math.toRadians(60), value0.getY(), value0.getZ()));
+//                        }
+//                    } else if (animation.equals("ice_slide")) {
+//                        if (modelName.equals("body") && type == TransformType.ROTATION) {
+//                            float changeValue = getChangeValue();
+//                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(value0.getX(), value0.getY(), changeValue));
+//                        } else if (modelName.equals("head") && type == TransformType.ROTATION) {
+//                            desiredZRot = -value0.getY();
+//                            return super.get3DTransform(modelName, type, tickDelta, new Vec3f(value0.getX(), value0.getY(), value0.getZ()));
+//                        }
+//                    }
+//                    return super.get3DTransform(modelName, type, tickDelta, value0);
+//                }
+//
+//                private float getChangeValue() {
+//                    double currentRotY = desiredZRot;
+//                    double deltaYRot = (float) (Mth.smoothstep(0.05f) * (prevRotY - currentRotY) + currentRotY);
+//                    prevRotY = desiredZRot;
+//                    return (float) deltaYRot;
+//                }
+//
+//                @Override
+//                public void setupAnim(float tickDelta) {
+//                    float delta = tickDelta - this.delta; //this should stay positive
+//                    this.delta = tickDelta;
+//                    step(delta);
+//                }
+//
+//                protected void step(float delta) {
+//                    delta *= speed;
+//                    delta += shiftedDelta;
+//                    while (delta > 1) {
+//                        delta -= 1;
+//                        super.tick();
+//                    }
+//                    super.setupAnim(delta);
+//                    this.shiftedDelta = delta;
+//                }
+//
+//                @Override
+//                public @NotNull FirstPersonMode getFirstPersonMode(float tickDelta) {
+//                    return super.getFirstPersonMode(tickDelta);
+//                }
+//
+//                @Override
+//                public @NotNull FirstPersonConfiguration getFirstPersonConfiguration(float tickDelta) {
+//                    return super.getFirstPersonConfiguration(tickDelta);
+//                }
+//            }, 0);
+//
+//        } catch (Exception e) {
+//            System.out.println(e.toString());
+//        }
+//    }
+//
+//    public static void StopAnimation(String animation) {
+//        try {
+//            customAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation(MOD_ID, animation));
+//            customAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(10, Ease.INOUTEXPO), null);
+//        } catch (Exception e) {
+//            System.out.println(e.toString());
+//        }
+//    }
 }

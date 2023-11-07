@@ -30,7 +30,7 @@ public class IceSlide {
     private static final double MAX_SLIDE_SPEED = 0.7;
     private static double CURRENT_SPEED = 0;
     private static boolean isSliding = false;
-    private static final float ManaCost = 0.1f;
+    public static final float ManaCost = 0.1f;
     public static void StartSlide(ServerPlayer player, int cooldown, float mana) {
         if (cooldown <= 0) Slide(player, mana, cooldown);
     }
@@ -49,7 +49,7 @@ public class IceSlide {
             isSliding = true;
             ServerLevel serverLevel = (ServerLevel) player.level();
             new Thread(() -> {
-                while (isSliding && cooldown <= 0) {
+                while (isSliding && cooldown <= 0 && !player.isDeadOrDying()) {
                     try {
                         ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("", ManaCost), player);
                         if (CURRENT_SPEED < MAX_SLIDE_SPEED) {
@@ -75,7 +75,7 @@ public class IceSlide {
 
                             ModMessage.sendToPlayer(new AddForceToEntityS2CPacket(new Vec3(motionX, 0, motionZ), player, true), player);
                         } else {
-                            for (int i = 0; i < 10; i++)serverLevel.sendParticles(ParticleTypes.BUBBLE, player.getX() + player.getRandomY() * 0.0005, player.getY() + 0.6 + player.getRandomY() * 0.0005, player.getZ() + player.getRandomY() * 0.0005, 1, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005);
+                            for (int i = 0; i < 10; i++)serverLevel.sendParticles(ParticleTypes.BUBBLE, player.getX() + player.getRandomY() * 0.0005, player.getY() + 0.1 + player.getRandomY() * 0.0005, player.getZ() + player.getRandomY() * 0.0005, 1, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005, player.getRandomY() * 0.0005);
                             player.level().playSound(player, player.position().x, player.position().y, player.position().z, SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
 
                             double motionX = player.getForward().x * CURRENT_SPEED;

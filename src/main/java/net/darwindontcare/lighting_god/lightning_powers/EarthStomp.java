@@ -45,8 +45,9 @@ public class EarthStomp {
             StartedStomp.set(playerIdx, true);
             int finalPlayerIdx = playerIdx;
             new Thread(() -> {
+                MobEffectInstance jumpBoost = new MobEffectInstance(MobEffects.JUMP, 50, 255, false, false);
                 try {
-                    while (true) {
+                    while (!player.isDeadOrDying() && StartedStomp.get(finalPlayerIdx)) {
                         if (DAMAGE.get(finalPlayerIdx) > maxDamage) {
                             DAMAGE.set(finalPlayerIdx, maxDamage);
                         }
@@ -57,12 +58,14 @@ public class EarthStomp {
                             System.out.println("damage: " + DAMAGE.get(finalPlayerIdx) + ", level: " + level + ", player y velocity: " + player.getDeltaMovement().y);
                             ModMessage.sendToServer(new ExplodeC2SPacket(player.position(), player, DAMAGE.get(finalPlayerIdx)));
                             player.resetFallDistance();
+                            player.removeEffect(jumpBoost.getEffect());
                             break;
                         } else if (player.onGround()) {
                             player.resetFallDistance();
+                            player.removeEffect(jumpBoost.getEffect());
                             break;
                         }
-                        player.resetFallDistance();
+                        player.addEffect(jumpBoost);
                         Thread.sleep(50);
                     }
                     DAMAGE.remove(finalPlayerIdx);

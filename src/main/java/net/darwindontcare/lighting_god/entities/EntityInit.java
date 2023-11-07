@@ -23,6 +23,10 @@ public class EntityInit {
     public static final RegistryObject<EntityType<IceSpikes>> ICE_SPIKES = ENTITY_TYPES.register("ice_spikes",
             () -> EntityType.Builder.of((EntityType.EntityFactory<IceSpikes>) IceSpikes::new, MobCategory.MISC).sized(4F, 4F).build(new ResourceLocation(LightningGodMod.MOD_ID, "ice_spikes").toString()));
 
+    public static final RegistryObject<EntityType<CustomLightningBolt>> CUSTOM_LIGHTNING = ENTITY_TYPES.register("custom_lightning",
+            () -> EntityType.Builder.of((EntityType.EntityFactory<CustomLightningBolt>) CustomLightningBolt::new, MobCategory.AMBIENT).sized(2F, 2F).build(new ResourceLocation(LightningGodMod.MOD_ID, "custom_lightning").toString()));
+
+
     public static void register(IEventBus bus) {
         ENTITY_TYPES.register(bus);
     }

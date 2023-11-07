@@ -43,6 +43,14 @@ public enum ArmorItemMaterial implements ArmorMaterial {
         p_266655_.put(ArmorItem.Type.HELMET, 3);
     }), 15, SoundEvents.ARMOR_EQUIP_DIAMOND, 3.0F, 0.1F, () -> {
         return Ingredient.of(Items.GOLD_INGOT);
+    }),
+    EARTH("earth", 37,Util.make(new EnumMap<>(ArmorItem.Type.class), (p_266655_) -> {
+        p_266655_.put(ArmorItem.Type.BOOTS, 3);
+        p_266655_.put(ArmorItem.Type.LEGGINGS, 6);
+        p_266655_.put(ArmorItem.Type.CHESTPLATE, 8);
+        p_266655_.put(ArmorItem.Type.HELMET, 3);
+    }), 15, SoundEvents.ARMOR_EQUIP_DIAMOND, 3.0F, 0.1F, () -> {
+        return Ingredient.of(Items.GOLD_INGOT);
     });
 
     public static final StringRepresentable.EnumCodec<ArmorMaterials> CODEC = StringRepresentable.fromEnum(ArmorMaterials::values);

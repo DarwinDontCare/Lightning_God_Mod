@@ -128,10 +128,10 @@ repositories {
     //     dir 'libs'
     // }
     maven {url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'}
-    maven {
-        name "KosmX's maven"
-        url 'https://maven.kosmx.dev/'
-    }
+//    maven {
+//        name "KosmX's maven"
+//        url 'https://maven.kosmx.dev/'
+//    }
 }
 
 dependencies {
@@ -140,7 +140,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
     implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.3')
-    implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:1.0.2-rc1+1.20")
+//    implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:1.0.2-rc1+1.20")
     //runtimeOnly fg.deobf("io.github.kosmx.bendy-lib:bendy-lib-forge:${project.bendylib_version}")
 
     // Real mod deobf dependency examples - these get remapped to your current mappings

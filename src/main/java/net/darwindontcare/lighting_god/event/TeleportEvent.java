@@ -39,7 +39,7 @@ public class TeleportEvent {
 
                 if (!block_head.isSolid() && !block_feet.isSolid()) {
                     System.out.println(player.position());
-                    player.level().playSound(null, player.position().x, player.position().y, player.position().z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+                    player.level().playSound(player, player.position().x, player.position().y, player.position().z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
                     for(int idx = 0; idx < 20; idx++) {
                         serverLevel.sendParticles(ParticleTypes.PORTAL, player.getX() + player.getRandomY() * 0.005, player.getY() + player.getRandomY() * 0.005, player.getZ() + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
                         serverLevel.sendParticles(ParticleTypes.PORTAL, player.getX() + player.getRandomY() * 0.005, player.getY() + player.getEyeHeight() + player.getRandomY() * 0.005, player.getZ() + player.getRandomY() * 0.005, 1, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005, player.getRandomY() * 0.005);
@@ -54,7 +54,9 @@ public class TeleportEvent {
                 } else if (!block_feet.isSolid() && !block_ground.isSolid()) {
                     System.out.println(player.position());
                     for(int idx = 0; idx < 15; idx++){player.level().addParticle(ParticleTypes.PORTAL, player.getX(), player.getY() + player.getRandom().nextDouble() * 2.0D, player.getZ(), event.getPlayer().getRandom().nextGaussian(), event.getPlayer().getRandom().nextGaussian(), event.getPlayer().getRandom().nextGaussian());}
-                    player.level().playSound((Player)null, player.position().x, player.position().y, player.position().z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+                    player.level().playSound(player, player.position().x, player.position().y, player.position().z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 0.5F, 0.4F / (player.getRandom().nextFloat() * 0.4F + 0.8F));
+                    MobEffectInstance invisibility = new MobEffectInstance(MobEffects.INVISIBILITY, 50, 1, false, false);
+                    player.addEffect(invisibility);
                     player.teleportTo(position.x, position.y, position.z);
                     player.resetFallDistance();
                     ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("teleport", event.getManaCost()), player);

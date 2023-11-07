@@ -146,21 +146,21 @@ public class IceSpikes extends Entity implements TraceableEntity, GeoEntity {
                         serverLevel.removeBlock(blockPos, false);
                         serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
                         serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                        for (int i = 0; i < 15; i++)
+                        for (int i = 0; i < 5; i++)
                             serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
                         serverLevel.setBlock(blockPos, Blocks.OBSIDIAN.defaultBlockState(), 3);
                     } else if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.WATER) {
                         serverLevel.removeBlock(blockPos, false);
                         serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
                         serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                        for (int i = 0; i < 15; i++)
+                        for (int i = 0; i < 5; i++)
                             serverLevel.sendParticles(ParticleTypes.END_ROD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
                         serverLevel.setBlock(blockPos, Blocks.PACKED_ICE.defaultBlockState(), 3);
                     } else if (serverLevel.getBlockState(blockPos).getBlock() == Blocks.FIRE) {
                         serverLevel.removeBlock(blockPos, false);
                         serverLevel.gameEvent(getOwner(), GameEvent.BLOCK_DESTROY, blockPos);
                         serverLevel.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getY(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                        for (int i = 0; i < 15; i++)
+                        for (int i = 0; i < 5; i++)
                             serverLevel.sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, this.getRandomY() * 0.005, this.getRandomY() * 0.005, 0, this.getRandomY() * 0.005);
                     }
                 }
