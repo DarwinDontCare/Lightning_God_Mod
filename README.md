@@ -27,9 +27,8 @@ Move the downloaded file to the "mods" folder in your Minecraft installation dir
 
 Launch Minecraft with the Forge profile and enjoy the new gaming experience!
 
-## Media
+## Demo Video
 https://youtu.be/EIAjsdghwiI
-<iframe width="560" height="315" src="https://youtu.be/EIAjsdghwiI" frameborder="0" allowfullscreen></iframe>
 
 ## Release Notes
 Current Version: v1.0.0
