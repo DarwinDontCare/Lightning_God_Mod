@@ -4,6 +4,7 @@ import net.darwindontcare.lighting_god.LightningGodMod;
 import net.darwindontcare.lighting_god.event.EntityGlideEvent;
 import net.darwindontcare.lighting_god.networking.ModMessage;
 import net.darwindontcare.lighting_god.networking.packet.SetClientCooldownS2CPacket;
+import net.darwindontcare.lighting_god.utils.FreezeHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -48,6 +49,7 @@ public class FireBurst {
                 if (entity != player) {
                     entity.setSecondsOnFire(10);
                     entity.hurt(entity.damageSources().inFire(), DAMAGE);
+                    FreezeHandler.removeFrozenEntity(entity);
                 }
             }
             for (int i = 0; i < 25; i++) {serverLevel.sendParticles(ParticleTypes.FLAME, playerPos.x + player.getRandomY() * 0.01, playerPos.y + player.getRandomY() * 0.01, playerPos.z + player.getRandomY() * 0.01, 1, player.getRandomY() * 0.01, player.getRandomY() * 0.01, player.getRandomY() * 0.01, player.getRandomY() * 0.01);}

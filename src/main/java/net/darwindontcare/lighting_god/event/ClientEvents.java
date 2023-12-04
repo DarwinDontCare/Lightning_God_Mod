@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -38,10 +39,10 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
             if (LightningGodMod.getPlayer() != null && !(Minecraft.getInstance().screen instanceof ChatScreen)) {
-                if (LightningGodMod.getPlayer().getPersistentData().contains("isStuckInPlace") && LightningGodMod.getPlayer().getPersistentData().getBoolean("isStuckInPlace")) {
-                    System.out.println("canceled key binding");
-                    event.setCanceled(true);
-                }
+//                if (LightningGodMod.getPlayer().getPersistentData().contains("isStuckInPlace") && LightningGodMod.getPlayer().getPersistentData().getBoolean("isStuckInPlace")) {
+//                    System.out.println("canceled key binding");
+//                    event.setCanceled(true);
+//                }
                 float currentMana = LightningGodMod.getCurrentMana();
                 if (event.getAction() == 0) {
                     if (event.getKey() == KeyBindings.FIRST_POWER_KEY.getKey().getValue()) {
@@ -67,80 +68,11 @@ public class ClientEvents {
                             //ModMessage.sendToServer(new EarthWallC2SPacket(LightningGodMod.getEarthWallCooldown()));
                         }
                     }
-                    if (event.getKey() == KeyBindings.SHIFT_KEY.getKey().getValue() || LightningGodMod.getPlayer().isCrouching()) {
+                    if (!LightningGodMod.getPlayer().isShiftKeyDown() && !LightningGodMod.getPlayer().isCrouching()) {
                         if (LightningGodMod.getCurrentPower().equals("earth")) {
                             ModMessage.sendToServer(new StopEarthStompC2SPacket());
                         }
                     }
-                }
-
-                if (KeyBindings.FIRST_POWER_KEY.consumeClick()) {
-                    if (LightningGodMod.getCurrentPower().equals("lightning")) {
-                        ModMessage.sendToServer(new LightningTeleportC2SPacket(LightningGodMod.getTeleportCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("fire")) {
-                        //if (LightningGodMod.getFireballCooldown() <= 0) LightningGodMod.ReproduceAnimation("fireball_cast");
-                        ModMessage.sendToServer(new FireballC2SPacket(LightningGodMod.getFireballCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("water")) {
-                        ModMessage.sendToServer(new FreezeC2SPacket(LightningGodMod.getFreezeCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("earth")) {
-                        calcEarthLaunchForce(LightningGodMod.getEarthLaunchCooldown(), LightningGodMod.getPowerTier("earth"));
-                    }
-                }
-                if (KeyBindings.SECOND_POWER_KEY.consumeClick()) {
-                    if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 1) {
-                        ModMessage.sendToServer(new ElThorC2SPacket(LightningGodMod.getElThorCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 1) {
-                        ModMessage.sendToServer(new FirePullC2SPacket(LightningGodMod.getFirePullCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 1) {
-                        if (LightningGodMod.getIceSlideCooldown() <= 0 && LightningGodMod.getCurrentMana() >= IceSlide.ManaCost) {
-                            LightningGodMod.setIsIceSliding(true);
-                        }
-                        else LightningGodMod.setIsIceSliding(false);
-                        ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 1) {
-                        ModMessage.sendToServer(new EarthWallC2SPacket(LightningGodMod.getEarthWallCooldown(), currentMana));
-                    }
-                }
-                if (KeyBindings.THIRD_POWER_KEY.consumeClick()) {
-                    if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 2) {
-                        if (LightningGodMod.getLightningBeamCooldown() <= 0 && LightningGodMod.getCurrentMana() >= LightningBeam.ManaCost) {
-                            LightningGodMod.setCanRegenMana(false);
-                        }
-                        ModMessage.sendToServer(new StartLightningBeamC2SPacket(LightningGodMod.getLightningBeamCooldown(), LightningGodMod.getCurrentMana()));
-                    } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 2) {
-                        if (LightningGodMod.getFireFlightCooldown() <= 0 && LightningGodMod.getCurrentMana() >= FireFlight.ManaCost) {
-                            //if (!LightningGodMod.getAlternativeGliding()) LightningGodMod.ReproduceAnimation("fire_flyght");
-                            LightningGodMod.setAlternativeGliding(true);
-                        }
-                        else LightningGodMod.setAlternativeGliding(false);
-                        ModMessage.sendToServer(new StartFireFlightC2SPacket(LightningGodMod.getFireFlightCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 2) {
-                        ModMessage.sendToServer(new IceSpikePowerC2SPacket(LightningGodMod.getIceSpikeCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 2) {
-                        ModMessage.sendToServer(new EarthTrapC2SPacket(LightningGodMod.getEarthTrapCooldown(), currentMana));
-                    }
-                }
-                if (KeyBindings.FORTH_POWER_KEY.consumeClick()) {
-                    if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 3) {
-                        //ModMessage.sendToServer(new ElThorC2SPacket(LightningGodMod.getElThorCooldown()));
-                    } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 3) {
-                        ModMessage.sendToServer(new FireBurstC2SPacket(LightningGodMod.getFireBurstCooldown(), currentMana));
-                    } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 3) {
-                        //ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown()));
-                    } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 3) {
-                        //if (LightningGodMod.getEarthMeteorCooldown() <= 0) LightningGodMod.ReproduceAnimation("earth_meteor_cast");
-                        ModMessage.sendToServer(new EarthMeteorC2SPacket(LightningGodMod.getEarthMeteorCooldown(), currentMana));
-                    }
-                }
-                if (KeyBindings.SHIFT_KEY.consumeClick()) {
-                    if (LightningGodMod.getCurrentPower().equals("earth")) {
-                        ModMessage.sendToServer(new StartEarthStompC2SPacket(LightningGodMod.getPowerTier("earth"), LightningGodMod.getEarthLaunchCooldown()));
-                    }
-                }
-                if (KeyBindings.POWER_WHEEL_KEY.consumeClick()) {
-                    LightningGodMod.setShowPowerWheel(true);
-                } else if (LightningGodMod.getShowPowerWheel()) {
-                    LightningGodMod.setShowPowerWheel(false);
                 }
             }
         }

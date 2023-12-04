@@ -1,6 +1,7 @@
 package net.darwindontcare.lighting_god.entities;
 
 import net.darwindontcare.lighting_god.event.EntityGlideEvent;
+import net.darwindontcare.lighting_god.utils.FreezeHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -42,9 +43,7 @@ public class CustomFireball extends LargeFireball {
 
             for (LivingEntity entity : nearbyEntities) {
                 entity.setTicksFrozen(0);
-                if (EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
-                    EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
-                }
+                FreezeHandler.removeFrozenEntity(entity);
             }
             ServerLevel serverLevel = (ServerLevel) level();
             Block[] iceBlocks = {Blocks.ICE, Blocks.FROSTED_ICE, Blocks.PACKED_ICE, Blocks.BLUE_ICE};

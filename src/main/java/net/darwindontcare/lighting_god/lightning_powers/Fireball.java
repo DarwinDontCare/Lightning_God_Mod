@@ -25,7 +25,7 @@ public class Fireball {
             ServerLevel serverLevel = (ServerLevel) player.level();
             player.swing(InteractionHand.MAIN_HAND);
             if (cooldown <= 0 && mana >= ManaCost) {
-                CustomFireball largeFireball = new CustomFireball(player.level(), player, player.getForward().x, player.getForward().y, player.getForward().z, 2);
+                CustomFireball largeFireball = new CustomFireball(player.level(), player, player.getForward().x, player.getForward().y, player.getForward().z, 3);
                 largeFireball.setPos(largeFireball.position().x, largeFireball.position().y + player.getEyeHeight(), largeFireball.position().z);
                 largeFireball.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0f, 4.0f, 4.0f);
                 player.level().addFreshEntity(largeFireball);

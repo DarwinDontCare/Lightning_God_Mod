@@ -1,6 +1,7 @@
 package net.darwindontcare.lighting_god.items;
 
 import net.darwindontcare.lighting_god.event.EntityGlideEvent;
+import net.darwindontcare.lighting_god.utils.FreezeHandler;
 import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -41,7 +42,7 @@ import java.util.List;
 public class FreezingProjectileEntity extends Snowball {
     private static int LIFE_TIME = 50;
     private static final int FREEZE_DAMAGE = 10;
-    private static final int FREEZE_TIME = 3;
+    private static final int FREEZE_TIME = 20;
 
     public FreezingProjectileEntity(Level p_37394_, double p_37395_, double p_37396_, double p_37397_) {
         super(p_37394_, p_37395_, p_37396_, p_37397_);
@@ -104,7 +105,7 @@ public class FreezingProjectileEntity extends Snowball {
             Entity projectile = this;
             ServerLevel serverLevel = (ServerLevel) projectile.level();
             if (hitEntity != null) {
-                FreezeEntity(hitEntity, owner, projectile, serverLevel);
+                FreezeEntity(hitEntity, owner, serverLevel);
             }
             Vec3 currentPos = projectile.position();
 
@@ -120,7 +121,7 @@ public class FreezingProjectileEntity extends Snowball {
             );
 
             for (LivingEntity entity : nearbyEntities) {
-                FreezeEntity(entity, owner, projectile, serverLevel);
+                FreezeEntity(entity, owner, serverLevel);
             }
             decresseLifeTime();
         } else {
@@ -160,88 +161,10 @@ public class FreezingProjectileEntity extends Snowball {
         }
     }
 
-    private void FreezeEntity(LivingEntity entity, Entity owner, Entity projectile, ServerLevel serverLevel) {
+    private void FreezeEntity(LivingEntity entity, Entity owner, ServerLevel serverLevel) {
         if (!entity.equals(owner)) {
-            if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) return;
-            entity.setSecondsOnFire(0);
-            Vec3 entityPos = entity.position();
             entity.hurt(owner.damageSources().playerAttack((Player) owner), FREEZE_DAMAGE);
-            HashMap<Vec3, Boolean> placedIce = new HashMap<>();
-            for (int y = 0; y < entity.getEyeHeight(); y++) {
-                for (int x = -1; x < 1; x++) {
-                    for (int z = -1; z < 1; z++) {
-                        Vec3 currentPos = new Vec3((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
-                        BlockPos currentBlockPos = new BlockPos((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
-                        if (!level().getBlockState(currentBlockPos).isSolid()) {
-                            placedIce.put(currentPos, level().setBlock(currentBlockPos, Blocks.PACKED_ICE.defaultBlockState(), 3));
-                            if (placedIce.getOrDefault(currentPos, false))
-                                level().gameEvent(owner, GameEvent.BLOCK_PLACE, currentBlockPos);
-                        } else {
-                            placedIce.put(currentPos, false);
-                        }
-                    }
-                }
-            }
-            projectile.level().playSound(null, projectile.position().x, projectile.position().y, projectile.position().z, SoundEvents.ELDER_GUARDIAN_CURSE, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-            entity.isInPowderSnow = true;
-            entity.setTicksFrozen(FREEZE_DAMAGE*500);
-            Thread runnable = getThread(entity, this, entityPos);
-            new Thread(() -> {
-                try {
-                    Thread.sleep(FREEZE_TIME*1000);
-                    entity.setTicksFrozen(0);
-                    runnable.interrupt();
-                    for (int y = 0; y < entity.getEyeHeight(); y++) {
-                        for (int x = -1; x < 1; x++) {
-                            for (int z = -1; z < 1; z++) {
-                                Vec3 currentPos = new Vec3((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
-                                BlockPos currentBlockPos = new BlockPos((int) entityPos.x + x, (int) entityPos.y + y, (int) entityPos.z + z);
-                                if (placedIce.get(currentPos)) {
-                                    level().destroyBlock(currentBlockPos, true);
-                                    level().gameEvent(owner, GameEvent.BLOCK_DESTROY, currentBlockPos);
-                                }
-                            }
-                        }
-                    }
-                    entity.level().playSound(null, entityPos.x, entityPos.y, entityPos.z, SoundEvents.GLASS_BREAK, SoundSource.NEUTRAL, 0.5F, 0.4F / ((float) Math.random() * 0.4F + 0.8F));
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-                }
-            }).start();
+            FreezeHandler.AddFreezeEntity(entity, FREEZE_TIME, serverLevel);
         }
-    }
-
-    @NotNull
-    private static Thread getThread(LivingEntity entity, FreezingProjectileEntity projectile, Vec3 position) {
-        Thread runnable = new Thread(() -> {
-            try {
-                CompoundTag compoundTag = entity.getPersistentData();
-                compoundTag.putBoolean("isStuckInPlace", true);
-                entity.addAdditionalSaveData(compoundTag);
-                MobEffectInstance slowness = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1, 255, false, false);
-                while (projectile.getLifeTime() > 0 && entity.getTicksFrozen() > 0) {
-                    entity.makeStuckInBlock(Blocks.PACKED_ICE.defaultBlockState(), position);
-                    if (!(entity instanceof Player)) {
-                        if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty() && !EntityGlideEvent.cancelLivingEntityUpdate.contains(entity)) {
-                            EntityGlideEvent.cancelLivingEntityUpdate.add(entity);
-                        }
-                    } else {
-                        entity.setJumping(false);
-                        entity.addEffect(slowness);
-                    }
-                    Thread.sleep(50);
-                }
-                if (!(entity instanceof Player)) {
-                    if (!EntityGlideEvent.cancelLivingEntityUpdate.isEmpty())
-                        EntityGlideEvent.cancelLivingEntityUpdate.remove(entity);
-                }
-                compoundTag.putBoolean("isStuckInPlace", false);
-                entity.addAdditionalSaveData(compoundTag);
-            } catch (Exception e) {
-                System.out.println(e.toString());
-            }
-        });
-        runnable.start();
-        return runnable;
     }
 }

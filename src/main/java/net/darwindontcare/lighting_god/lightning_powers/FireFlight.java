@@ -88,7 +88,7 @@ public class FireFlight {
                         if (modifier < 1) modifier = 1;
                         if (modifier > 3) modifier = 3;
                         if (CURRENT_SPEED < targetSpeed) {
-                            CURRENT_SPEED += 0.01f * modifier;
+                            CURRENT_SPEED += 0.05f * modifier;
                         } else if (CURRENT_SPEED > targetSpeed) {
                             CURRENT_SPEED -= 0.01f;
                         }
@@ -134,7 +134,6 @@ public class FireFlight {
             playerList.remove(playerIdx);
             ModMessage.sendToPlayer(new SetClientCooldownS2CPacket("fire_flight", 0), player);
             player.getAbilities().flying = false;
-            player.stopFallFlying();
             player.resetFallDistance();
         }
     }

@@ -15,6 +15,8 @@ public class SummonParticle {
         ServerLevel serverLevel = (ServerLevel) player.level();
         if (Objects.equals(usage, "ice_spike")) {
             serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GLASS.defaultBlockState()), position.x, position.y, position.z, 1, speed, movement.x, movement.y, movement.z);
+        } else if (Objects.equals(usage, "cloud")) {
+            serverLevel.sendParticles(ParticleTypes.CLOUD, position.x, position.y, position.z, 1, speed, movement.x, movement.y, movement.z);
         }
     }
 }

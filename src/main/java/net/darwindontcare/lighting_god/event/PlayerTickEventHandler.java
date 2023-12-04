@@ -199,7 +199,6 @@ public final class PlayerTickEventHandler {
             try {
                 currentPlayer = event.player;
                 LightningGodMod.setPlayer(currentPlayer);
-                loadedPlayerInfo = true;
             } catch (Exception exception) {
                 System.out.println(exception.toString());
             }

@@ -20,17 +20,26 @@ import net.darwindontcare.lighting_god.blocks.ModBlocks;
 import net.darwindontcare.lighting_god.blocks.entity.ModBlockEntities;
 import net.darwindontcare.lighting_god.client.SetPlayerData;
 import net.darwindontcare.lighting_god.client.render.LightningArrowRender;
+import net.darwindontcare.lighting_god.enchantments.EnchantmentsInit;
 import net.darwindontcare.lighting_god.entities.EntityInit;
 import net.darwindontcare.lighting_god.entities.client.CustomLightningRenderer;
 import net.darwindontcare.lighting_god.entities.client.IceSpikesRenderer;
 import net.darwindontcare.lighting_god.entities.client.MeteorProjectileRenderer;
+import net.darwindontcare.lighting_god.event.ClientEvents;
+import net.darwindontcare.lighting_god.event.EntityGlideEvent;
 import net.darwindontcare.lighting_god.event.TeleportEvent;
 import net.darwindontcare.lighting_god.items.ModCreativeModeTab;
 import net.darwindontcare.lighting_god.items.ModItems;
+import net.darwindontcare.lighting_god.lightning_powers.FireFlight;
+import net.darwindontcare.lighting_god.lightning_powers.IceSlide;
+import net.darwindontcare.lighting_god.lightning_powers.LightningBeam;
 import net.darwindontcare.lighting_god.loot.ModLootModifiers;
 import net.darwindontcare.lighting_god.networking.ModMessage;
+import net.darwindontcare.lighting_god.networking.packet.*;
+import net.darwindontcare.lighting_god.utils.KeyBindings;
 import net.darwindontcare.lighting_god.utils.ModItemProperties;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -439,6 +448,7 @@ public class LightningGodMod
         ModCreativeModeTab.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModLootModifiers.register(modEventBus);
+        EnchantmentsInit.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
@@ -519,6 +529,83 @@ public class LightningGodMod
 
             if (CURRENT_MANA < (MAX_MANA + MANA_BUFF) && canRegenMana) CURRENT_MANA += MANA_REGEN;
             if (CURRENT_MANA > (MAX_MANA + MANA_BUFF)) CURRENT_MANA = (MAX_MANA + MANA_BUFF);
+
+            if (player != null && !(Minecraft.getInstance().screen instanceof ChatScreen)) {
+
+                float currentMana = LightningGodMod.getCurrentMana();
+                if (KeyBindings.FIRST_POWER_KEY.isDown()) {
+                    if (LightningGodMod.getCurrentPower().equals("lightning")) {
+                        ModMessage.sendToServer(new LightningTeleportC2SPacket(LightningGodMod.getTeleportCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("fire")) {
+                        //if (LightningGodMod.getFireballCooldown() <= 0) LightningGodMod.ReproduceAnimation("fireball_cast");
+                        ModMessage.sendToServer(new FireballC2SPacket(LightningGodMod.getFireballCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("water")) {
+                        ModMessage.sendToServer(new FreezeC2SPacket(LightningGodMod.getFreezeCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("earth")) {
+                        ClientEvents.ClientForgeEvents.calcEarthLaunchForce(LightningGodMod.getEarthLaunchCooldown(), LightningGodMod.getPowerTier("earth"));
+                    }
+                }
+                if (KeyBindings.SECOND_POWER_KEY.isDown()) {
+                    if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 1) {
+                        ModMessage.sendToServer(new ElThorC2SPacket(LightningGodMod.getElThorCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 1) {
+                        ModMessage.sendToServer(new FirePullC2SPacket(LightningGodMod.getFirePullCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 1) {
+                        if (LightningGodMod.getIceSlideCooldown() <= 0 && LightningGodMod.getCurrentMana() >= IceSlide.ManaCost) {
+                            LightningGodMod.setIsIceSliding(true);
+                        }
+                        else LightningGodMod.setIsIceSliding(false);
+                        ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 1) {
+                        ModMessage.sendToServer(new EarthWallC2SPacket(LightningGodMod.getEarthWallCooldown(), currentMana));
+                    }
+                }
+                if (KeyBindings.THIRD_POWER_KEY.isDown()) {
+                    if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 2) {
+                        if (LightningGodMod.getLightningBeamCooldown() <= 0 && LightningGodMod.getCurrentMana() >= LightningBeam.ManaCost) {
+                            LightningGodMod.setCanRegenMana(false);
+                        }
+                        ModMessage.sendToServer(new StartLightningBeamC2SPacket(LightningGodMod.getLightningBeamCooldown(), LightningGodMod.getCurrentMana()));
+                    } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 2) {
+                        if (LightningGodMod.getFireFlightCooldown() <= 0 && LightningGodMod.getCurrentMana() >= FireFlight.ManaCost) {
+                            //if (!LightningGodMod.getAlternativeGliding()) LightningGodMod.ReproduceAnimation("fire_flyght");
+                            LightningGodMod.setAlternativeGliding(true);
+                        }
+                        else LightningGodMod.setAlternativeGliding(false);
+                        ModMessage.sendToServer(new StartFireFlightC2SPacket(LightningGodMod.getFireFlightCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 2) {
+                        ModMessage.sendToServer(new IceSpikePowerC2SPacket(LightningGodMod.getIceSpikeCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 2) {
+                        ModMessage.sendToServer(new EarthTrapC2SPacket(LightningGodMod.getEarthTrapCooldown(), currentMana));
+                    }
+                }
+                if (KeyBindings.FORTH_POWER_KEY.isDown()) {
+                    if (LightningGodMod.getCurrentPower().equals("lightning") && LightningGodMod.getPowerTier("lightning") > 3) {
+                        //ModMessage.sendToServer(new ElThorC2SPacket(LightningGodMod.getElThorCooldown()));
+                    } else if (LightningGodMod.getCurrentPower().equals("fire") && LightningGodMod.getPowerTier("fire") > 3) {
+                        ModMessage.sendToServer(new FireBurstC2SPacket(LightningGodMod.getFireBurstCooldown(), currentMana));
+                    } else if (LightningGodMod.getCurrentPower().equals("water") && LightningGodMod.getPowerTier("water") > 3) {
+                        //ModMessage.sendToServer(new IceSlideC2SPacket(LightningGodMod.getIceSlideCooldown()));
+                    } else if (LightningGodMod.getCurrentPower().equals("earth") && LightningGodMod.getPowerTier("earth") > 3) {
+                        //if (LightningGodMod.getEarthMeteorCooldown() <= 0) LightningGodMod.ReproduceAnimation("earth_meteor_cast");
+                        ModMessage.sendToServer(new EarthMeteorC2SPacket(LightningGodMod.getEarthMeteorCooldown(), currentMana));
+                    }
+                }
+
+                if (KeyBindings.SPACE_KEY.isDown() && !player.onGround() && !player.isInFluidType() && !player.isFallFlying()) {
+                    EntityGlideEvent.isJumping = true;
+                }
+                if (KeyBindings.SHIFT_KEY.isDown() && !player.onGround() && !player.isInFluidType() && !player.isFallFlying()) {
+                    if (getCurrentPower().equals("earth")) {
+                        ModMessage.sendToServer(new StartEarthStompC2SPacket(getPowerTier("earth"), getEarthLaunchCooldown()));
+                    }
+                }
+                if (KeyBindings.POWER_WHEEL_KEY.isDown()) {
+                    setShowPowerWheel(true);
+                } else if (LightningGodMod.getShowPowerWheel()) {
+                    setShowPowerWheel(false);
+                }
+            }
 
             long currentTime = System.nanoTime();
             deltaTime = (currentTime - lastTickTime) / 1.0E9F; // Converter para segundos

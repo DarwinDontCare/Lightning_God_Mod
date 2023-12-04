@@ -1,7 +1,6 @@
 package net.darwindontcare.lighting_god.networking.packet;
 
-import net.darwindontcare.lighting_god.lightning_powers.FireBurst;
-import net.darwindontcare.lighting_god.lightning_powers.FirePull;
+import net.darwindontcare.lighting_god.lightning_powers.FireRay;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -31,7 +30,7 @@ public class FirePullC2SPacket {
 
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            FirePull.Pull(player, cooldown, mana);
+            FireRay.Ray(player, cooldown, mana);
         });
 
         return true;
