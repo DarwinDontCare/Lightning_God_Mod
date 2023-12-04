@@ -27,6 +27,10 @@ Move the downloaded file to the "mods" folder in your Minecraft installation dir
 
 Launch Minecraft with the Forge profile and enjoy the new gaming experience!
 
+## Media
+https://youtu.be/EIAjsdghwiI
+<iframe width="560" height="315" src="https://youtu.be/EIAjsdghwiI" frameborder="0" allowfullscreen></iframe>
+
 ## Release Notes
 Current Version: v1.0.0
 
@@ -34,7 +38,7 @@ Added Celestial Isles and Elemental Temples.
 Elemental Powers and Themed Monsters introduced.
 Created a post Ender Dragon progression.
 
-##License
+## License
 This mod is distributed under the MIT License. See the LICENSE.md file for more details.
 
 Have fun exploring the new realms and mastering elemental powers with the "Lightning God" Mod!
